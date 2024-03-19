@@ -17,6 +17,7 @@ class Program
         bool loggedin = false;
         while (!exit)
         {
+            if (loggedin == false){
             Console.WriteLine("Type the number of the action you want to perform:");
             Console.WriteLine("1. Register");
             Console.WriteLine("2. Login");
@@ -65,6 +66,7 @@ class Program
                     }
                     User user = new User(firstName, lastName, email, password);
                     dbHandler.SaveUser(user);
+                    
                     Console.WriteLine("Your information has been saved. Proceed to login.");
                     break;
                 case 2:
@@ -72,6 +74,11 @@ class Program
                     string LoginEmail = Console.ReadLine();
                     Console.WriteLine("Enter your password:");
                     string LoginPassword = Console.ReadLine();
+                    User Login = new User(null, null, LoginEmail, LoginPassword);
+                    User answer = dbHandler.CheckUser(Login);
+                    if (answer != null){
+                        loggedin = true;
+                    }
                     break;
                 case 3:
                     exit = true;
@@ -79,6 +86,9 @@ class Program
                 default:
                     Console.WriteLine("Invalid option. Please choose a valid action.");
                     break;
+                }
+            }else{
+                // zet hier je eigen cases van wat de user moet doen je eigen menu.
             }
         }
     }

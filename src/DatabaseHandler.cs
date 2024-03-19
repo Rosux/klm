@@ -50,4 +50,38 @@ public class DatabaseHandler
 
         conn.Close();
     }
+    public User CheckUser(User login)
+    {
+        conn.Open();
+        string selectSql = @"
+            SELECT *
+            FROM Users
+            WHERE Email = @Email AND Password = @Password
+        ";
+
+        User currentUser = null;
+
+        using (SQLiteCommand command = new SQLiteCommand(selectSql, conn))
+        {
+            command.Parameters.AddWithValue("@Email", login.email);
+            command.Parameters.AddWithValue("@Password", login.password);
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    currentUser = new User(
+                        reader["firstName"].ToString(),
+                        reader["lastName"].ToString(),
+                        reader["email"].ToString(),
+                        reader["password"].ToString()
+                    );
+                }
+            }
+        }
+
+        conn.Close();
+
+        return currentUser;
+    }
 }
