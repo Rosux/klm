@@ -12,7 +12,7 @@ public class DatabaseHandler
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
             Password TEXT NOT NULL,
-            Admin INTEGER DEFAULT 0
+            Role TEXT DEFAULT USER NOT NULL
         )
     ";
     private static readonly string _CreateConsumtionString = @"
