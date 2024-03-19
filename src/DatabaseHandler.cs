@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Data.SQLite;
 using System.Data.SQLite.Generic;
@@ -20,6 +21,9 @@ public class DatabaseHandler
         CREATE TABLE IF NOT EXISTS Users (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             FirstName TEXT NOT NULL,
+            LastName TEXT NOT NULL,
+            Email TEXT NOT NULL,
+            Password TEXT NOT NULL
         )
         ";
         SQLiteCommand createTables = new SQLiteCommand(createTablesString, conn);
@@ -27,11 +31,23 @@ public class DatabaseHandler
         conn.Close();
     }
 
-    // public void SaveUser(User u){
-    //     // u.Name;
-    //     // u.Password;
-    //     // database open
-    //     // database insert into
-    //     // database close
-    // }
+    public void SaveUser(string firstName, string lastName, string email, string password)
+    {
+        conn.Open();
+        string insertSql = @"
+            INSERT INTO Users (FirstName, LastName, Email, Password)
+            VALUES (@FirstName, @LastName, @Email, @Password)
+        ";
+
+        using (SQLiteCommand command = new SQLiteCommand(insertSql, conn))
+        {
+            command.Parameters.AddWithValue("@FirstName", firstName);
+            command.Parameters.AddWithValue("@LastName", lastName);
+            command.Parameters.AddWithValue("@Email", email);
+            command.Parameters.AddWithValue("@Password", password);
+            command.ExecuteNonQuery();
+        }
+
+        conn.Close();
+    }
 }
