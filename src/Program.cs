@@ -13,6 +13,7 @@ class Program
 
     static void Menu(DatabaseHandler dbHandler)
     {
+        User? CurrentUser = null;
         bool exit = false;
         bool loggedin = false;
         while (!exit)
@@ -64,7 +65,7 @@ class Program
                         Console.WriteLine("Password cannot be empty. Please try again.");
                         break;
                     }
-                    User user = new User(firstName, lastName, email, password);
+                    User user = new User(firstName, lastName, email, password, "User");
                     dbHandler.SaveUser(user);
                     
                     Console.WriteLine("Your information has been saved. Proceed to login.");
@@ -74,9 +75,10 @@ class Program
                     string LoginEmail = Console.ReadLine();
                     Console.WriteLine("Enter your password:");
                     string LoginPassword = Console.ReadLine();
-                    User Login = new User(null, null, LoginEmail, LoginPassword);
-                    User answer = dbHandler.CheckUser(Login);
-                    if (answer != null){
+                    User Login = new User(null, null, LoginEmail, LoginPassword, null);
+                    CurrentUser = dbHandler.CheckUser(Login);
+                    if (CurrentUser != null){
+                        Console.WriteLine($"current Role = {CurrentUser.Role}");
                         loggedin = true;
                     }
                     break;
@@ -89,6 +91,7 @@ class Program
                 }
             }else{
                 // zet hier je eigen cases van wat de user moet doen je eigen menu.
+
             }
         }
     }

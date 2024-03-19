@@ -23,7 +23,8 @@ public class DatabaseHandler
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
-            Password TEXT NOT NULL
+            Password TEXT NOT NULL,
+            Role TEXT NOT NULL
         )
         ";
         SQLiteCommand createTables = new SQLiteCommand(createTablesString, conn);
@@ -35,8 +36,8 @@ public class DatabaseHandler
     {
         conn.Open();
         string insertSql = @"
-            INSERT INTO Users (FirstName, LastName, Email, Password)
-            VALUES (@FirstName, @LastName, @Email, @Password)
+            INSERT INTO Users (FirstName, LastName, Email, Password, Role)
+            VALUES (@FirstName, @LastName, @Email, @Password, @User)
         ";
 
         using (SQLiteCommand command = new SQLiteCommand(insertSql, conn))
@@ -45,6 +46,8 @@ public class DatabaseHandler
             command.Parameters.AddWithValue("@LastName", user.lastName);
             command.Parameters.AddWithValue("@Email", user.email);
             command.Parameters.AddWithValue("@Password", user.password);
+            command.Parameters.AddWithValue("@User", user.Role);
+
             command.ExecuteNonQuery();
         }
 
@@ -74,7 +77,8 @@ public class DatabaseHandler
                         reader["firstName"].ToString(),
                         reader["lastName"].ToString(),
                         reader["email"].ToString(),
-                        reader["password"].ToString()
+                        reader["password"].ToString(),
+                        reader["Role"].ToString()
                     );
                 }
             }
