@@ -31,7 +31,7 @@ public class DatabaseHandler
         conn.Close();
     }
 
-    public void SaveUser(string firstName, string lastName, string email, string password)
+    public void SaveUser(User user)
     {
         conn.Open();
         string insertSql = @"
@@ -41,10 +41,10 @@ public class DatabaseHandler
 
         using (SQLiteCommand command = new SQLiteCommand(insertSql, conn))
         {
-            command.Parameters.AddWithValue("@FirstName", firstName);
-            command.Parameters.AddWithValue("@LastName", lastName);
-            command.Parameters.AddWithValue("@Email", email);
-            command.Parameters.AddWithValue("@Password", password);
+            command.Parameters.AddWithValue("@FirstName", user.firstName);
+            command.Parameters.AddWithValue("@LastName", user.lastName);
+            command.Parameters.AddWithValue("@Email", user.email);
+            command.Parameters.AddWithValue("@Password", user.password);
             command.ExecuteNonQuery();
         }
 

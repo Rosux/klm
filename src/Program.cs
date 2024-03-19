@@ -63,7 +63,8 @@ class Program
                         Console.WriteLine("Password cannot be empty. Please try again.");
                         break;
                     }
-                    dbHandler.SaveUser(firstName, lastName, email, password);
+                    User user = new User(firstName, lastName, email, password);
+                    dbHandler.SaveUser(user);
                     Console.WriteLine("Your information has been saved. Proceed to login.");
                     break;
                 case 2:
