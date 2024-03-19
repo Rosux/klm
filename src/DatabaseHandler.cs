@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Data.SQLite.Generic;
 
+// MODEL (handle sqlite related things here such as insert's and update's)
 public class DatabaseHandler
 {
     private static readonly string _CreateUserString = @"

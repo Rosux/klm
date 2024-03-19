@@ -1,5 +1,6 @@
 ﻿using System;
 
+// CONTROLLER (handle logic here such as updating user data) (make for each controller its own private static method)
 class Program
 {
     // User? User = null;

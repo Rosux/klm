@@ -1,5 +1,6 @@
 using System;
 
+// VIEW (handle user input/output here as much as you can such as asking a user to select a time and recieving that input and sending it to the controller)
 public static class Menu{
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
