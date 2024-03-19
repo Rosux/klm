@@ -9,6 +9,6 @@ class Program
     {
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
         DatabaseHandler DB = new DatabaseHandler();
-        Console.ReadLine();
+        // Console.ReadLine();
     }
 }

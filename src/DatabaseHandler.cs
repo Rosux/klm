@@ -10,7 +10,7 @@ public class DatabaseHandler
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
-            Password TEXT NOT NULL,
+            Password TEXT NOT NULL
         )
     ";
     private static readonly string _CreateConsumtionString = @"
@@ -19,13 +19,13 @@ public class DatabaseHandler
             Name TEXT NOT NULL,
             Price REAL NOT NULL,
             StartTime TEXT NOT NULL,
-            EndTime TEXT NOT NULL,
+            EndTime TEXT NOT NULL
         )
     ";
     private static readonly string _CreateRoomsString = @"
         CREATE TABLE IF NOT EXISTS Rooms(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Capacity INTEGER NOT NULL,
+            Capacity INTEGER NOT NULL
         )
     ";
     private static readonly string _CreateReservations =  @"
@@ -39,10 +39,10 @@ public class DatabaseHandler
             Price REAL NOT NULL,
             TimeLine TEXT NOT NULL,
             FOREIGN KEY (RoomId) REFERENCES Rooms(ID),
-            FOREIGN KEY (UserId) REFERENCES Users(ID), 
-	        FOREIGN KEY (TimeLine) REFERENCES Movies(ID),
+            FOREIGN KEY (UserId) REFERENCES Users(ID)
         )
     ";
+    
     private SQLiteConnection? _Conn = null;
     private readonly string DatabasePath = "./database/CINEMA.db";
     public DatabaseHandler(){
@@ -57,14 +57,13 @@ public class DatabaseHandler
         _Conn.Open();
         List<SQLiteCommand> Tables = new List<SQLiteCommand>(){
             new SQLiteCommand(_CreateUserString, _Conn),
-            // new SQLiteCommand(_CreateConsumtionString, _Conn),
-            // new SQLiteCommand(_CreateRoomsString, _Conn),
-            // new SQLiteCommand(_CreateReservations, _Conn),
+            new SQLiteCommand(_CreateConsumtionString, _Conn),
+            new SQLiteCommand(_CreateRoomsString, _Conn),
+            new SQLiteCommand(_CreateReservations, _Conn),
         };
-        // foreach (SQLiteCommand comm in Tables){
-        //     comm.ExecuteNonQuery();
-        // }
-        Tables[0].ExecuteNonQuery();
+        foreach (SQLiteCommand comm in Tables){
+            comm.ExecuteNonQuery();
+        }
         
         _Conn.Close();
     }
