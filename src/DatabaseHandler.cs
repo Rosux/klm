@@ -44,7 +44,7 @@ public class DatabaseHandler
         )
     ";
     
-    private SQLiteConnection? _Conn = null;
+    private SQLiteConnection _Conn = new SQLiteConnection();
     private readonly string DatabasePath = "./database/CINEMA.db";
     public DatabaseHandler(){
         if (!File.Exists(DatabasePath)){
@@ -68,27 +68,4 @@ public class DatabaseHandler
         
         _Conn.Close();
     }
-
-    // public void SaveUser(User u){
-    //     // u.Name;
-    //     // u.Password;
-    //     // database open
-    //     // database insert into
-    //     // database close
-    // }
-
-    // public bool UpdateConsumption(Consumption consumption){
-    //     _Conn.Open();
-    //     int rowsAffected = -1;
-    //     string updateConsumption = "UPDATE Consumptions SET (Name, Price, StartTime, EndTime) = (?, ?, ?, ?)";
-    //     using (SQLiteCommand comm = new SQLiteCommand(updateConsumption, _Conn)){
-    //         comm.Parameters.Add(consumption.Name);
-    //         comm.Parameters.Add(consumption.Price);
-    //         comm.Parameters.Add(consumption.StartTime);
-    //         comm.Parameters.Add(consumption.EndTime);
-    //         rowsAffected = comm.ExecuteNonQuery();
-    //     }
-    //     _Conn.Close();
-    //     return rowsAffected > 0;
-    // }
 }
