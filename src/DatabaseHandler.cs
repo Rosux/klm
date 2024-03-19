@@ -10,7 +10,8 @@ public class DatabaseHandler
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
-            Password TEXT NOT NULL
+            Password TEXT NOT NULL,
+            Admin INTEGER DEFAULT 0
         )
     ";
     private static readonly string _CreateConsumtionString = @"
@@ -74,5 +75,20 @@ public class DatabaseHandler
     //     // database open
     //     // database insert into
     //     // database close
+    // }
+
+    // public bool UpdateConsumption(Consumption consumption){
+    //     _Conn.Open();
+    //     int rowsAffected = -1;
+    //     string updateConsumption = "UPDATE Consumptions SET (Name, Price, StartTime, EndTime) = (?, ?, ?, ?)";
+    //     using (SQLiteCommand comm = new SQLiteCommand(updateConsumption, _Conn)){
+    //         comm.Parameters.Add(consumption.Name);
+    //         comm.Parameters.Add(consumption.Price);
+    //         comm.Parameters.Add(consumption.StartTime);
+    //         comm.Parameters.Add(consumption.EndTime);
+    //         rowsAffected = comm.ExecuteNonQuery();
+    //     }
+    //     _Conn.Close();
+    //     return rowsAffected > 0;
     // }
 }
