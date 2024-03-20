@@ -3,7 +3,7 @@
 // CONTROLLER (handle logic here such as updating user data) (make for each controller its own private static method)
 class Program
 {
-    // User? CurrentUser = null;
+    static User? CurrentUser = null;
     private static DatabaseHandler DB = new DatabaseHandler();
     static void Main(string[] args)
     {
@@ -28,11 +28,22 @@ class Program
         });
     }
 
-    private static void Login(){
-
+    static void Register()
+    {
+        Menu.Register();
     }
 
-    private static void Register(){
-        
+    static void Login()
+    {
+        User Credentials = Menu.Login();
+        User LoggedUser = DB.CheckUser(Credentials);
+        if (LoggedUser == null)
+        {
+            Console.WriteLine("not logged in bozo");
+        }else{
+            CurrentUser = LoggedUser;
+            Console.WriteLine(CurrentUser.firstName);
+        }
     }
+
 }
