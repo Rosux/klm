@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.Entity.Infrastructure.Design;
 using System.Data.SQLite;
 using System.Data.SQLite.Generic;
 
@@ -32,14 +33,14 @@ public class DatabaseHandler
         conn.Close();
     }
 
-    public void SaveUser(User user)
+    public bool SaveUser(User user)
     {
         conn.Open();
         string insertSql = @"
             INSERT INTO Users (FirstName, LastName, Email, Password, Role)
             VALUES (@FirstName, @LastName, @Email, @Password, @User)
         ";
-
+        int result = -1;
         using (SQLiteCommand command = new SQLiteCommand(insertSql, conn))
         {
             command.Parameters.AddWithValue("@FirstName", user.firstName);
@@ -48,11 +49,14 @@ public class DatabaseHandler
             command.Parameters.AddWithValue("@Password", user.password);
             command.Parameters.AddWithValue("@User", user.Role);
 
-            command.ExecuteNonQuery();
+            result = command.ExecuteNonQuery();
         }
 
         conn.Close();
+        return result > 0;
     }
+
+
     public User CheckUser(User login)
     {
         conn.Open();
