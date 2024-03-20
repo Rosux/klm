@@ -3,10 +3,8 @@
 // CONTROLLER (handle logic here such as updating user data) (make for each controller its own private static method)
 class Program
 {
-    // User? CurrentUser = null;
-    private static DatabaseHandler DB = new DatabaseHandler();
     static User? CurrentUser = null;
-
+    private static DatabaseHandler DB = new DatabaseHandler();
     static void Main(string[] args)
     {
         Console.Title = "24/7 BINGE WATCH CINEMA!";
@@ -47,4 +45,5 @@ class Program
             Console.WriteLine(CurrentUser.firstName);
         }
     }
+
 }
