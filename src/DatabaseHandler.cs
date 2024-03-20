@@ -59,18 +59,16 @@ public class DatabaseHandler
 
     private void CreateDatabaseIfNotExist(){
         _Conn.Open();
-        string createTablesString = @"
-        CREATE TABLE IF NOT EXISTS Users (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            FirstName TEXT NOT NULL,
-            LastName TEXT NOT NULL,
-            Email TEXT NOT NULL,
-            Password TEXT NOT NULL,
-            Role TEXT NOT NULL
-        )
-        ";
-        SQLiteCommand createTables = new SQLiteCommand(createTablesString, _Conn);
-        createTables.ExecuteNonQuery();
+        List<SQLiteCommand> Tables = new List<SQLiteCommand>(){
+            new SQLiteCommand(_CreateUserString, _Conn),
+            new SQLiteCommand(_CreateConsumtionString, _Conn),
+            new SQLiteCommand(_CreateRoomsString, _Conn),
+            new SQLiteCommand(_CreateReservations, _Conn),
+        };
+        foreach (SQLiteCommand comm in Tables){
+            comm.ExecuteNonQuery();
+        }
+        
         _Conn.Close();
     }
 
