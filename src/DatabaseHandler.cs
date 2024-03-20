@@ -81,13 +81,8 @@ public class DatabaseHandler
             INSERT INTO Users (FirstName, LastName, Email, Password, Role)
             VALUES (@FirstName, @LastName, @Email, @Password, @User)
         ";
-<<<<<<< HEAD
-
-        using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
-=======
         int result = -1;
-        using (SQLiteCommand command = new SQLiteCommand(insertSql, conn))
->>>>>>> b5d09993ea410c6df55ed5d90445b4bfb94561c4
+        using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
         {
             command.Parameters.AddWithValue("@FirstName", user.firstName);
             command.Parameters.AddWithValue("@LastName", user.lastName);
@@ -98,12 +93,8 @@ public class DatabaseHandler
             result = command.ExecuteNonQuery();
         }
 
-<<<<<<< HEAD
         _Conn.Close();
-=======
-        conn.Close();
         return result > 0;
->>>>>>> b5d09993ea410c6df55ed5d90445b4bfb94561c4
     }
 
 

@@ -6,7 +6,6 @@ public static class Menu{
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
-<<<<<<< HEAD
     public static TimeOnly SelectTime(){
         TimeOnly time = new TimeOnly();
         bool hour = true;
@@ -65,71 +64,6 @@ public static class Menu{
     /// └──────────────────┘
     /// </example>
     public static void SelectOptions(string Header, Dictionary<string, Action> Options){
-=======
-    
-    public static void Register()
-    {
-        bool exit = false;
-                    Console.WriteLine("Enter your first name:");
-                    string firstName = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(firstName))
-                    {
-                        Console.WriteLine("First name cannot be empty. Please try again.");
-                    }
-                    Console.WriteLine("Enter your last name:");
-                    string lastName = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(lastName))
-                    {
-                        Console.WriteLine("Last name cannot be empty. Please try again.");
-                    }
-                    string email;
-                    do
-                    {
-                        Console.WriteLine("Enter your email:");
-                        email = Console.ReadLine();
-                        if (string.IsNullOrWhiteSpace(email))
-                        {
-                            Console.WriteLine("Email cannot be empty. Please try again.");
-                            continue;
-                        }
-                    } while (!IsValidEmail(email));
-                    Console.WriteLine("Enter your password (totally secured btw):");
-                    string password = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(password))
-                    {
-                        Console.WriteLine("Password cannot be empty. Please try again.");
-                    }
-                    User user = new User(firstName, lastName, email, password, "User");
-                    // return user;
-                    Console.WriteLine("Your information has been saved. Proceed to login.");
-                }
-
-    public static User Login()
-    {
-        Console.WriteLine("Enter your email:");
-        string LoginEmail = Console.ReadLine();
-        Console.WriteLine("Enter your password:");
-        string LoginPassword = Console.ReadLine();
-        User Login = new User(null, null, LoginEmail, LoginPassword, null);
-        return Login;
-    }
-
-    static bool IsValidEmail(string email)
-    {
-        // Basic email format validation
-        if (email.Contains("@") && (email.EndsWith(".com") || email.EndsWith(".nl")))
-        {
-            return true;
-        }
-        else
-        {
-            Console.WriteLine("Invalid email format. Please enter a valid email address.");
-            return false;
-        }
-    }
-
-    public static void Options(string Header, Dictionary<string, Action> Options){
->>>>>>> b5d09993ea410c6df55ed5d90445b4bfb94561c4
         // some basic error checking
         if (Options.Count == 0) { return; }
 
@@ -170,11 +104,7 @@ public static class Menu{
 
             // if the user presses uo/down we increase/decrease the current choice
             if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
-<<<<<<< HEAD
-               currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
-=======
                 currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
->>>>>>> b5d09993ea410c6df55ed5d90445b4bfb94561c4
             }
 
             // limit the current choice so it doesnt cause out of range errors
@@ -185,7 +115,6 @@ public static class Menu{
         // call callback method based on the users choice
         Options.Values.ElementAt(currentSelection).Invoke();
     }
-<<<<<<< HEAD
 
     /// <summary>
     /// Shows a list of options to the user and return the value of the chosen option.
@@ -333,6 +262,3 @@ public static class Menu{
         }
     }
 }
-=======
-}
->>>>>>> b5d09993ea410c6df55ed5d90445b4bfb94561c4
