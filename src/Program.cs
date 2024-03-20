@@ -3,7 +3,7 @@
 // CONTROLLER (handle logic here such as updating user data) (make for each controller its own private static method)
 class Program
 {
-    // User? User = null;
+    // User? CurrentUser = null;
     private static DatabaseHandler DB = new DatabaseHandler();
     static void Main(string[] args)
     {
@@ -12,19 +12,27 @@ class Program
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
 
         // asks the user to choose either of these options
-        // Menu.Options("Choose an option", new Dictionary<string, Action>(){
-        //     {"Register", ()=>{
-        //         // Register code here or call a Register method
-        //     }},
-        //     {"Login", ()=>{
-        //         // Login code here or call a Login method
-        //     }},
-        //     {"Exit", ()=>{
-        //         // Exit code here or call a Exit method
-        //     }},
-        // });
+        Menu.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+            {"Register", ()=>{
+                // run Register method
+                Register();
+            }},
+            {"Login", ()=>{
+                // run Login method
+                Login();
+            }},
+            {"Exit", ()=>{
+                // close application
+                Environment.Exit(1);
+            }},
+        });
+    }
 
-        // asks the user for a time in HH:MM
-        // Menu.Time();
+    private static void Login(){
+
+    }
+
+    private static void Register(){
+        
     }
 }
