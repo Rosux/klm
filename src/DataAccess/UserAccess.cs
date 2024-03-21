@@ -23,6 +23,7 @@ public class UserAccess : DatabaseHandler{
         _Conn.Close();
         return userId != -1;
     }
+
     public User CheckUser(User login)
     {
         _Conn.Open();
@@ -43,12 +44,14 @@ public class UserAccess : DatabaseHandler{
             {
                 if (reader.Read())
                 {
+                    UserRole r;
+                    Enum.TryParse(reader["Role"].ToString(), out r);
                     currentUser = new User(
                         reader["firstName"].ToString(),
                         reader["lastName"].ToString(),
                         reader["email"].ToString(),
                         reader["password"].ToString(),
-                        (UserRole)Enum.Parse(typeof(UserRole), reader["Role"].ToString())
+                        r
                     );
                 }
             }
