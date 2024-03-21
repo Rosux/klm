@@ -1,6 +1,8 @@
+global using System.Data.Entity.Infrastructure.Design;
+global using System.Data.SQLite;
+global using System.Data.SQLite.Generic;
+using System;
 using System.Data;
-using System.Data.SQLite;
-using System.Data.SQLite.Generic;
 
 public class DatabaseHandler
 {
@@ -10,7 +12,8 @@ public class DatabaseHandler
             FirstName TEXT NOT NULL,
             LastName TEXT NOT NULL,
             Email TEXT NOT NULL,
-            Password TEXT NOT NULL
+            Password TEXT NOT NULL,
+            Role TEXT DEFAULT 'USER' NOT NULL
         )
     ";
     private static readonly string _CreateConsumtionString = @"
@@ -43,13 +46,14 @@ public class DatabaseHandler
         )
     ";
     
-    private SQLiteConnection? _Conn = null;
-    private readonly string DatabasePath = "./database/CINEMA.db";
-    public DatabaseHandler(){
-        if (!File.Exists(DatabasePath)){
-            SQLiteConnection.CreateFile(DatabasePath);
+    protected SQLiteConnection _Conn = new SQLiteConnection();
+    private string DatabasePath;
+    public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
+        this.DatabasePath = DatabasePath;
+        if (!File.Exists(this.DatabasePath)){
+            SQLiteConnection.CreateFile(this.DatabasePath);
         }
-        _Conn = new SQLiteConnection($"DATA Source={DatabasePath};Version=3");
+        _Conn = new SQLiteConnection($"DATA Source={this.DatabasePath};Version=3");
         CreateDatabaseIfNotExist();
     }
 
@@ -67,12 +71,4 @@ public class DatabaseHandler
         
         _Conn.Close();
     }
-
-    // public void SaveUser(User u){
-    //     // u.Name;
-    //     // u.Password;
-    //     // database open
-    //     // database insert into
-    //     // database close
-    // }
 }

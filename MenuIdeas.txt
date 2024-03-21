@@ -1,0 +1,19 @@
+menu ideas
+
+┌─Select a Movie─┐
+│ Terminator     │
+│ Heart of iron  │
+│ Mordhau        │
+├────────────────┤
+│ <-    1/4   -> │
+└────────────────┘
+│ <- 1/4 -> │
+
+┌─Select an action─┐
+│ Login            │
+│ Register         │
+│ Exit             │
+└──────────────────┘
+
+23:59
+31:23:59
