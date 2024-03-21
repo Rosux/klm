@@ -11,19 +11,22 @@ class Menu
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
 
         // asks the user to choose either of these options
-        MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-            {"Register", ()=>{
-                // run Register method
-                UserLogic.Register();
-            }},
-            {"Login", ()=>{
-                // run Login method
-                UserLogic.Login();
-            }},
-            {"Exit", ()=>{
-                // close application
-                Environment.Exit(1);
-            }},
-        });
+        // MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+        //     {"Register", ()=>{
+        //         // run Register method
+        //         UserLogic.Register();
+        //     }},
+        //     {"Login", ()=>{
+        //         // run Login method
+        //         UserLogic.Login();
+        //     }},
+        //     {"Exit", ()=>{
+        //         // close application
+        //         Environment.Exit(1);
+        //     }},
+        // });
+
+        // DECLAN zet hieronder je logic call
+        // hier
     }
 }
