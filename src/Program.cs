@@ -15,11 +15,11 @@ class Program
         Menu.SelectOptions("Choose an option", new Dictionary<string, Action>(){
             {"Register", ()=>{
                 // run Register method
-                Register();
+                // Register();
             }},
             {"Login", ()=>{
                 // run Login method
-                Login();
+                // Login();
             }},
             {"Exit", ()=>{
                 // close application
@@ -27,23 +27,4 @@ class Program
             }},
         });
     }
-
-    static void Register()
-    {
-        Menu.Register();
-    }
-
-    static void Login()
-    {
-        User Credentials = Menu.Login();
-        User LoggedUser = DB.CheckUser(Credentials);
-        if (LoggedUser == null)
-        {
-            Console.WriteLine("not logged in bozo");
-        }else{
-            CurrentUser = LoggedUser;
-            Console.WriteLine(CurrentUser.firstName);
-        }
-    }
-
 }

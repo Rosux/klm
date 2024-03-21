@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Data.SQLite.Generic;
 
 // MODEL (handle sqlite related things here such as insert's and update's)
-public class DatabaseHandler
+public static class DatabaseHandler
 {
     private static readonly string _CreateUserString = @"
         CREATE TABLE IF NOT EXISTS Users (
@@ -47,9 +47,9 @@ public class DatabaseHandler
         )
     ";
     
-    private SQLiteConnection _Conn = new SQLiteConnection();
-    private readonly string DatabasePath = "./database/CINEMA.db";
-    public DatabaseHandler(){
+    protected static SQLiteConnection _Conn = new SQLiteConnection();
+    private static readonly string DatabasePath = "./database/CINEMA.db";
+    public static void Main(){
         if (!File.Exists(DatabasePath)){
             SQLiteConnection.CreateFile(DatabasePath);
         }
@@ -57,7 +57,7 @@ public class DatabaseHandler
         CreateDatabaseIfNotExist();
     }
 
-    private void CreateDatabaseIfNotExist(){
+    private static void CreateDatabaseIfNotExist(){
         _Conn.Open();
         List<SQLiteCommand> Tables = new List<SQLiteCommand>(){
             new SQLiteCommand(_CreateUserString, _Conn),
@@ -70,65 +70,5 @@ public class DatabaseHandler
         }
         
         _Conn.Close();
-    }
-
-    public bool SaveUser(User user)
-    {
-        _Conn.Open();
-        string insertSql = @"
-            INSERT INTO Users (FirstName, LastName, Email, Password, Role)
-            VALUES (@FirstName, @LastName, @Email, @Password, @User)
-        ";
-        int result = -1;
-        using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
-        {
-            command.Parameters.AddWithValue("@FirstName", user.firstName);
-            command.Parameters.AddWithValue("@LastName", user.lastName);
-            command.Parameters.AddWithValue("@Email", user.email);
-            command.Parameters.AddWithValue("@Password", user.password);
-            command.Parameters.AddWithValue("@User", user.Role);
-
-            result = command.ExecuteNonQuery();
-        }
-
-        _Conn.Close();
-        return result > 0;
-    }
-
-
-    public User CheckUser(User login)
-    {
-        _Conn.Open();
-        string selectSql = @"
-            SELECT *
-            FROM Users
-            WHERE Email = @Email AND Password = @Password
-        ";
-
-        User currentUser = null;
-
-        using (SQLiteCommand command = new SQLiteCommand(selectSql, _Conn))
-        {
-            command.Parameters.AddWithValue("@Email", login.email);
-            command.Parameters.AddWithValue("@Password", login.password);
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    currentUser = new User(
-                        reader["firstName"].ToString(),
-                        reader["lastName"].ToString(),
-                        reader["email"].ToString(),
-                        reader["password"].ToString(),
-                        reader["Role"].ToString()
-                    );
-                }
-            }
-        }
-
-        _Conn.Close();
-
-        return currentUser;
     }
 }
