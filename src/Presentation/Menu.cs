@@ -26,7 +26,7 @@ class Menu
         //     }},
         // });
 
-        // DECLAN zet hieronder je logic call
-        // hier
+        // DECLAN zet hieronder je logic call 
+        ConsumptionLogic.Consumption();
     }
 }
