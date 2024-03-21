@@ -13,7 +13,7 @@ public class UserAccess : DatabaseHandler{
             command.Parameters.AddWithValue("@LastName", user.LastName);
             command.Parameters.AddWithValue("@Email", user.Email);
             command.Parameters.AddWithValue("@Password", user.Password);
-            command.Parameters.AddWithValue("@Role", user.Role);
+            command.Parameters.AddWithValue("@Role", user.Role.ToString());
 
             object result = command.ExecuteScalar();
             if (result != null && int.TryParse(result.ToString(), out userId)){
@@ -22,5 +22,40 @@ public class UserAccess : DatabaseHandler{
         }
         _Conn.Close();
         return userId != -1;
+    }
+    public User CheckUser(User login)
+    {
+        _Conn.Open();
+        string selectSql = @"
+            SELECT *
+            FROM Users
+            WHERE Email = @Email AND Password = @Password
+        ";
+
+        User currentUser = null;
+
+        using (SQLiteCommand command = new SQLiteCommand(selectSql, _Conn))
+        {
+            command.Parameters.AddWithValue("@Email", login.Email);
+            command.Parameters.AddWithValue("@Password", login.Password);
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    currentUser = new User(
+                        reader["firstName"].ToString(),
+                        reader["lastName"].ToString(),
+                        reader["email"].ToString(),
+                        reader["password"].ToString(),
+                        (UserRole)Enum.Parse(typeof(UserRole), reader["Role"].ToString())
+                    );
+                }
+            }
+        }
+
+        _Conn.Close();
+
+        return currentUser;
     }
 }

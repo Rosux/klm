@@ -48,7 +48,7 @@ public class DatabaseHandler
     
     protected SQLiteConnection _Conn = new SQLiteConnection();
     private string DatabasePath;
-    public DatabaseHandler(string DatabasePath="./database/CINEMA.db"){
+    public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
         this.DatabasePath = DatabasePath;
         if (!File.Exists(this.DatabasePath)){
             SQLiteConnection.CreateFile(this.DatabasePath);

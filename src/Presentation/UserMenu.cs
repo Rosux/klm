@@ -1,5 +1,5 @@
-public static class UserView{
-    public static void Register()
+public static class UserMenu{
+    public static User Register()
     {
         bool exit = false;
         Console.WriteLine("Enter your first name:");
@@ -32,8 +32,7 @@ public static class UserView{
             Console.WriteLine("Password cannot be empty. Please try again.");
         }
         User user = new User(firstName, lastName, email, password);
-        // return user;
-        Console.WriteLine("Your information has been saved. Proceed to login.");
+        return user;
     }
 
     public static User Login()
