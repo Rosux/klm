@@ -1,11 +1,10 @@
+global using System.Data.Entity.Infrastructure.Design;
+global using System.Data.SQLite;
+global using System.Data.SQLite.Generic;
 using System;
 using System.Data;
-using System.Data.Entity.Infrastructure.Design;
-using System.Data.SQLite;
-using System.Data.SQLite.Generic;
 
-// MODEL (handle sqlite related things here such as insert's and update's)
-public static class DatabaseHandler
+public class DatabaseHandler
 {
     private static readonly string _CreateUserString = @"
         CREATE TABLE IF NOT EXISTS Users (
@@ -47,17 +46,18 @@ public static class DatabaseHandler
         )
     ";
     
-    protected static SQLiteConnection _Conn = new SQLiteConnection();
-    private static readonly string DatabasePath = "./database/CINEMA.db";
-    public static void Main(){
-        if (!File.Exists(DatabasePath)){
-            SQLiteConnection.CreateFile(DatabasePath);
+    protected SQLiteConnection _Conn = new SQLiteConnection();
+    private string DatabasePath;
+    public DatabaseHandler(string DatabasePath="./database/CINEMA.db"){
+        this.DatabasePath = DatabasePath;
+        if (!File.Exists(this.DatabasePath)){
+            SQLiteConnection.CreateFile(this.DatabasePath);
         }
-        _Conn = new SQLiteConnection($"DATA Source={DatabasePath};Version=3");
+        _Conn = new SQLiteConnection($"DATA Source={this.DatabasePath};Version=3");
         CreateDatabaseIfNotExist();
     }
 
-    private static void CreateDatabaseIfNotExist(){
+    private void CreateDatabaseIfNotExist(){
         _Conn.Open();
         List<SQLiteCommand> Tables = new List<SQLiteCommand>(){
             new SQLiteCommand(_CreateUserString, _Conn),

@@ -4,7 +4,6 @@
 class Program
 {
     static User? CurrentUser = null;
-    private static DatabaseHandler DB = new DatabaseHandler();
     static void Main(string[] args)
     {
         Console.Title = "24/7 BINGE WATCH CINEMA!";
@@ -12,19 +11,19 @@ class Program
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
 
         // asks the user to choose either of these options
-        Menu.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-            {"Register", ()=>{
-                // run Register method
-                // Register();
-            }},
-            {"Login", ()=>{
-                // run Login method
-                // Login();
-            }},
-            {"Exit", ()=>{
-                // close application
-                Environment.Exit(1);
-            }},
-        });
+        // Menu.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+        //     {"Register", ()=>{
+        //         // run Register method
+        //         // Register();
+        //     }},
+        //     {"Login", ()=>{
+        //         // run Login method
+        //         // Login();
+        //     }},
+        //     {"Exit", ()=>{
+        //         // close application
+        //         Environment.Exit(1);
+        //     }},
+        // });
     }
 }
