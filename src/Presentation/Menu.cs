@@ -14,7 +14,7 @@ class Menu
         MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
             {"Register", ()=>{
                 // run Register method
-                // UserLogic.Register();
+                UserLogic.Register();
             }},
             {"Login", ()=>{
                 // run Login method

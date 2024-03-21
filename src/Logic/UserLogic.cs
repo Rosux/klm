@@ -1,4 +1,4 @@
-public class UserLogic
+public static class UserLogic
 {
     public static void Login()
     {
@@ -12,5 +12,11 @@ public class UserLogic
             Program.CurrentUser = LoggedUser;
             Console.WriteLine(Program.CurrentUser.FirstName);
         }
+    }
+    public static void Register()
+    {
+        UserAccess u = new UserAccess();
+        User Credentials = UserMenu.Register();
+        u.AddUser(Credentials);
     }
 }
