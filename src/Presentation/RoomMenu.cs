@@ -3,31 +3,38 @@ public class RoomMenu
     public static void AdminOverView()
     {
         Console.Clear();
-        ConsoleColor foreColor = Console.ForegroundColor;
         Console.WriteLine("Welcome to Admin overview for Rooms\nSelect an action:\n1. Show all rooms\n2. Add a room\n3. Remove a room\n4. Edit a room\n5. Show specified room\n6. Exit");
-        int option = int.Parse(Console.ReadLine());
-        switch (option)
+        if (int.TryParse(Console.ReadLine(), out int option))
         {
-            case 1:
-                Action1();
-                break;
-            case 2:
-                Action2();
-                break;
-            case 3:
-                Action3();
-                break;
-            case 4:
-                Action4();
-                break;
-            case 5:
-                Action5();
-                break;
-            case 6:
-                break;
-            default:
-                Console.WriteLine("Fill in a valid number");
-                break;
+            switch(option)
+            {
+                case 1:
+                    Action1();
+                    break;
+                case 2:
+                    Action2();
+                    break;
+                case 3:
+                    Action3();
+                    break;
+                case 4:
+                    Action4();
+                    break;
+                case 5:
+                    Action5();
+                    break;
+                case 6:
+                    break;
+                default:
+                    Console.WriteLine("Fill in a valid number");
+                    break;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid input. Please enter a valid number.");
+            Console.ReadKey;
+            AdminOverView();
         }
 
 
@@ -36,7 +43,7 @@ public class RoomMenu
     {
         Console.Clear();
         RoomAccess.PrintAllRooms();
-        Console.WriteLine("\nPress any key to continue");
+        Console.WriteLine("\n\nPress any key to continue");
         Console.ReadKey();
         AdminOverView();
     }
@@ -44,14 +51,22 @@ public class RoomMenu
     {
         Console.Clear();
         Console.Write("Creating new room:\nCapacity: ");
-        int GivenCapacity = int.Parse(Console.ReadLine());
-        Room newRoom = new Room(GivenCapacity);
-        int newRoomId = RoomAccess.AddToRoomTable(newRoom);
-        Console.Clear();
-        Console.WriteLine($"New room created. \nID:{newRoomId} \nCapacity: {GivenCapacity}\n\nPress any key to continue...");
-        Console.ReadKey();
-        Console.Clear();
-        AdminOverView();
+        if (int.TryParse(Console.ReadLine(), out int GivenCapacity))
+        {
+            Room newRoom = new Room(GivenCapacity);
+            int newRoomId = RoomAccess.AddToRoomTable(newRoom);
+            Console.Clear();
+            Console.WriteLine($"New room created. \nID:{newRoomId} \nCapacity: {GivenCapacity}\n\nPress any key to continue...");
+            Console.ReadKey();
+            Console.Clear();
+            AdminOverView();
+        }
+        else
+        {
+            Console.WriteLine("Invalid input. Please enter a valid number.\n\n New room not created.");
+            Console.ReadKey();
+            AdminOverView();
+        }
     }
     private static void Action3()
     {
