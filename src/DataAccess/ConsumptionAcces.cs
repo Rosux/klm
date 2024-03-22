@@ -1,5 +1,9 @@
 public class ConsumptionAcces : DatabaseHandler
 {
+    public ConsumptionAcces(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
+
+    }
+    
     public bool CreateConsumption(Consumption consumption){
         _Conn.Open();
         string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
