@@ -36,6 +36,7 @@ public class ConsumptionAcces : DatabaseHandler
         _Conn.Close();
         return consumptions;
     }
+    
     public bool DeleteConsumption(Consumption consumption){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
@@ -46,5 +47,21 @@ public class ConsumptionAcces : DatabaseHandler
             _Conn.Close();
             return rowsAffected > 0;
         }
+    }
+
+    public bool UpdateConsumption(Consumption consumption){
+        _Conn.Open();
+        int rowsAffected = -1;
+        string updateConsumption = @"UPDATE Consumptions SET Name = @Name, Price = @Price, StartTime = @StartTime, EndTime = @EndTime WHERE ID = @Id";
+        using (SQLiteCommand comm = new SQLiteCommand(updateConsumption, _Conn)){
+            comm.Parameters.AddWithValue("@Name", consumption.Name);
+            comm.Parameters.AddWithValue("@Price", consumption.Price);
+            comm.Parameters.AddWithValue("@StartTime", consumption.StartTime.Hour.ToString("00") + ":" + consumption.StartTime.Minute.ToString("00"));
+            comm.Parameters.AddWithValue("@EndTime", consumption.EndTime.Hour.ToString("00") + ":" + consumption.EndTime.Minute.ToString("00"));
+            comm.Parameters.AddWithValue("@Id", consumption.Id);
+            rowsAffected = comm.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        return rowsAffected > 0;
     }
 }
