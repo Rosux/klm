@@ -28,5 +28,6 @@ class Menu
 
         // DECLAN zet hieronder je logic call
         // hier
+        FilmSerieMenu.UI();
     }
 }
