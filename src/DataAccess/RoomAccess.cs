@@ -1,5 +1,9 @@
 public class RoomAccess : DatabaseHandler {
-    public static int AddToRoomTable(Room room)
+    public RoomAccess()
+    {
+
+    } 
+    public int AddToRoomTable(Room room)
     {
         int newRoomId = -1;
         _Conn.Open();
@@ -10,7 +14,7 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return newRoomId;
     }
-    public static void EditFromRoomTable(int id, int capacity)
+    public void EditFromRoomTable(int id, int capacity)
     {
         _Conn.Open();
         string query = "UPDATE Rooms SET Capacity=@capacity WHERE ID=@id";
@@ -20,7 +24,7 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-    public static void RemoveFromRoomTable(int roomid)
+    public void RemoveFromRoomTable(int roomid)
     {
         _Conn.Open();
         string query = "DELETE FROM Rooms WHERE ID=@id";
@@ -29,7 +33,7 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-    public static string GetRoom(int id)
+    public string GetRoom(int id)
     {
         string RoomInfo = "";
         _Conn.Open();
@@ -44,7 +48,7 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return RoomInfo;
     }
-    private static List<string> _getAllRooms()
+    public List<string> _getAllRooms()
     {
         _Conn.Open();
         List<string> roomlist = new List<string>();
@@ -59,20 +63,4 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
-    public static void PrintAllRooms()
-    {
-        List<string> roomlist = _getAllRooms();
-        bool isEmpty = !roomlist.Any();
-        if(!isEmpty)
-        {
-            foreach(string rooms in roomlist)
-            {
-                Console.WriteLine(rooms);
-            }
-        } 
-        else
-        {
-            Console.WriteLine("There are currently no rooms.");
-        } 
-    }
 }

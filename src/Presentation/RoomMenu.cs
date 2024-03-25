@@ -1,7 +1,10 @@
 public class RoomMenu
-{    
+{   
+    
     public static void AdminOverView()
     {
+        
+
         Console.Clear();
         Console.WriteLine("Welcome to Admin overview for Rooms\nSelect an action:\n1. Show all rooms\n2. Add a room\n3. Remove a room\n4. Edit a room\n5. Show specified room\n6. Exit");
         if (int.TryParse(Console.ReadLine(), out int option))
@@ -33,7 +36,7 @@ public class RoomMenu
         else
         {
             Console.WriteLine("Invalid input. Please enter a valid number.");
-            Console.ReadKey;
+            Console.ReadKey();
             AdminOverView();
         }
 
@@ -42,7 +45,7 @@ public class RoomMenu
     private static void Action1()
     {
         Console.Clear();
-        RoomAccess.PrintAllRooms();
+        PrintAllRooms();
         Console.WriteLine("\n\nPress any key to continue");
         Console.ReadKey();
         AdminOverView();
@@ -53,13 +56,7 @@ public class RoomMenu
         Console.Write("Creating new room:\nCapacity: ");
         if (int.TryParse(Console.ReadLine(), out int GivenCapacity))
         {
-            Room newRoom = new Room(GivenCapacity);
-            int newRoomId = RoomAccess.AddToRoomTable(newRoom);
-            Console.Clear();
-            Console.WriteLine($"New room created. \nID:{newRoomId} \nCapacity: {GivenCapacity}\n\nPress any key to continue...");
-            Console.ReadKey();
-            Console.Clear();
-            AdminOverView();
+            RoomLogic.CreateRoom(GivenCapacity);
         }
         else
         {
@@ -67,6 +64,8 @@ public class RoomMenu
             Console.ReadKey();
             AdminOverView();
         }
+        Console.Clear();
+        AdminOverView();
     }
     private static void Action3()
     {
@@ -76,9 +75,7 @@ public class RoomMenu
         bool checkParse = int.TryParse(givenid, out int roomid);
         if(checkParse == true)
         {
-            RoomAccess.RemoveFromRoomTable(roomid);
-            Console.Write($"Room with id {roomid} removed.\n\nPress any key to continue...");
-            Console.ReadKey();
+            RoomLogic.RemoveRoom(roomid);
         }
         else
         {
@@ -99,10 +96,7 @@ public class RoomMenu
         bool checkParseId = int.TryParse(givenid, out int roomid);
         if(checkParseId == true && checkParseCapacity == true)
         {
-            Console.Write($"Old room:  {RoomAccess.GetRoom(roomid)}.\n");
-            RoomAccess.EditFromRoomTable(roomid, capacity);
-            Console.Write($"New room: {RoomAccess.GetRoom(roomid)}\n\nPress any key to continue...");
-            Console.ReadKey();
+            RoomLogic.EditRoom(capacity, roomid);
         }
         else
         {
@@ -119,10 +113,8 @@ public class RoomMenu
         string givenid = Console.ReadLine();
         bool checkParse = int.TryParse(givenid, out int roomid);
         if(checkParse == true)
-        {
-            Console.WriteLine(RoomAccess.GetRoom(roomid));
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey();
+        {  
+            RoomLogic.FetchRoom(roomid);
         }
         else
         {
@@ -132,5 +124,21 @@ public class RoomMenu
         Console.Clear();
         AdminOverView();
 
+    }
+    private static void PrintAllRooms()
+    {
+        List<string> roomlist = RoomLogic.GetAllRooms();
+        bool isEmpty = !roomlist.Any();
+        if(!isEmpty)
+        {
+            foreach(string rooms in roomlist)
+            {
+                Console.WriteLine(rooms);
+            }
+        } 
+        else
+        {
+            Console.WriteLine("There are currently no rooms.");
+        } 
     }
 }

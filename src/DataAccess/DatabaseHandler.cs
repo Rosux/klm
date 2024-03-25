@@ -46,7 +46,7 @@ public class DatabaseHandler
         )
     ";
     
-    protected static SQLiteConnection _Conn = new SQLiteConnection();
+    protected SQLiteConnection _Conn = new SQLiteConnection();
     private string DatabasePath;
     public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
         this.DatabasePath = DatabasePath;
