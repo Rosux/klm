@@ -5,9 +5,6 @@ public class FilmAcesser
     {
         string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Films.json"));
         string string_movies = File.ReadAllText(path);
-        // StreamReader reader = new("Films.json");
-        // string string_movies = reader.ReadToEnd();
-        // reader.Close();
         List<Film> list_movies = JsonConvert.DeserializeObject<List<Film>>(string_movies)!;
         return list_movies;
     }

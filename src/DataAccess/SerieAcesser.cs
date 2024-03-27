@@ -5,9 +5,6 @@ public class SerieAcesser
     {
         string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Series.json"));
         string string_series = File.ReadAllText(path);
-        // StreamReader reader = new("Series.json");
-        // string string_series = reader.ReadToEnd();
-        // reader.Close();
         List<Serie> list_series = JsonConvert.DeserializeObject<List<Serie>>(string_series)!;
         return list_series;
     }

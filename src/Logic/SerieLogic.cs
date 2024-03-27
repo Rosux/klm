@@ -2,13 +2,14 @@
 public class SerieLogic
 {
     
-    public void Add_Serie(Serie serie)
+    public string Add_Serie(Serie serie)
     {
         SerieAcesser serieacesser = new();
         List<Serie> list_serie = serieacesser.Get_info();
         serie.Id = list_serie.Count();
         list_serie.Add(serie);
         serieacesser.Return_info(list_serie);
+        return $"you succesfully added the serie {serie.Title}.";
     }
 
     public string Add_Season(int id)
