@@ -8,7 +8,6 @@ class Menu
         Console.Title = "24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
-
         // asks the user to choose either of these options
         // MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
         //     {"Register", ()=>{
@@ -25,6 +24,8 @@ class Menu
         //     }},
         // });
  
-        ConsumptionLogic.Consumption();
+        // ConsumptionLogic.Consumption();
+        // RoomMenu.AdminOverView();
+        // FilmSerieMenu.UI();
     }
 }

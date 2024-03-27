@@ -10,7 +10,6 @@ public static class UserLogic
             Console.WriteLine("not logged in bozo");
         }else{
             Program.CurrentUser = LoggedUser;
-            Console.WriteLine(Program.CurrentUser.FirstName);
         }
     }
     public static void Register()
