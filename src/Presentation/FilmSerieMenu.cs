@@ -295,7 +295,7 @@ class FilmSerieMenu
         Console.WriteLine("Duration(min): ");
         if (int.TryParse(Console.ReadLine(), out int duration))
         {
-            filmlogic_obj.Add_film(new Film(title, genre, duration));
+            Console.WriteLine(filmlogic_obj.Add_film(new Film(title, genre, duration)));
         }
         else
         {

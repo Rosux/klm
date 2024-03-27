@@ -20,13 +20,14 @@ public class FilmLogic
         }
     }
 
-    public void Add_film(Film film)
+    public string Add_film(Film film)
     {
         FilmAcesser filmacesser = new();
         List<Film> list_films = filmacesser.Get_info();
         film.Id = list_films.Count();
         list_films.Add(film);
         filmacesser.Return_info(list_films);
+        return $"you succesfully added the movie {film.Title}.";
     }
 
     public string Remove_film(int id)
