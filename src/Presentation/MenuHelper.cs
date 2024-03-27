@@ -1,13 +1,12 @@
 using System;
 
-// VIEW (handle user input/output here as much as you can such as asking a user to select a time and recieving that input and sending it to the controller)
 public static class MenuHelper{
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
-    public static TimeOnly SelectTime(){
-        TimeOnly time = new TimeOnly();
+    public static TimeOnly SelectTime(TimeOnly defualtTime = new TimeOnly()){
+        TimeOnly time = defualtTime;
         bool hour = true;
         ConsoleKey key;
         do{
@@ -124,6 +123,9 @@ public static class MenuHelper{
     /// <param name="Options">A Dictionary of options and any typed values that will be returned if that item is selected.</param>
     /// <returns>The value of the chosen option by the user.</returns>
     public static T SelectFromList<T>(string Header, Dictionary<string, T> Options){
+        if (Options.Count == 0){
+            return default(T);
+        }
         // split Options into a list of chunks
         List<Dictionary<string, T>> chunks = new List<Dictionary<string, T>>();
         for (int i=0;i<Options.Count;i+=10)

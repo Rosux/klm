@@ -1,6 +1,5 @@
 using System;
 
-// CONTROLLER (handle logic here such as updating user data) (make for each controller its own private static method)
 class Menu
 {
     static User? CurrentUser = null;
@@ -24,10 +23,9 @@ class Menu
         //         Environment.Exit(1);
         //     }},
         // });
-
-        // DECLAN zet hieronder je logic call
-        // hier
+ 
+        // ConsumptionLogic.Consumption();
         // RoomMenu.AdminOverView();
-        //FilmSerieMenu.UI();
+        // FilmSerieMenu.UI();
     }
 }
