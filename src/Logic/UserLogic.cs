@@ -7,10 +7,9 @@ public static class UserLogic
         User LoggedUser = u.CheckUser(Credentials);
         if (LoggedUser == null)
         {
-            Console.WriteLine("not logged in bozo");
+            Program.CurrentUser = null;
         }else{
             Program.CurrentUser = LoggedUser;
-            Console.WriteLine(Program.CurrentUser.FirstName);
         }
     }
     public static void Register()
