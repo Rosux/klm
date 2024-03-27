@@ -29,11 +29,11 @@ class Menu
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                     {"Movies", ()=>{
-                        // room editor
+                        // movie editor
                         FilmSerieMenu.UI();
                     }},
                     {"Consumptions", ()=>{
-                        // room editor
+                        // consumption editor
                         ConsumptionLogic.Consumption();
                     }},
                     {"Rooms", ()=>{
