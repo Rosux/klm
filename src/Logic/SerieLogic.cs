@@ -92,15 +92,8 @@ public class SerieLogic
                 r_serie = serie;
             }
         }
-
         list_series.Remove(r_serie);
-        int i = 0;
         string info = $"you sucesfully removed {r_serie.Title}.";
-        foreach(Serie serie in list_series)
-        {
-            serie.Id = i;
-            i++;
-        }
         serieacesser.Return_info(list_series);
         return info;
     }
