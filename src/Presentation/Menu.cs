@@ -40,6 +40,10 @@ class Menu
                         // room editor
                         RoomMenu.AdminOverView();
                     }},
+                    {"View reservations", ()=>{
+                        // close application
+                        ReservationOverviewLogic.ReservationOverview();
+                    }},
                     {"Exit", ()=>{
                         // close application
                         Environment.Exit(1);
