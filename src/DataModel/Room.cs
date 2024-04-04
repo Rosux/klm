@@ -4,7 +4,7 @@ using System.Data.SQLite.Generic;
 
 public class Room
 {
-    public int id;
+    public int Id;
     private int _capacity;
     public int Capacity 
     { 
@@ -28,7 +28,7 @@ public class Room
     }
     public Room(int id, int capacity)
     {
-        this.id = id;
+        this.Id = id;
         Capacity = capacity;
     }
 }

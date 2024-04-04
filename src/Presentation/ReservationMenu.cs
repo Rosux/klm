@@ -24,7 +24,31 @@ public static class ReservationMenu
         }else{
             endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:");
         }
+
+        TimeLine.Holder t = new TimeLine.Holder();
+        t.Add(
+            new Break(15),
+            new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0),
+            new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0).AddMinutes(new Break(15).Time)
+        );
+        // t.AddBreak();
+
+        // TODO remove (for debug purposes only)
+        Program.CurrentUser = new User(69, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         
+        if (Program.CurrentUser != null){
+            Reservation r = new Reservation(
+                SelectedRoom.Id,
+                Program.CurrentUser.Id,
+                GroupSize,
+                new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0),
+                new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0),
+                (double)(GroupSize * 12.0),
+                t
+            );
+            Console.WriteLine(r);
+            Console.ReadKey();
+        }
         return null;
     }
 }
