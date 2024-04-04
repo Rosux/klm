@@ -35,7 +35,13 @@ public class FilmLogic
         }
         if (duplicate)
         {
-            film.Id = list_films.Count();
+            IdAccess idaccess = new();
+            List<int> list_id = idaccess.Get_Id();
+            int new_id = list_id[0] + 1;
+            film.Id = new_id;
+            list_id.RemoveAt(0);
+            list_id.Insert(0, new_id);
+            idaccess.Return_Id(list_id);
             list_films.Add(film);
             filmacesser.Return_info(list_films);
             return $"you succesfully added the movie {film.Title}.";
@@ -66,7 +72,7 @@ public class FilmLogic
         return info;
     }
 
-    public bool Check_film(int id = 0)
+    public bool Check_film(int id)
     {
         bool all_info = false;
         FilmAcesser filmacesser = new();
@@ -77,6 +83,18 @@ public class FilmLogic
             {
                 all_info = true;
             }
+        }
+        return all_info;
+    }
+
+    public bool Check_films_exist()
+    {
+        bool all_info = false;
+        FilmAcesser filmacesser = new();
+        List<Film> list_films = filmacesser.Get_info();
+        if(list_films.Count() != 0)
+        {
+            all_info = true;
         }
         return all_info;
     }

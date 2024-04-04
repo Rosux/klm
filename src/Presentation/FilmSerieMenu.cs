@@ -135,7 +135,7 @@ class FilmSerieMenu
     }
     private static void serie_remove(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             Console.WriteLine(serie_obj.All_id());
             Console.WriteLine("Id: ");
@@ -165,7 +165,7 @@ class FilmSerieMenu
     private static void episode_add(SerieLogic serie_obj)
     {
         Console.WriteLine(serie_obj.All_id());
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             SeasonLogic season_obj = new SeasonLogic();
                         
@@ -230,7 +230,7 @@ class FilmSerieMenu
 
     private static void season_add(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
 
             Console.WriteLine(serie_obj.All_id());
@@ -253,7 +253,7 @@ class FilmSerieMenu
     }
     private static void serie_info(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             Console.WriteLine(serie_obj.info());
         }
@@ -276,7 +276,7 @@ class FilmSerieMenu
 // --------------------------------------------------------------------------------------------------------------
     private static void movie_info(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
         }
@@ -306,7 +306,7 @@ class FilmSerieMenu
     }
     private static void movie_remove(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
             Console.WriteLine("Id: ");
@@ -335,7 +335,7 @@ class FilmSerieMenu
     }
     private static void movie_change(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
             Console.WriteLine("Id of movie you want to change: ");
