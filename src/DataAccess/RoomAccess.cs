@@ -1,8 +1,8 @@
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess()
-    {
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
 
-    } 
+    }
+
     public int AddToRoomTable(Room room)
     {
         int newRoomId = -1;
@@ -63,4 +63,38 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    public List<Room> GetAllRooms(int filterMinSize=0){
+        List<Room> roomlist = new List<Room>();
+        _Conn.Open();
+        string query = "SELECT * FROM Rooms WHERE Capacity >= @MinRoomSize";
+        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@MinRoomSize", filterMinSize);
+            SQLiteDataReader reader = Command.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int nocap = reader.GetInt32(1);
+                roomlist.Add(new Room(id, nocap));
+            }
+        }
+        _Conn.Close();
+        return roomlist;
+    }
+
+    public int GetMaxRoomCapacity()
+    {
+        int maxCapacity = 0;
+        _Conn.Open();
+        string query = "SELECT MAX(Capacity) FROM Rooms";
+        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn))
+        {
+            object result = Command.ExecuteScalar();
+            if (result != DBNull.Value)
+            {
+                maxCapacity = Convert.ToInt32(result);
+            }
+        }
+        _Conn.Close();
+        return maxCapacity;
+    }
 }

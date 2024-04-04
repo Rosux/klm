@@ -26,4 +26,9 @@ public class Room
     {
         Capacity = capacity;
     }
+    public Room(int id, int capacity)
+    {
+        this.id = id;
+        Capacity = capacity;
+    }
 }

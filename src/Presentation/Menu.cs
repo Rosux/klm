@@ -63,4 +63,22 @@ class Menu
         // RoomMenu.AdminOverView();
         // FilmSerieMenu.UI();
     }
+
+    // used for testing purpose
+    public static void TestStart(){
+        Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
+        Console.CursorVisible = false;
+        while(true)
+        {
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"Test", ()=>{
+                    ReservationLogic.Reservation();
+                }},
+                {"Exit", ()=>{
+                    // close application
+                    Environment.Exit(1);
+                }},
+            });
+        }
+    }
 }
