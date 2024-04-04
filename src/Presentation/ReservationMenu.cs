@@ -16,10 +16,14 @@ public static class ReservationMenu
         // Console.WriteLine(SelectedRoom.id);
         // Console.ReadLine();
         DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
-        TimeOnly startTime = MenuHelper.SelectTime("Select at what time you want to start your reservation");
+        TimeOnly startTime = MenuHelper.SelectTime("Select at what time you want to start your reservation:", "", new TimeOnly(), null, null);
         DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", null, startDate, null);
-        // TODO make a check to see if the endTime is after startTime and IF SO: ask the user again. OR implement a parameter in SelectTime where there can be a minimum and maximum set
-        TimeOnly endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:");
+        TimeOnly endTime = new TimeOnly();
+        if (startDate == endDate){
+            endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:", "", startTime.AddMinutes(1), startTime.AddMinutes(1), null);
+        }else{
+            endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:");
+        }
         
         return null;
     }

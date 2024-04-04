@@ -346,7 +346,9 @@ public static class MenuHelper{
     /// <param name="suffix">A string of text printed after the selected value.</param>
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
-    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly()){
+    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+        TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
+        TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
         TimeOnly time = defaultTime;
         bool hour = true;
         ConsoleKey key;
@@ -379,8 +381,15 @@ public static class MenuHelper{
                 } else {
                     time = time.AddMinutes(TimeAmount);
                 }
+                
+                if (time < MinTime){
+                    time = MinTime;
+                }
+                if (time > MaxTime){
+                    time = MaxTime;
+                }
             }
-        } while (key != ConsoleKey.Enter);
+        } while (key != ConsoleKey.Enter || time > MaxTime || time < MinTime);
         Console.Clear();
         return time;
     }
@@ -391,7 +400,7 @@ public static class MenuHelper{
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
     public static TimeOnly SelectTime(TimeOnly defaultTime = new TimeOnly()){
-        return SelectTime("", "", defaultTime);
+        return SelectTime("", "", defaultTime, null, null);
     }
 #endregion
 
