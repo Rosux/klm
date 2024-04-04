@@ -1,6 +1,7 @@
 public static class SearchMenu
 {
-    public static void Start(string userinput = "")
+    public static List<Genre> SelectedFilters;
+    public static void Start(string userinput = "", List<Genre> ListGenres = null)
     {
         while(Program.CurrentUser == null){
                 MenuHelper.SelectOptions("Select an option", new Dictionary<string, Action>(){
@@ -10,13 +11,27 @@ public static class SearchMenu
                         string userinput = Console.ReadLine();
                         Start(userinput);
                     }},
-                    {"Filters", ()=>{
+                    {$"{SearchLogic.GenreToString(ListGenres)}", ()=>{
                         SearchLogic logic = new SearchLogic();
                         logic.SelectFilters();
-                        logic.CheckSelectedFilters();
+                        SelectedFilters = logic.CheckSelectedFilters();
+                        Start(userinput, SelectedFilters);
                     }},
-                    {"Search", ()=>{
-                        // close application
+                    {"Enter search", ()=>{
+                        List<Film> SearchResult = new List<Film>();
+                        if (userinput == null && ListGenres == null)
+                        {
+                            Console.WriteLine("Please fill in a search query\n\nPress Enter to continue...");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            SearchResult = SearchLogic.Search(userinput, ListGenres);
+                        }
+                        foreach (Film film in SearchResult)
+                        {
+                            Console.WriteLine(film.Title);
+                        }
                         
                     }},
                     {"Exit", ()=>{

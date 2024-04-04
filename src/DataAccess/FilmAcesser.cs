@@ -27,6 +27,5 @@ public class FilmAcesser
             .Select(genreName => new Genre(genreName))
             .ToList();
         return genres;
-
     }
 }
