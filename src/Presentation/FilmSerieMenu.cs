@@ -1,141 +1,111 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 class FilmSerieMenu
 {
     public static void UI()
     {
-        Console.WriteLine("what do you want to change\n1. movies\n2. series\n3. quit\nchoice: ");
-        if(int.TryParse(Console.ReadLine(), out int choice))
+        bool running = true;
+        while(running)
         {
-            switch(choice)
-            {
-                case 1:
-                    movie_options();    
-                    break;
-                case 2:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. Manage Movies", ()=>{
+                    //takes admin to movies menu.
+                    movie_options();
+                }},
+                {"2. Manage series", ()=>{
+                    //takes admin to series menu.
                     serie_options();
-                    break;
-                case 3:
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    UI();
-                    break;
-            }
-        }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            UI();
+                }},
+                {"3. Exit to main menu", ()=>{
+                    running = false;
+                }},
+            });
         }
     }
 //--------------------------------------------------------------------------------------------------------------
     private static void serie_options()
     {
-        Console.WriteLine();
-        Console.WriteLine("1. all Series\n2. add Serie\n3. add Season\n4. add Episode\n5. remove Serie\n6. go back\nchoice:");
         SerieLogic serie_obj = new SerieLogic();
-        if(int.TryParse(Console.ReadLine(), out int choice_4))
+        bool running = true;
+        while(running)
         {
-            Console.WriteLine();
-            switch(choice_4)
-            {
-                case 1:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. All series", ()=>{
+                    //views all series.
                     serie_info(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 2:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"2. Add serie", ()=>{
+                    //makes admin be able to add serie.
                     serie_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 3:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"3. Add season", ()=>{
+                    //makes admin be able to add season.
                     season_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 4:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"4. Add episode", ()=>{
+                    //makes admin be able to add episode.
                     episode_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 5:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"5. Remove serie", ()=>{
+                    //makes admin be able to remove serie.
                     serie_remove(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 6:
-                    Console.WriteLine();
-                    UI();
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    serie_options();
-                    break;    
-            } 
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"6. Go back", ()=>{
+                    running = false;
+                }},
+            });
         }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            serie_options();
-        }     
     }
     private static void movie_options()
     {
-        Console.WriteLine();
         FilmLogic filmlogic_obj = new FilmLogic();
-        Console.WriteLine("1. all movies\n2. add movie\n3. remove movie\n4. change movie\n5. go back\nchoice:");
-        if (int.TryParse(Console.ReadLine(), out int choice_1))
+        bool running = true;
+        while(running)
         {
-            Console.WriteLine();
-            switch(choice_1)
-            {
-                case 1:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. All movies", ()=>{
+                    //views all movies.
                     movie_info(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 2:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"2. Add movie", ()=>{
+                    //makes admin be able to add movie.
                     movie_add(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 3:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"3. Remove movie", ()=>{
+                    //makes admin be able to remove movie.
                     movie_remove(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 4:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"4. Change movie", ()=>{
+                    //makes admin be able to change movie.
                     movie_change(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 5:
-                    Console.WriteLine();
-                    UI();
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    movie_options();
-                    break;
-            }
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"5. Go back", ()=>{
+                    running = false;
+                }},
+            });
         }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            movie_options();
-        }
-//-----------------------------------------------------------------------------------------------------------------  
     }
+//-----------------------------------------------------------------------------------------------------------------  
     private static void serie_remove(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             Console.WriteLine(serie_obj.All_id());
             Console.WriteLine("Id: ");
@@ -158,14 +128,14 @@ class FilmSerieMenu
         }
         else
         {
-            Console.WriteLine("There are no series to remove.");
+            Console.WriteLine("There are no series to remove");
         }
     }
 
     private static void episode_add(SerieLogic serie_obj)
     {
         Console.WriteLine(serie_obj.All_id());
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             SeasonLogic season_obj = new SeasonLogic();
                         
@@ -230,7 +200,7 @@ class FilmSerieMenu
 
     private static void season_add(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
 
             Console.WriteLine(serie_obj.All_id());
@@ -253,7 +223,7 @@ class FilmSerieMenu
     }
     private static void serie_info(SerieLogic serie_obj)
     {
-        if (serie_obj.Check_Serie())
+        if (serie_obj.Check_Series_exist())
         {
             Console.WriteLine(serie_obj.info());
         }
@@ -276,7 +246,7 @@ class FilmSerieMenu
 // --------------------------------------------------------------------------------------------------------------
     private static void movie_info(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
         }
@@ -306,7 +276,7 @@ class FilmSerieMenu
     }
     private static void movie_remove(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
             Console.WriteLine("Id: ");
@@ -335,7 +305,7 @@ class FilmSerieMenu
     }
     private static void movie_change(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_film())
+        if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine(filmlogic_obj.info());
             Console.WriteLine("Id of movie you want to change: ");
