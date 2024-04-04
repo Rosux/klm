@@ -10,6 +10,7 @@ public static class ReservationMenu
         int RoomCounter = 1;
         foreach(Room room in RoomsAccess.GetAllRooms(GroupSize)){
             rooms.Add($"Room {RoomCounter} (Maximum size: {room.Capacity})", room);
+            RoomCounter++;
         }
         Room SelectedRoom = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
         // Console.WriteLine(SelectedRoom.id);
