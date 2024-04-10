@@ -40,8 +40,5 @@ public static class ReservationLogic
         {
             return;
         }
-        else
-        {
-        }
     }
 }

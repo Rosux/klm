@@ -121,7 +121,6 @@ public static class ReservationMenu
         {
             Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
         }
-
         Console.Write("Enter the ID of the reservation to select: ");
         int selectedId;
         if (int.TryParse(Console.ReadLine(), out selectedId))
