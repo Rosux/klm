@@ -40,6 +40,10 @@ class Menu
                         // room editor
                         RoomMenu.AdminOverView();
                     }},
+                    {"Users", ()=>{
+                        // room editor
+                        UserLogic.User();
+                    }},
                     {"Exit", ()=>{
                         // close application
                         Environment.Exit(1);
