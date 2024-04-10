@@ -6,7 +6,7 @@ class Program
     public static void Main()
     {
 
-        SearchMenu.Start();
+        SearchMenu.SelectSearch();
 
     }
 }
