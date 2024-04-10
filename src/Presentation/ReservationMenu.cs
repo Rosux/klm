@@ -2,7 +2,6 @@ public static class ReservationMenu
 {
     private static RoomAccess RoomsAccess = new RoomAccess();
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
-    private static ReservationAccess ReservationAccess = new ReservationAccess();
 
     public static Reservation? BookReservation(){
         double totalPrice = 0.0;
@@ -89,9 +88,6 @@ public static class ReservationMenu
                 }},
             });
         }
-
-        // TODO remove (for debug purposes only)
-        // Program.CurrentUser = new User(69, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         
         if (Program.CurrentUser != null && save){
             Reservation r = new Reservation(
@@ -103,13 +99,7 @@ public static class ReservationMenu
                 (double)(GroupSize * 12.0) + totalPrice,
                 timeline
             );
-            // save reservation
-            bool success = ReservationAccess.CreateReservation(r);
-            if (success){
-                Saved();
-            }else{
-                Error();
-            }
+            return r;
         }else if(!save){
             return null;
         }

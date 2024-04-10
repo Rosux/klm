@@ -1,5 +1,6 @@
 public static class ReservationLogic
 {
+    private static ReservationAccess ReservationAccess = new ReservationAccess();
     public static void Reservation(){
         bool running = true;
         while(running)
@@ -24,6 +25,12 @@ public static class ReservationLogic
         else
         {
             // save reservation
+            bool success = ReservationAccess.CreateReservation(r);
+            if(success){
+                ReservationMenu.Saved();
+            }else{
+                ReservationMenu.Error();
+            }
         }
     }
 
