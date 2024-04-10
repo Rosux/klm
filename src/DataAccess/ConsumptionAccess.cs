@@ -1,6 +1,6 @@
-public class ConsumptionAcces : DatabaseHandler
+public class ConsumptionAccess : DatabaseHandler
 {
-    public ConsumptionAcces(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
+    public ConsumptionAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
 
     }
     
