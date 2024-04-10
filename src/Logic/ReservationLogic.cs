@@ -28,6 +28,13 @@ public static class ReservationLogic
     }
 
     public static void ViewReservation(){
-
+        Reservation? r = ReservationMenu.ShowReservation();
+        if (r == null)
+        {
+            return;
+        }
+        else
+        {
+        }
     }
 }

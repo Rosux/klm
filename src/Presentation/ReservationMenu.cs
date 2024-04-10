@@ -1,7 +1,7 @@
 public static class ReservationMenu
 {
     private static RoomAccess RoomsAccess = new RoomAccess();
-
+    private static ReservationAccess ReservationAccess = new ReservationAccess();       
     public static Reservation? BookReservation(){
         int roomMaxSize = RoomsAccess.GetMaxRoomCapacity();
         int GroupSize = MenuHelper.SelectInteger("Select your group size:", "", 1, 1, roomMaxSize);
@@ -50,5 +50,40 @@ public static class ReservationMenu
             Console.ReadKey();
         }
         return null;
+    }
+    public static Reservation? ShowReservation()
+    {
+    List<Reservation> reservations = ReservationAccess.ReadReservations();
+    if (reservations.Count == 0)
+    {
+        Console.WriteLine("There are no reservations available to show.");
+        return null;
+    }
+    else
+    {
+        Console.WriteLine("Available Reservations:");
+        foreach (Reservation reservation in reservations)
+        {
+            Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
+        }
+
+        Console.Write("Enter the ID of the reservation to select: ");
+        int selectedId;
+        if (int.TryParse(Console.ReadLine(), out selectedId))
+        {
+            foreach (Reservation reservation in reservations)
+            {
+                if (reservation.Id == selectedId)
+                {
+                    return reservation;
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid input. Please enter a valid ID.");
+        }
+    }
+    return null;
     }
 }
