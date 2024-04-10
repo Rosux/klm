@@ -28,7 +28,7 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Movies", ()=>{
+                    {"Manage movies/series", ()=>{
                         // movie editor
                         FilmSerieMenu.UI();
                     }},

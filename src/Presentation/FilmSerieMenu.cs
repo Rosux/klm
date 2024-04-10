@@ -3,136 +3,107 @@ class FilmSerieMenu
 {
     public static void UI()
     {
-        Console.WriteLine("what do you want to change\n1. movies\n2. series\n3. quit\nchoice: ");
-        if(int.TryParse(Console.ReadLine(), out int choice))
+        bool running = true;
+        while(running)
         {
-            switch(choice)
-            {
-                case 1:
-                    movie_options();    
-                    break;
-                case 2:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. Manage movies", ()=>{
+                    //Manage movies.
+                    movie_options();
+                }},
+                {"2. Manage series", ()=>{
+                    //Manage series.
                     serie_options();
-                    break;
-                case 3:
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    UI();
-                    break;
-            }
-        }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            UI();
-        }
+                }},
+                {"3. Exit to main menu", ()=>{
+                    running = false;
+                }},
+            });
+        }   
     }
 //--------------------------------------------------------------------------------------------------------------
     private static void serie_options()
     {
-        Console.WriteLine();
-        Console.WriteLine("1. all Series\n2. add Serie\n3. add Season\n4. add Episode\n5. remove Serie\n6. go back\nchoice:");
         SerieLogic serie_obj = new SerieLogic();
-        if(int.TryParse(Console.ReadLine(), out int choice_4))
+        bool running = true;
+        while(running)
         {
-            Console.WriteLine();
-            switch(choice_4)
-            {
-                case 1:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. All series", ()=>{
+                    //shows all series.
                     serie_info(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 2:
-                    serie_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 3:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"2. Add serie", ()=>{
+                    //adds a serie.
+                     serie_add(serie_obj);
+                     Console.Write($"\n\nPress any key to continue...");
+                     Console.ReadKey();
+                }},
+                {"3. Add seasons", ()=>{
+                    //adds a season.
                     season_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 4:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"4. Add episode", ()=>{
+                    //adds episode.
                     episode_add(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 5:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"5. Remove serie", ()=>{
+                    //Manage series.
                     serie_remove(serie_obj);
-                    Console.WriteLine();
-                    serie_options();
-                    break;
-                case 6:
-                    Console.WriteLine();
-                    UI();
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    serie_options();
-                    break;    
-            } 
-        }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            serie_options();
-        }     
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"6. Go back", ()=>{
+                    running = false;
+                }},
+            });
+        } 
     }
     private static void movie_options()
     {
-        Console.WriteLine();
         FilmLogic filmlogic_obj = new FilmLogic();
         Console.WriteLine("1. all movies\n2. add movie\n3. remove movie\n4. change movie\n5. go back\nchoice:");
-        if (int.TryParse(Console.ReadLine(), out int choice_1))
+        bool running = true;
+        while(running)
         {
-            Console.WriteLine();
-            switch(choice_1)
-            {
-                case 1:
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. All movies", ()=>{
+                    //shows all movies.
                     movie_info(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 2:
-                    movie_add(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 3:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"2. Add movie", ()=>{
+                    //adds a movie.
+                     movie_add(filmlogic_obj);
+                     Console.Write($"\n\nPress any key to continue...");
+                     Console.ReadKey();
+                }},
+                {"3. Remove movie", ()=>{
+                    //Remove a movie.
                     movie_remove(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 4:
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"4. Edit movie", ()=>{
+                    //edit a movie.
                     movie_change(filmlogic_obj);
-                    movie_options();
-                    Console.WriteLine();
-                    break;
-                case 5:
-                    Console.WriteLine();
-                    UI();
-                    break;
-                default:
-                    Console.WriteLine("please enter a valid interger.");
-                    Console.WriteLine();
-                    movie_options();
-                    break;
-            }
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey();
+                }},
+                {"5. Go back", ()=>{
+                    running = false;
+                }},
+            });
         }
-        else
-        {
-            Console.WriteLine("please enter a valid interger.");
-            Console.WriteLine();
-            movie_options();
-        }
-//-----------------------------------------------------------------------------------------------------------------  
     }
+    //-----------------------------------------------------------------------------------------------------------------  
     private static void serie_remove(SerieLogic serie_obj)
     {
         if (serie_obj.Check_Series_exist())
