@@ -3,18 +3,28 @@ public static class UserMenu{
 
     public static User Register()
     {
-        bool exit = false;
-        Console.WriteLine("Enter your first name:");
-        string firstName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(firstName))
-        {
-            Console.WriteLine("First name cannot be empty. Please try again.");
+        string firstName= "";
+        string lastName= "";
+        string password = "";
+        while(true){
+            Console.WriteLine("Enter your first name:");
+            firstName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                Console.WriteLine("First name cannot be empty. Please try again.");
+                continue;
+            }
+            break;
         }
-        Console.WriteLine("Enter your last name:");
-        string lastName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(lastName))
-        {
-            Console.WriteLine("Last name cannot be empty. Please try again.");
+        while(true){
+            Console.WriteLine("Enter your last name:");
+            lastName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                Console.WriteLine("Last name cannot be empty. Please try again.");
+                continue;
+            }
+            break;
         }
         string email;
         do
@@ -27,11 +37,15 @@ public static class UserMenu{
                 continue;
             }
         } while (!IsValidEmail(email));
-        Console.WriteLine("Enter your password (totally secured btw):");
-        string password = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            Console.WriteLine("Password cannot be empty. Please try again.");
+        while(true){
+            Console.WriteLine("Enter your password (totally secured btw):");
+            password = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                Console.WriteLine("Password cannot be empty. Please try again.");
+                continue;
+            }
+            break;
         }
         User user = new User(firstName, lastName, email, password);
         Console.WriteLine("User has been added");
@@ -64,36 +78,52 @@ public static class UserMenu{
 
     public static User AddNewUser()
     {
-        bool exit = false;
-        Console.WriteLine("Enter user first name:");
-        string firstName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(firstName))
-        {
-            Console.WriteLine("First name cannot be empty. Please try again.");
-        }
-        Console.WriteLine("Enter user last name:");
-        string lastName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(lastName))
-        {
-            Console.WriteLine("Last name cannot be empty. Please try again.");
-        }
-        string email;
-        do
-        {
-            Console.WriteLine("Enter user email:");
-            email = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(email))
+        string firstName = "";
+        string lastName = "";
+        string password = "";
+        while (true){
+            Console.WriteLine("Enter user first name:");
+            firstName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(firstName))
             {
-                Console.WriteLine("Email cannot be empty. Please try again.");
+                Console.WriteLine("First name cannot be empty. Please try again.");
                 continue;
             }
-        } while (!IsValidEmail(email));
-        Console.WriteLine("Enter user password (totally secured btw):");
-        string password = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            Console.WriteLine("Password cannot be empty. Please try again.");
+            break;
         }
+
+        while (true){
+            Console.WriteLine("Enter user last name:");
+            lastName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                Console.WriteLine("Last name cannot be empty. Please try again.");
+                continue;
+            }
+            break;
+        }
+            string email;
+            do
+            {
+                Console.WriteLine("Enter user email:");
+                email = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    Console.WriteLine("Email cannot be empty. Please try again.");
+                    continue;
+                }
+            } 
+            while (!IsValidEmail(email));
+                Console.WriteLine("Enter user password (totally secured btw):");
+                while(true){
+                password = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    Console.WriteLine("Password cannot be empty. Please try again.");
+                    continue;
+                }
+                break;
+            }
         User user = new User(firstName, lastName, email, password);
         Console.WriteLine("User has been added");
         return user;
@@ -120,12 +150,17 @@ public static class UserMenu{
     }
     public static void UserRemoved(){
         Console.Clear();
-        Console.WriteLine("the user has been removed.\n\nPress any key to continue");
+        Console.WriteLine("The user has been removed.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void UserAdded(){
         Console.Clear();
-        Console.WriteLine("the user has been added.\n\nPress any key to continue");
+        Console.WriteLine("The user has been added.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+    public static void WrongLogin(){
+        Console.Clear();
+        Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     

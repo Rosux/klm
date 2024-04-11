@@ -3,7 +3,6 @@ public class ConsumptionTest
 {
     ConsumptionAccess? c = null;
     UserAccess? u = null;
-
     [OneTimeSetUp]
     public void Setup(){
         File.Delete("./TEST.db");
@@ -24,4 +23,20 @@ public class ConsumptionTest
         bool insertresult = c.CreateConsumption(x);
         Assert.IsTrue(insertresult);
     }
+    
+    [Test]
+    public void RegisterTest()
+    {
+        var x = new User(
+            1,
+            "testname",
+            "testlast",
+            "test@mail.com",
+            "password",
+            UserRole.USER
+        );
+        bool RegisterResult = u.AddUser(x);
+        Assert.IsTrue(RegisterResult);
+    }
+    
 }

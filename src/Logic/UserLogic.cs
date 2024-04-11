@@ -8,6 +8,7 @@ public static class UserLogic
         if (LoggedUser == null)
         {
             Program.CurrentUser = null;
+            UserMenu.WrongLogin();
         }else{
             Program.CurrentUser = LoggedUser;
         }
