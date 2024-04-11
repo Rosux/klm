@@ -1,6 +1,6 @@
 public static class ConsumptionLogic
 {
-    private static ConsumptionAcces c = new ConsumptionAcces();
+    private static ConsumptionAccess c = new ConsumptionAccess();
     public static void Consumption(){
         bool running = true;
         while(running)
@@ -9,6 +9,10 @@ public static class ConsumptionLogic
                 {"1. Add Consumption", ()=>{
                     //Retrieve product from the add menu and sends it to the database.
                     Consumption consumption = ConsumptionMenu.AddConsumptionMenu();
+                    if(consumption == null){
+                        ConsumptionMenu.NoItemsToAdd();
+                        return;
+                    }
                     bool added = c.CreateConsumption(consumption);
                 }},
                 {"2. Remove Consumption", ()=>{
