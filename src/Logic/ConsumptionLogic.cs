@@ -1,6 +1,6 @@
 public static class ConsumptionLogic
 {
-    private static ConsumptionAcces c = new ConsumptionAcces();
+    private static ConsumptionAccess c = new ConsumptionAccess();
     public static void Consumption(){
         bool running = true;
         while(running)

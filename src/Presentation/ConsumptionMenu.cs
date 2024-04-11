@@ -1,6 +1,6 @@
 public static class ConsumptionMenu
 {
-    private static ConsumptionAcces c = new ConsumptionAcces();
+    private static ConsumptionAccess c = new ConsumptionAccess();
     public static Consumption AddConsumptionMenu(){
         string Name, StartTime, EndTime;
         double Price;
