@@ -116,7 +116,7 @@ public static class ReservationMenu
     }
     else
     {
-        Console.WriteLine("Available Reservations:");
+        Console.WriteLine("My Reservations:");
         foreach (Reservation reservation in reservations)
         {
             Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
