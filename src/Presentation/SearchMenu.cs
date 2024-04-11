@@ -42,10 +42,8 @@ public static class SearchMenu
                         else
                         {
                             SearchResult = SearchLogic.SearchMovie(userinput, ListGenres);
-                            foreach (Film film in SearchResult)
-                            {
-                                Console.WriteLine(film.Title);
-                            }
+                            Film SelectedFilm = SelectMovie(SearchResult);
+                            Console.WriteLine(SelectedFilm.Title);
                             Console.ReadKey();
                         }
                         
@@ -102,6 +100,15 @@ public static class SearchMenu
                     }},
                 });
             } 
+    }
+
+
+
+    public static Film SelectMovie(List<Film> SearchedMovies)
+    {
+        Dictionary<string, Film> filmOptions = SearchedMovies.ToDictionary(film => film.Title, film => film);
+        Film selectedFilm = MenuHelper.SelectFromList("Select a movie", filmOptions);
+        return selectedFilm;
     }
     public static List<Episode> SearchEpisodes(List<Serie> SearchedSeries)
     {
