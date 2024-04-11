@@ -12,7 +12,42 @@ public static class ReservationOverviewLogic
                     Console.ReadKey();
                 }},
                 {"2. View all reservations for this week",()=> {
-                    ReservationMenu.ShowSpecificReservation(DateTime.Now.AddDays(7));
+                    DateTime date = DateTime.Now;
+                    DayOfWeek day = DateTime.Now.DayOfWeek;
+                    TimeSpan date_s = new TimeSpan(0, 0, 0, 0, 0, 0);
+                    DateTime date_cor = new DateTime();
+                    string day_str = day.ToString();
+                    switch(day_str)
+                    {
+                        case "Monday":
+                            date_cor = date;
+                            break;
+                        case "Tuesday":
+                            date_s = new TimeSpan(0, 0, 1, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                        case "Wednesday":
+                            date_s = new TimeSpan(0, 0, 2, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                        case "Thursday":
+                            date_s = new TimeSpan(0, 0, 3, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                        case "Friday":
+                            date_s = new TimeSpan(0, 0, 4, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                        case "Saturday":
+                            date_s = new TimeSpan(0, 0, 5, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                        case "Sunday":
+                            date_s = new TimeSpan(0, 0, 6, 0, 0, 0);
+                            date_cor = date.Subtract(date_s);
+                            break;
+                    }
+                    ReservationMenu.ShowSpecificReservation(date_cor);
                     Console.Write($"\n\nPress any key to continue...");
                     Console.ReadKey();
                 }},
