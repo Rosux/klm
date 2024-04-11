@@ -6,26 +6,21 @@ public static class ReservationOverviewLogic
         while(running)
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"1. Show all rooms", ()=>{
-                    List<string> roomlist = RoomLogic.GetAllRooms();
-                    bool isEmpty = !roomlist.Any();
-                    if(!isEmpty)
-                    {
-                        foreach(string rooms in roomlist)
-                        {
-                            Console.WriteLine(rooms);
-                        }
-                    } 
-                    else
-                    {
-                        Console.WriteLine("There are currently no rooms.");
-                    }
+                {"1. View all reservations",()=> {
+                    ReservationLogic.ViewReservation();
+                }},
+                {"2. Choose date",()=> {
+                    DateOnly date = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
+                    DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+                    ReservationMenu.ShowSpecificReservation(date_2);
                     Console.Write($"\n\nPress any key to continue...");
+                    Console.Write(DateTime.Now);
                     Console.ReadKey();
                 }},
-                {"2. Exit to main menu", ()=>{
+                {"3. Exit to main menu", ()=>{
                     running = false;
                 }},
+
             });
         }
     }

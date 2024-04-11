@@ -140,6 +140,26 @@ public static class ReservationMenu
     }
     return null;
     }
+
+    public static Reservation? ShowSpecificReservation(DateTime date)
+    {
+    List<Reservation> reservations = ReservationAccess.PickReservations(date);
+    if (reservations.Count == 0)
+    {
+        Console.WriteLine("There are no reservations available to show.");
+        return null;
+    }
+    else
+    {
+        Console.WriteLine("Available Reservations:");
+        foreach (Reservation reservation in reservations)
+        {
+            Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
+        }
+    }
+    return null;
+    }
+
     public static void Error(){
         Console.Clear();
         Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");

@@ -58,6 +58,10 @@ class Menu
                         // close application
                         Environment.Exit(1);
                     }},
+                    {"Make reservation", ()=>{
+                        // close application
+                        ReservationLogic.BookReservation();
+                    }},
                 });
             }
         }

@@ -9,7 +9,7 @@ class Program
         // Menu.Start();
 
         // DO NOT USE UNLESS FOR TESTING
-        Menu.TestStart();
+        Menu.Start();
 
     }
 }
