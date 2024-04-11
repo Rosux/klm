@@ -1,8 +1,9 @@
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess()
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath)
     {
 
-    } 
+    }
+
     public int AddToRoomTable(Room room)
     {
         int newRoomId = -1;
@@ -14,6 +15,7 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return newRoomId;
     }
+
     public void EditFromRoomTable(int id, int capacity)
     {
         _Conn.Open();
@@ -24,6 +26,7 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
+
     public void RemoveFromRoomTable(int roomid)
     {
         _Conn.Open();
@@ -33,6 +36,7 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
+
     public string GetRoom(int id)
     {
         string RoomInfo = "";
@@ -48,6 +52,7 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return RoomInfo;
     }
+
     public List<string> _getAllRooms()
     {
         _Conn.Open();
