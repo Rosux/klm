@@ -74,6 +74,7 @@ public static class SearchMenu
                         SearchSeriesMenu(userinput, SelectedFilters);
                     }},
                     {"Enter search", ()=>{
+                        List<Episode> EpisodeResult = new List<Episode>();
                         List<Serie> SearchResult = new List<Serie>();
                         if (userinput == null && ListGenres == null)
                         {
@@ -83,9 +84,13 @@ public static class SearchMenu
                         else
                         {
                             SearchResult = SearchLogic.SearchSeries(userinput, ListGenres);
-                            foreach (Serie serie in SearchResult)
+                            EpisodeResult = SearchEpisodes(SearchResult);
+                            Console.WriteLine("Selected Episodes: ");
+                            int i = 1;
+                            foreach (Episode episode in EpisodeResult)
                             {
-                                Console.WriteLine(serie.Title);
+                                Console.WriteLine($"{i}. {episode.Title}");
+                                i++;
                             }
                             Console.ReadKey();
                         }
@@ -98,5 +103,76 @@ public static class SearchMenu
                 });
             } 
     }
-
+    public static List<Episode> SearchEpisodes(List<Serie> SearchedSeries)
+    {
+        List<Episode> SelectedEpisodes = new List<Episode>();
+        List<Season> SelectedSeries = new List<Season>();
+        Console.WriteLine("Select a series by giving its index");
+        for (int i = 0; i < SearchedSeries.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {SearchedSeries[i].Title}");
+        }
+        Console.Write("Select series: ");
+        string _selectedSeries = Console.ReadLine();
+        int index;
+        if (int.TryParse(_selectedSeries, out index))
+        {
+            if (index == 0)
+            {
+                Environment.Exit(1);
+            }
+            if (index >= 1 && index <= SearchedSeries.Count)
+            {
+                var serie = SearchedSeries[index - 1];
+                for (int i = 0; i < serie.Seasons.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {serie.Seasons[i].Title}");
+                }
+                Console.Write("\nSelect Season: ");
+                string input = Console.ReadLine();
+                if (int.TryParse(input, out index))
+                {
+                    if (index == 0)
+                    {
+                        Environment.Exit(1);
+                    }
+                    if (index >= 1 && index <= serie.Seasons.Count)
+                    {
+                        var season = serie.Seasons[index - 1];
+                        for (int i = 0; i < season.Episodes.Count; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. {season.Episodes[i].Title}");
+                        }
+                        while (true)
+                        {
+                            Console.Write("\nSelect episodes: (Select 0 to quit)");
+                            input = Console.ReadLine();
+                            if (int.TryParse(input, out index))
+                            {
+                                if (index == 0 )
+                                {
+                                    break;
+                                }
+                                if (index >= 1 && index <= season.Episodes.Count)
+                                {
+                                    SelectedEpisodes.Add(season.Episodes[index - 1]);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid index. Please try again.");
+                                }
+                            } 
+                        }
+                        return SelectedEpisodes;
+                    }
+                }
+                
+            }
+            else
+            {
+                Console.WriteLine("Invalid index");
+            }
+        }
+        return SelectedEpisodes;
+    }
 }
