@@ -124,6 +124,7 @@ class FilmSerieMenu
             else
             {
                 Console.WriteLine("please enter a valid interger, try again");
+                Console.WriteLine();
                 serie_remove(serie_obj);
             }
         }
@@ -161,13 +162,22 @@ class FilmSerieMenu
                             Console.WriteLine("Episode duration(min): ");
                             if (int.TryParse(Console.ReadLine(), out int episode_duration))
                             {
-                    
-                                Episode new_episode = new Episode(episode_title, episode_duration);
-                                Console.WriteLine(season_obj.Add_Episode(new_episode, serie_id, season_id));
+                                if (episode_duration > 0)
+                                {
+                                    Episode new_episode = new Episode(episode_title, episode_duration);
+                                    Console.WriteLine(season_obj.Add_Episode(new_episode, serie_id, season_id));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Duration has to be higher then zero, try again.");
+                                    Console.WriteLine();
+                                    episode_add(serie_obj);
+                                }
                             }
                             else
                             {
                                 Console.WriteLine("please enter a valid interger, try again");
+                                Console.WriteLine();
                                 episode_add(serie_obj);
                             }
                         }
@@ -179,6 +189,7 @@ class FilmSerieMenu
                     else
                     {
                         Console.WriteLine("please enter a valid interger, try again");
+                        Console.WriteLine();
                         episode_add(serie_obj);
                     }
                 }
@@ -190,6 +201,7 @@ class FilmSerieMenu
             else
             {
                 Console.WriteLine("please enter a valid interger, try again");
+                Console.WriteLine();
                 episode_add(serie_obj);
             }
         }
@@ -214,6 +226,7 @@ class FilmSerieMenu
             else
             {
                 Console.WriteLine("please enter a valid interger.");
+                Console.WriteLine();
                 season_add(serie_obj);
             }
         }
@@ -266,7 +279,16 @@ class FilmSerieMenu
         Console.WriteLine("Duration(min): ");
         if (int.TryParse(Console.ReadLine(), out int duration))
         {
-            Console.WriteLine(filmlogic_obj.Add_film(new Film(title, genre, duration)));
+            if (duration > 0)
+            {
+                Console.WriteLine(filmlogic_obj.Add_film(new Film(title, genre, duration)));
+            }
+            else
+            {
+                Console.WriteLine("Duration has to be higher then zero, try again.");
+                Console.WriteLine();
+                movie_add(filmlogic_obj);
+            }
         }
         else
         {
@@ -333,7 +355,16 @@ class FilmSerieMenu
                                 Console.WriteLine("New duration: ");
                                 if (int.TryParse(Console.ReadLine(), out int new_duration))
                                 {
-                                    Console.WriteLine(filmlogic_obj.change_duration(film_id, new_duration));
+                                    if (new_duration > 0)
+                                    {
+                                        Console.WriteLine(filmlogic_obj.change_duration(film_id, new_duration));
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Duration has to be higher then zero, try again.");
+                                        Console.WriteLine();
+                                        movie_change(filmlogic_obj);
+                                    }
                                 }
                                 else
                                 {
