@@ -16,6 +16,7 @@ public class DatabaseHandler
             Role TEXT DEFAULT 'USER' NOT NULL
         )
     ";
+
     private static readonly string _CreateConsumtionString = @"
         CREATE TABLE IF NOT EXISTS Consumptions(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,12 +26,14 @@ public class DatabaseHandler
             EndTime TEXT NOT NULL
         )
     ";
+
     private static readonly string _CreateRoomsString = @"
         CREATE TABLE IF NOT EXISTS Rooms(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Capacity INTEGER NOT NULL
         )
     ";
+
     private static readonly string _CreateReservations =  @"
         CREATE TABLE IF NOT EXISTS Reservations(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +48,7 @@ public class DatabaseHandler
             FOREIGN KEY (UserId) REFERENCES Users(ID)
         )
     ";
-    
+
     protected SQLiteConnection _Conn = new SQLiteConnection();
     private string DatabasePath;
     public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
@@ -68,7 +71,6 @@ public class DatabaseHandler
         foreach (SQLiteCommand comm in Tables){
             comm.ExecuteNonQuery();
         }
-        
         _Conn.Close();
     }
 }
