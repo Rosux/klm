@@ -202,4 +202,99 @@ public static class MenuHelper{
         } while (key != ConsoleKey.Enter);
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
+
+
+    /// This extra function is copied from SelectFromList, but with this function you are able 
+    /// to select multiple answers for the dictionary. This function will only close with Environment.Exit 
+    /// or when it is referred to another function
+    /// So you must implement a Save / Exit option
+    
+public static T SelectMultipleFromList<T>(string Header, Dictionary<string, T> Options){
+    if (Options.Count == 0){
+        return default(T);
+    }
+    
+    // split Options into a list of chunks
+    List<Dictionary<string, T>> chunks = new List<Dictionary<string, T>>();
+    for (int i=0;i<Options.Count;i+=10)
+    {
+        chunks.Add(Options.Skip(i).Take(10).ToDictionary(kv => kv.Key, kv => kv.Value));
+    }
+
+    // get longest option
+    int longestWord = Options.Keys.OrderByDescending(w=>w.Length).First().Length;
+    if (Header.Length > longestWord) {longestWord = Header.Length;}
+    int longestArrowString = ((chunks.Count.ToString().Length*2)+1) + Math.Max(2, longestWord-((chunks.Count.ToString().Length*2)+1)-4) + 4;
+    if (longestArrowString > longestWord){ longestWord = longestArrowString; }
+
+    // selection variables
+    int currentSelection = 0;
+    int currentPage = 0;
+    
+    // draw loop
+    ConsoleKey key;
+    do{
+        // create the page number
+        string pageNumber = $"{currentPage+1}/{chunks.Count}";
+        string pageArrows = $"{pageNumber}";
+        // add spaces on each side of the page number
+        for (int i=1;i<=Math.Max(2, longestWord-pageNumber.Length-4);i++){
+            pageArrows = ((i % 2 == 1) ? " " : "") + pageArrows + ((i % 2 == 0) ? " " : "");
+        }
+        // add arrows on the correct sides of the page number
+        pageArrows = (currentPage > 0 ? "<-" : "  ") + pageArrows + (currentPage < chunks.Count-1 ? "->" : "  ");
+        
+        // print menu with options
+        Console.Clear();
+        // write header
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Write($"┌─{Header}{new String('─', Math.Max(0, longestWord-Header.Length))}─┐\n");
+        
+        // loop over options and print them
+        for (int i = 0; i < chunks[currentPage].Keys.Count; i++){
+            string word = chunks[currentPage].Keys.ElementAt(i);
+            Console.BackgroundColor = ConsoleColor.Black;
+            // if currently selected make the background darkgray instead of black (3 prints so the whitespace doesnt get a background color)
+            Console.Write("│ ");
+            if (currentSelection == i) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+            Console.Write($"{word}");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{new String(' ', Math.Max(0, longestWord-word.Length))} │\n");
+        }
+
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Write($"├─{new String('─', Math.Max(0, longestWord))}─┤\n");
+
+        // write the current page and arrows
+        Console.Write($"│ {pageArrows} │\n");
+
+        // write closing border
+        Console.Write($"└─{new String('─', Math.Max(0, longestWord))}─┘");
+
+        // get user input and call the callback if an option is selected
+        key = Console.ReadKey(true).Key;
+
+        // handle navigation and selection
+        if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
+            currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
+        } else if (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
+            currentPage += (key == ConsoleKey.RightArrow) ? 1 : -1;
+            currentSelection = 0;
+        } else if (key == ConsoleKey.Enter){
+            // Check if the selected option is "Save" or "Exit"
+            if (chunks[currentPage].Keys.ElementAt(currentSelection) == "Save" ||
+                chunks[currentPage].Keys.ElementAt(currentSelection) == "Exit") {
+                break; // Exit the loop if "Save" or "Exit" is selected
+            }
+        }
+
+        // limit the current choice so it doesn't cause out-of-range errors
+        currentPage = Math.Clamp(currentPage, 0, chunks.Count - 1);
+        currentSelection = Math.Clamp(currentSelection, 0, chunks[currentPage].Count - 1);
+
+    } while (true); // Changed to an infinite loop
+
+    return chunks[currentPage].Values.ElementAt(currentSelection);
+}
+
 }

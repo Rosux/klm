@@ -4,13 +4,12 @@ public class SearchLogic
 {
     private static FilmAcesser Film = new FilmAcesser();
     private static SerieAcesser serieAcesser = new SerieAcesser();
-    public List<Genre> FilmGenres { get; private set; }
-    public List<Genre> SeriesGenres { get; private set; }
+    public static List<Genre> FilmGenres { get; private set; }
+    public static  List<Genre> SeriesGenres { get; private set; }
     public List<Film> AllFilms { get; private set; }
 
     public SearchLogic()
     {
-        FilmGenres =  Film.Get_Genres();
         SeriesGenres = serieAcesser.Get_Genres();
     }
 
@@ -75,7 +74,7 @@ public class SearchLogic
 
     }
 
-    public List<Genre> CheckSelectedFiltersMovie() //Displays the selected filters in SelectFilters()
+    public static List<Genre> CheckSelectedFiltersMovie() //Displays the selected filters in SelectFilters()
 
     {
         Console.WriteLine("\nSelected genres:");
@@ -93,7 +92,7 @@ public class SearchLogic
         return SelectedGenres;
     }
 
-    public List<Genre> CheckSelectedFiltersSeries() //Displays the selected filters in SelectFilters()
+    public static List<Genre> CheckSelectedFiltersSeries() //Displays the selected filters in SelectFilters()
 
     {
         Console.WriteLine("\nSelected genres:");
@@ -200,5 +199,19 @@ public class SearchLogic
             }
         }
 
+    }
+    public static List<Genre> Get_Genres(bool IsMovie)
+    {
+        if (IsMovie == true)
+        {
+            FilmGenres = Film.Get_Genres();
+            return FilmGenres;
+        }
+        else if (IsMovie == false)
+        {
+            SeriesGenres = serieAcesser.Get_Genres();
+            return SeriesGenres;
+        }
+        else return null;
     }
 }

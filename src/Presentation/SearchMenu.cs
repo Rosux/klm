@@ -33,8 +33,8 @@ public static class SearchMenu
                     }}, //below outputs: Selected genres: 
                     {$"{SearchLogic.GenreToString(ListGenres)}", ()=>{
                         SearchLogic logic = new SearchLogic();
-                        logic.SelectMovieFilters();
-                        SelectedFilters = logic.CheckSelectedFiltersMovie();
+                        SelectFilters(SearchLogic.Get_Genres(true));
+                        SelectedFilters = SearchLogic.CheckSelectedFiltersMovie();
                         SearchMovieMenu(userinput, SelectedFilters);
                     }},
                     {"Enter search", ()=>{
@@ -73,8 +73,8 @@ public static class SearchMenu
                     }}, //below outputs: Selected genres: 
                     {$"{SearchLogic.GenreToString(ListGenres)}", ()=>{
                         SearchLogic logic = new SearchLogic();
-                        logic.SelectSerieFilters();
-                        SelectedFilters = logic.CheckSelectedFiltersSeries();
+                        SelectFilters(SearchLogic.Get_Genres(false));
+                        SelectedFilters = SearchLogic.CheckSelectedFiltersSeries();
                         SearchSeriesMenu(userinput, SelectedFilters);
                     }},
                     {"Enter search", ()=>{
@@ -187,5 +187,54 @@ public static class SearchMenu
             }
         }
         return SelectedEpisodes;
+    }
+
+    public static void SelectFilters(List<Genre> genres)
+    {
+        int selectedGenreIndex = 0;
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("Select genres using arrow keys and press Enter to toggle selection:\n");
+            for (int i = 0; i < genres.Count; i++)
+            {
+                if (i == selectedGenreIndex)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else
+                    Console.ResetColor();
+                
+                Console.WriteLine($"{(i == selectedGenreIndex ? ">" : " ")}{(genres[i].IsSelected ? "[x]" : "[ ]")} {genres[i].Name}");
+            }
+
+            Console.ResetColor(); // Reset console color after printing menu
+            Console.WriteLine("\nOptions:");
+            Console.WriteLine("1. Save");
+            Console.WriteLine("2. Exit");
+
+            ConsoleKeyInfo key = Console.ReadKey(true);
+
+            switch (key.Key)
+            {
+                case ConsoleKey.UpArrow:
+                    selectedGenreIndex = Math.Max(0, selectedGenreIndex - 1);
+                    break;
+                case ConsoleKey.DownArrow:
+                    selectedGenreIndex = Math.Min(genres.Count - 1, selectedGenreIndex + 1);
+                    break;
+                case ConsoleKey.Enter:
+                    genres[selectedGenreIndex].GenreSelect();
+                    break;
+                case ConsoleKey.Escape:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    return; // Exit the program
+                case ConsoleKey.D1: // Save option
+                    Console.ForegroundColor = ConsoleColor.White;
+                    return;
+                case ConsoleKey.D2: // Exit option
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Environment.Exit(1);
+                    break; // Exit the program
+            }
+        }  
     }
 }
