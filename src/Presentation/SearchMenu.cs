@@ -5,7 +5,8 @@ public static class SearchMenu
 
     public static void SelectSearch()
     {
-        while(Program.CurrentUser == null){
+        bool loop = true;
+        while(loop){
                 MenuHelper.SelectOptions("Select an option", new Dictionary<string, Action>(){
                     {$"Search Movies", ()=>{
                         SearchMovieMenu();
@@ -13,12 +14,16 @@ public static class SearchMenu
                     {$"Search Series", ()=>{
                         SearchSeriesMenu();
                     }},
+                    {$"Quit", ()=>{
+                       loop = false; 
+                    }}
                 });
             }
     }
     public static void SearchMovieMenu(string userinput = null, List<Genre> ListGenres = null)
     {
-        while(Program.CurrentUser == null){
+        bool loop = true;
+        while(loop){
                 MenuHelper.SelectOptions("Select an option", new Dictionary<string, Action>(){
                     {$"Input search: {userinput}", ()=>{
                         // run search logic
@@ -50,14 +55,15 @@ public static class SearchMenu
                     }},
                     {"Exit", ()=>{
                         // close application
-                        Environment.Exit(1);
+                        loop = false;
                     }},
                 });
             } 
     }
     public static void SearchSeriesMenu(string userinput = null, List<Genre> ListGenres = null)
     {
-        while(Program.CurrentUser == null){
+        bool loop = true;
+        while(loop){
                 MenuHelper.SelectOptions("Select an option", new Dictionary<string, Action>(){
                     {$"Input search: {userinput}", ()=>{
                         // run search logic
@@ -96,7 +102,7 @@ public static class SearchMenu
                     }},
                     {"Exit", ()=>{
                         // close application
-                        Environment.Exit(1);
+                        loop = false;
                     }},
                 });
             } 
