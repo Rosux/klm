@@ -44,9 +44,25 @@ public static class UserLogic
                     UserMenu.UserRemoved();
                 }},
                 {"2. Add User", ()=>{
-                    //Check if there is a item to remove and if there is it send a message to get it removed.
                     Addusers();
                     UserMenu.UserAdded();
+                }},
+                {"3. Edit User", ()=>{
+                    User editedUser = UserMenu.EditUser();
+                    // if there are no products show error and return to the menu
+                    if (editedUser == null){
+                        ConsumptionMenu.NoItems();
+                        return;
+                    }
+                    // send updated Consumption to DataAccess layer
+                    UserAccess u = new UserAccess();
+                    bool updated = u.UpdateUser(editedUser);
+                    // show user if its updated or not
+                    if (updated){
+                        ConsumptionMenu.Saved();
+                    }else{
+                        ConsumptionMenu.Error();
+                    }
                 }},
                 {"2. Exit to main menu", ()=>{
                     running = false;

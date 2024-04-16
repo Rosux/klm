@@ -104,4 +104,21 @@ public class UserAccess : DatabaseHandler{
             return rowsAffected > 0;
         }
     }
+
+    public bool UpdateUser(User user){
+        _Conn.Open();
+        int rowsAffected = -1;
+        string updateUser = @"UPDATE Users SET FirstName = @Name, LastName= @LastName, Email = @Email, Password = @Password, Role = @Role WHERE ID = @Id";
+        using (SQLiteCommand comm = new SQLiteCommand(updateUser, _Conn)){
+            comm.Parameters.AddWithValue("@Name", user.FirstName);
+            comm.Parameters.AddWithValue("@LastName", user.LastName);
+            comm.Parameters.AddWithValue("@Email", user.Email);
+            comm.Parameters.AddWithValue("@Password", user.Password);
+            comm.Parameters.AddWithValue("@Role", user.Role.ToString());
+            comm.Parameters.AddWithValue("@Id", user.Id);
+            rowsAffected = comm.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        return rowsAffected > 0;
+    }
 }

@@ -143,6 +143,61 @@ public static class UserMenu{
         }
     }
 
+    public static User? EditUser(){
+        Dictionary<string, User> cons = new Dictionary<string, User>();
+        foreach (User user in u.GetAllUsers()){
+            cons.Add(user.FirstName, user);
+        }
+        if (cons.Count == 0)
+        {
+            return null;
+        }
+        User editedUser = MenuHelper.SelectFromList("Select product to edit", cons);
+        bool changing = true;
+        while (changing)
+        {
+            MenuHelper.SelectOptions("Select User property to edit", new Dictionary<string, Action>(){
+                {"Name", ()=>{
+                    Console.WriteLine("Enter the new name of the User:");
+                    editedUser.FirstName = Console.ReadLine();
+                }},
+                {"LastName", ()=>{
+                    Console.WriteLine("Enter the new LastName of the User:");
+                    editedUser.LastName = Console.ReadLine();
+                }},
+                {"Email", ()=>{
+                    Console.WriteLine("Enter the new Email of the User:");
+                    editedUser.Email = Console.ReadLine();
+                }},
+                {"Password", ()=>{
+                    Console.WriteLine("Enter the new Password of the User:");
+                    editedUser.Password = Console.ReadLine();
+                }},
+                {"Role", ()=>{
+                    bool running = true;
+                    while(running)
+                    {
+                        MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
+                            {"1. User", ()=>{
+                                 editedUser.Role = UserRole.USER;
+                                  running = false;
+                            }},
+                            {"2. Admin", ()=>{
+                                editedUser.Role = UserRole.ADMIN;
+                                 running = false;
+                            }},
+                        });
+                    }
+                }},
+                {"Save changes", ()=>{
+                    changing = false;
+                }},
+            });
+        }
+        
+        return editedUser;
+    }
+
     public static void NoUsersToRemove(){
         Console.Clear();
         Console.WriteLine("There are no Users stored to remove.\n\nPress any key to continue");
