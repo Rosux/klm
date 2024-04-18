@@ -1,5 +1,5 @@
 
-public class Episode
+public class Episode : Media
 {
     public string Title;
     public int Length;

@@ -1,4 +1,4 @@
-public class Serie
+public class Serie : Media
 {
     public string Title;
     public string Genre;

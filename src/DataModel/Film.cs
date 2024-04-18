@@ -1,5 +1,5 @@
 
-public class Film
+public class Film : Media
 {
     public string Title;
     public string Genre;

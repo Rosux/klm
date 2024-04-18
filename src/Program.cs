@@ -5,8 +5,7 @@ class Program
     public static User? CurrentUser = null;
     public static void Main()
     {
-
-        SearchMenu.SelectSearch();
-
+        // Menu.Start();
+        Menu.TestStart();
     }
 }
