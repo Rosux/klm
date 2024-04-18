@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
@@ -17,8 +18,11 @@ public class ReservationAccess : DatabaseHandler
                 DateTime startdate = DateTime.Parse(reader.GetString(4));
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
-                TimeLine.Holder timeline = new TimeLine.Holder();
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, timeline));
+                string timeline_str = reader.GetString(7);
+                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(timeline_str)!;
+                TimeLine.Holder TimelineHolder = new TimeLine.Holder();
+                TimelineHolder.t = timeline;
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
             }
         }
         _Conn.Close();
@@ -42,8 +46,37 @@ public class ReservationAccess : DatabaseHandler
                 DateTime startdate = DateTime.Parse(reader.GetString(4));
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
-                TimeLine.Holder timeline = new TimeLine.Holder();
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, timeline));
+                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
+                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
+                TimelineHolder.t = timeline;
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+            }
+        }
+        _Conn.Close();
+        return reservations;
+    }
+
+    public List<Reservation> PickReservationsUser(){
+        List<Reservation> reservations = new List<Reservation>();
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Reservations WHERE UserId = @UserId";
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@UserId", Program.CurrentUser.Id);
+            SQLiteDataReader reader = Launch.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int roomid = reader.GetInt32(1);
+                int userid = reader.GetInt32(2);
+                int groupsize = reader.GetInt32(3);
+                DateTime startdate = DateTime.Parse(reader.GetString(4));
+                DateTime enddate = DateTime.Parse(reader.GetString(5));
+                double price = reader.GetDouble(6);
+                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
+                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
+                TimelineHolder.t = timeline;
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
             }
         }
         _Conn.Close();
@@ -51,12 +84,12 @@ public class ReservationAccess : DatabaseHandler
     }
 
     public bool CreateReservation(Reservation reservation){
-        _Conn.Open();
-        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
-        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
-        int rowsAffected;
-        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
-        {
+    _Conn.Open();
+    string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
+    VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
+    int rowsAffected;
+    using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+    {
             Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
             Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
             Launch.Parameters.AddWithValue("@GroupSize", reservation.GroupSize);

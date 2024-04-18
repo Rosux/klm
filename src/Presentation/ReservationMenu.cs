@@ -33,8 +33,51 @@ public static class ReservationMenu
         bool save = false;
         while(addingToTimeline){
             MenuHelper.SelectOptions($"Select an option", new Dictionary<string, Action>(){
-                {"Add Movies/Series", ()=>{
-                    // TODO implement movies/series picking (better fucking ui pls)
+                {"Add Movies/Episode", ()=>{
+                    List<object> FilmOrEpisode_list = SearchMenu.SelectSearch();
+                    foreach (object FilmOrEpisode in FilmOrEpisode_list)
+                    {
+                        if(FilmOrEpisode is Film)
+                        {
+                            Film film = (Film)FilmOrEpisode;
+                            DateOnly d = MenuHelper.SelectDate($"Select the date and time you want {film.Title} to begin.", null, startDate, endDate);
+                            TimeOnly t;
+                            if (d == startDate && d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                            }else if (d == startDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                            }else if (d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                            }else{
+                                t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                            }
+                            timeline.Add(
+                            film,
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(film.Duration)
+                            );
+                        }
+                        else
+                        {
+                            Episode episode = (Episode)FilmOrEpisode;
+                            DateOnly d = MenuHelper.SelectDate($"Select the date and time you want the episode {episode.Title} to begin.", null, startDate, endDate);
+                            TimeOnly t;
+                            if (d == startDate && d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                            }else if (d == startDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                            }else if (d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                            }else{
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                            }
+                            timeline.Add(
+                            episode,
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
+                            );
+                        }
+                    }
                 }},
                 {"Add Consumptions", ()=>{
                     Dictionary<string, Consumption> consumptions = new Dictionary<string, Consumption>();
@@ -132,6 +175,7 @@ public static class ReservationMenu
                     return reservation;
                 }
             }
+            Console.Write($"No reservation found with id: {selectedId}.");
         }
         else
         {
@@ -146,15 +190,36 @@ public static class ReservationMenu
     List<Reservation> reservations = ReservationAccess.PickReservations(date);
     if (reservations.Count == 0)
     {
-        Console.WriteLine("There are no reservations available to show.");
+        Console.WriteLine("There are no reservations during this time period.");
         return null;
     }
     else
     {
-        Console.WriteLine("Available Reservations:");
+        Console.WriteLine("All Reservations during this time period:");
         foreach (Reservation reservation in reservations)
         {
             Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
+        }
+    }
+    return null;
+    }
+
+    public static Reservation? ShowSpecificReservationUser()
+    {
+    List<Reservation> reservations = ReservationAccess.PickReservationsUser();
+    if (reservations.Count == 0)
+    {
+        Console.WriteLine("You have no reservations.");
+        return null;
+    }
+    else
+    {
+        Console.WriteLine("All your Reservations:");
+        int number = 1;
+        foreach (Reservation reservation in reservations)
+        {
+            Console.WriteLine($"Resrevation {number}: Room ID: {reservation.RoomId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
+            number++;
         }
     }
     return null;

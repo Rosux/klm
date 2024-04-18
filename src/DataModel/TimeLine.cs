@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace TimeLine{
     public class Holder
     {
-        private List<Item> t = new List<Item>();
+        public List<Item> t = new List<Item>();
 
         public Holder(){
             this.t = new List<Item>();

@@ -1,68 +1,101 @@
-public static class ReservationOverviewLogic
+using Newtonsoft.Json;
+public class ReservationOverviewLogic
 {
-    public static void ReservationOverview()
+    public string Overview(Reservation selected_res)
     {
-                bool running = true;
-        while(running)
+        string overview = "";
+        if (selected_res != null)
         {
-            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"1. View all reservations",()=> {
-                    ReservationLogic.ViewReservation();
-                    Console.Write($"\n\nPress any key to continue...");
-                    Console.ReadKey();
-                }},
-                {"2. View all reservations for this week",()=> {
-                    DateTime date = DateTime.Now;
-                    DayOfWeek day = DateTime.Now.DayOfWeek;
-                    TimeSpan date_s = new TimeSpan(0, 0, 0, 0, 0, 0);
-                    DateTime date_cor = new DateTime();
-                    string day_str = day.ToString();
-                    switch(day_str)
+            ConsumptionAccess con_accesser = new ConsumptionAccess();
+            FilmAcesser film_accesser = new FilmAcesser();
+            SerieAcesser serie_acesser = new SerieAcesser();
+            bool condition_con = false;
+            bool condition_film = false;
+            bool condition_episode = false;
+            Consumption cons_cor = new(-1,"",4, TimeOnly.Parse("12:00:00"), TimeOnly.Parse("23:00:00"));
+            Film film_cor = new("","",-1,-1);
+            Episode episode_cor = new("",-1,-1);
+            Season season_cor = new("",-1);
+            Serie serie_cor = new("","",-1);
+            overview = overview + $"\nReservation info:\nId: {selected_res.Id}.\nRoom: {selected_res.RoomId}.\nGroup size: {selected_res.GroupSize}.\n\nTimeline:\nStart of reservation at {selected_res.StartDate}.\n";
+            foreach(TimeLine.Item actie in selected_res.TimeLine.t)
+            {
+                condition_con = false;
+                condition_film = false;
+                condition_episode = false;
+                foreach(Consumption cons in con_accesser.ReadConsumption())
+                {
+                    TimeLine.Item timeline_item = new TimeLine.Item(cons, actie.StartTime, actie.EndTime);
+                    string string_movies = JsonConvert.SerializeObject(timeline_item);
+                    TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
+                    string timeline_str = timeline.Action.ToString();
+                    string actie_str = actie.Action.ToString();
+                    if(String.Compare(timeline_str, actie_str) == 0)
                     {
-                        case "Monday":
-                            date_cor = date;
-                            break;
-                        case "Tuesday":
-                            date_s = new TimeSpan(0, 0, 1, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
-                        case "Wednesday":
-                            date_s = new TimeSpan(0, 0, 2, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
-                        case "Thursday":
-                            date_s = new TimeSpan(0, 0, 3, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
-                        case "Friday":
-                            date_s = new TimeSpan(0, 0, 4, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
-                        case "Saturday":
-                            date_s = new TimeSpan(0, 0, 5, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
-                        case "Sunday":
-                            date_s = new TimeSpan(0, 0, 6, 0, 0, 0);
-                            date_cor = date.Subtract(date_s);
-                            break;
+                        cons_cor = cons;
+                        condition_con = true;
+                        break;
                     }
-                    ReservationMenu.ShowSpecificReservation(date_cor);
-                    Console.Write($"\n\nPress any key to continue...");
-                    Console.ReadKey();
-                }},
-                {"3. Choose date",()=> {
-                    DateOnly date = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
-                    DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
-                    ReservationMenu.ShowSpecificReservation(date_2);
-                    Console.Write($"\n\nPress any key to continue...");
-                    Console.ReadKey();
-                }},
-                {"4. Exit to main menu", ()=>{
-                    running = false;
-                }},
-
-            });
+                }
+                foreach(Serie serie in serie_acesser.Get_info())
+                {
+                    foreach(Season season in serie.Seasons)
+                    {
+                        foreach(Episode episode in season.Episodes)
+                        {
+                            TimeLine.Item timeline_item = new TimeLine.Item(episode, actie.StartTime, actie.EndTime);
+                            string string_movies = JsonConvert.SerializeObject(timeline_item);
+                            TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
+                            string timeline_str = timeline.Action.ToString();
+                            string actie_str = actie.Action.ToString();
+                            if(String.Compare(timeline_str, actie_str) == 0)
+                            {
+                                episode_cor = episode;
+                                season_cor = season;
+                                serie_cor = serie;
+                                condition_episode = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                foreach(Film film in film_accesser.Get_info())
+                {
+                    TimeLine.Item timeline_item = new TimeLine.Item(film, actie.StartTime, actie.EndTime);
+                    string string_movies = JsonConvert.SerializeObject(timeline_item);
+                    TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
+                    string timeline_str = timeline.Action.ToString();
+                    string actie_str = actie.Action.ToString();
+                    if(String.Compare(timeline_str, actie_str) == 0)
+                    {
+                        film_cor = film;
+                        condition_film = true;
+                        break;
+                    }
+                }
+                if(condition_con == true && condition_film == false && condition_episode == false)
+                {
+                    overview = overview + $"\nAt {actie.StartTime} a order of {cons_cor.Name} for {cons_cor.Price} euro.";
+                }
+                else if(condition_con == false && condition_film == true && condition_episode == false)
+                {
+                    overview = overview + $"\nwatching the movie {film_cor.Title} from {actie.StartTime} to {actie.EndTime}.";
+                }
+                else if(condition_con == false && condition_film == false && condition_episode == true)
+                {
+                    overview = overview + $"\nwatching episode {episode_cor.Id}: {episode_cor.Title} from {serie_cor.Title} {season_cor.Title}, from {actie.StartTime} to {actie.EndTime}.";
+                }
+                else
+                {
+                    overview = overview + $"\nBreak form {actie.StartTime} to {actie.EndTime}.";
+                }
+            }
+            overview = overview + $"\n\nEnd of reservation at {selected_res.EndDate}.";
+            return overview;
+        }
+        else
+        {
+            return overview;
         }
     }
 }

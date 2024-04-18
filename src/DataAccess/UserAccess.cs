@@ -51,6 +51,7 @@ public class UserAccess : DatabaseHandler{
                     UserRole r;
                     Enum.TryParse(reader["Role"].ToString(), out r);
                     currentUser = new User(
+                        Int32.Parse(reader["Id"].ToString()),
                         reader["firstName"].ToString(),
                         reader["lastName"].ToString(),
                         reader["email"].ToString(),

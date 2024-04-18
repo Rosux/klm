@@ -42,7 +42,7 @@ class Menu
                     }},
                     {"View reservations", ()=>{
                         // close application
-                        ReservationOverviewLogic.ReservationOverview();
+                        ReservationOverviewMenu.ReservationOverview();
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -61,6 +61,12 @@ class Menu
                     {"Make reservation", ()=>{
                         // close application
                         ReservationLogic.BookReservation();
+                    }},
+                    {"Show all your Reservations", ()=>{
+                        // close application
+                        ReservationMenu.ShowSpecificReservationUser();
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey();
                     }},
                 });
             }
