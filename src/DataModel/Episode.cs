@@ -9,5 +9,5 @@ public class Episode : Media
         Id = id;
         Length = length;
         Title = title;
-    }  
+    }
 }

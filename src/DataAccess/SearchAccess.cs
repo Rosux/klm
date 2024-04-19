@@ -18,7 +18,7 @@ public class SearchAccess
         string[] tokens = searchPattern.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries);
         foreach (Film f in AllMovies){
             foreach (string token in tokens){
-                if(f.Title.ToLower().Contains(token.ToLower())){    
+                if(f.Title.ToLower().Contains(token.ToLower())){
                     films.Add(f);
                     break;
                 }else if(f.Genre.ToLower().Contains(token.ToLower())){
@@ -37,7 +37,8 @@ public class SearchAccess
                     break;
                 }
             }
-        }  
+        }
+        films.Sort((x, y) => x.Rating.CompareTo(y.Rating));
         return films;
     }
 }

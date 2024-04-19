@@ -11,6 +11,13 @@ public class ConsumptionTest
         u = new UserAccess("./TEST.db");
     }
 
+    [TearDown]
+    public void Cleanup()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+    }
+
     [Test]
     public void InsertionTest()
     {
