@@ -1,10 +1,11 @@
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
-    public List<Reservation> ReadReservations(){
-        List<Reservation> reservations = new List<Reservation>();
+    public List<Reservation> ReadReservations(int loggedInUserId){
+        List<Reservation> reservations = new List<Reservation>(loggedInUserId);
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations";
+        string NewQuery = @"SELECT * FROM Reservations WHERE userid = " + loggedInUserId;
+
         using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
         {
             SQLiteDataReader reader = Show.ExecuteReader();

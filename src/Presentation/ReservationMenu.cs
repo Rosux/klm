@@ -106,9 +106,9 @@ public static class ReservationMenu
         }
         return null;
     }
-    public static Reservation? ShowReservation()
+    public static Reservation? ShowReservation(int loggedInUserId)
     {
-    List<Reservation> reservations = ReservationAccess.ReadReservations();
+    List<Reservation> reservations = ReservationAccess.ReadReservations(loggedInUserId);
     if (reservations.Count == 0)
     {
         Console.WriteLine("There are no reservations available to show.");

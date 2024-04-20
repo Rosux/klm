@@ -73,7 +73,7 @@ class Menu
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"Test", ()=>{
-                    ReservationLogic.Reservation();
+                    ReservationLogic.Reservation(Program.CurrentUser.Id);
                 }},
                 {"Exit", ()=>{
                     // close application
