@@ -68,15 +68,7 @@ class Menu
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"Test", ()=>{
-                    // SearchAccess x = new SearchAccess();
-                    // List<Media> a = x.Search("b");
-                    // foreach(Media m in a){
-                    //     if(m is Film){
-                    //         Console.WriteLine(((Film)m).Title);
-                    //     }else if(m is Serie){
-                    //         Console.WriteLine(((Serie)m).Title);
-                    //     }
-                    // }
+                    // How to use MenuHelper.SelectMovieOrEpisode();
                     object a = MenuHelper.SelectMovieOrEpisode();
                     if(a is Film){
                         Console.WriteLine(((Film)a).Title);

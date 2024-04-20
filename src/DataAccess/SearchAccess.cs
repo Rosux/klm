@@ -1,5 +1,6 @@
-using System.Text.RegularExpressions;
-
+/// <summary>
+/// This class holds methods for searching a specific movie/series
+/// </summary>
 public class SearchAccess
 {
     private FilmAcesser FilmAccessor = new FilmAcesser();
@@ -11,6 +12,11 @@ public class SearchAccess
         AllSeries = SerieAccessor.Get_info();
     }
 
+    /// <summary>
+    /// Search a movie/series by string seperated by ',' and return a list of Media.
+    /// </summary>
+    /// <param name="searchPattern">A string containing Title/Genre text optionally with seperator , between multiple search options.</param>
+    /// <returns>A list of Media objects holding every movie/serie where the title/genre contains the searchPattern.</returns>
     public List<Media> Search(string searchPattern){
         List<Media> films = new List<Media>();
         List<Serie> AllSerie = AllSeries;
