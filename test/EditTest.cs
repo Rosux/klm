@@ -62,26 +62,7 @@ public class EditTest
             lastInsertedId = (long)command.ExecuteScalar();
         }
 
-        string updateUser = @"UPDATE Users 
-        SET FirstName = @FirstName, 
-        LastName = @LastName, 
-        Email = @Email, 
-        Password = @Password, 
-        Role = @Role 
-        WHERE ID = @Id";
-
-        using (SQLiteCommand command = new SQLiteCommand(updateUser, _Conn))
-        {
-            command.Parameters.AddWithValue("@FirstName", UpdatedUser.FirstName);
-            command.Parameters.AddWithValue("@LastName", UpdatedUser.LastName);
-            command.Parameters.AddWithValue("@Email", UpdatedUser.Email);
-            command.Parameters.AddWithValue("@Password", UpdatedUser.Password);
-            command.Parameters.AddWithValue("@Role", UpdatedUser.Role.ToString());
-            command.Parameters.AddWithValue("@Id", UpdatedUser.Id);
-
-
-            int rowsAffected = command.ExecuteNonQuery();
-        }
+        u.UpdateUser(UpdatedUser);
 
         User retrievedUser = null;
         string selectUserSql = "SELECT * FROM Users WHERE Id = @Id";
