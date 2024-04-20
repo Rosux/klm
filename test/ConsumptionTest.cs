@@ -59,7 +59,7 @@ public class ConsumptionTest
             
         foreach (var consumption in readResult)
         {
-            if (AreEqual(consumption, x))
+            if (consumption.Id == x.Id && consumption.Name == x.Name && consumption.Price == x.Price && consumption.StartTime == x.StartTime && consumption.EndTime == x.EndTime)
             {
                 Assert.Pass("Inserted Consumption found in the list.");
             }
@@ -68,14 +68,6 @@ public class ConsumptionTest
         Assert.Fail("Inserted Consumption not found in the list.");
     }
     
-    private bool AreEqual(Consumption consumption1, Consumption consumption2)
-    {
-        return consumption1.Id == consumption2.Id &&
-               consumption1.Name == consumption2.Name &&
-               consumption1.Price == consumption2.Price &&
-               consumption1.StartTime == consumption2.StartTime &&
-               consumption1.EndTime == consumption2.EndTime;
-    }
     // [Test]
     // public void RemoveTest(){
     //     var x = new Consumption(
