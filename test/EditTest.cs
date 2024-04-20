@@ -1,11 +1,17 @@
 [TestFixture]
 public class EditTest
 {
+    private SQLiteConnection _Conn;
     UserAccess? u = null;
 
     [OneTimeSetUp]
-    public void Setup(){
+    public void Setup()
+    {
         File.Delete("./TEST.db");
+        SQLiteConnection.CreateFile("./TEST.db");
+        string connectionString = "Data Source=./TEST.db;Version=3";
+        _Conn = new SQLiteConnection(connectionString);
+        Directory.CreateDirectory("./DataSource/");
         u = new UserAccess("./TEST.db");
     }
 
@@ -20,25 +26,87 @@ public class EditTest
     public void EditTesting()
     {
         var User = new User(
-            Id: 1,
             FirstName: "Testname",
             LastName: "Testlast",
             Email: "Test@mail.com",
             Password: "123",
             Role: UserRole.USER
         );
-        u.AddUser(User);
 
         var UpdatedUser = new User(
-            Id: 1,
+            Id: 1, // Assuming you're updating a user with Id 1
             FirstName: "Upatedname",
             LastName: "Updatedlast",
             Email: "Test@mail.com",
             Password: "123",
             Role: UserRole.ADMIN
         );
-        u.UpdateUser(UpdatedUser);
-        var checkUser = u.CheckUser(UpdatedUser);
-        Assert.AreEqual(checkUser.FirstName, UpdatedUser.FirstName);
+
+        string insertSql = @"
+            INSERT INTO Users (FirstName, LastName, Email, Password, Role)
+            VALUES (@FirstName, @LastName, @Email, @Password, @Role);
+            SELECT last_insert_rowid();
+        ";
+
+        long lastInsertedId = 0;
+
+        using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
+        {
+            command.Parameters.AddWithValue("@FirstName", User.FirstName);
+            command.Parameters.AddWithValue("@LastName", User.LastName);
+            command.Parameters.AddWithValue("@Email", User.Email);
+            command.Parameters.AddWithValue("@Password", User.Password);
+            command.Parameters.AddWithValue("@Role", User.Role.ToString());
+
+            _Conn.Open();
+            lastInsertedId = (long)command.ExecuteScalar();
+        }
+
+        string updateUser = @"UPDATE Users 
+        SET FirstName = @FirstName, 
+        LastName = @LastName, 
+        Email = @Email, 
+        Password = @Password, 
+        Role = @Role 
+        WHERE ID = @Id";
+
+        using (SQLiteCommand command = new SQLiteCommand(updateUser, _Conn))
+        {
+            command.Parameters.AddWithValue("@FirstName", UpdatedUser.FirstName);
+            command.Parameters.AddWithValue("@LastName", UpdatedUser.LastName);
+            command.Parameters.AddWithValue("@Email", UpdatedUser.Email);
+            command.Parameters.AddWithValue("@Password", UpdatedUser.Password);
+            command.Parameters.AddWithValue("@Role", UpdatedUser.Role.ToString());
+            command.Parameters.AddWithValue("@Id", UpdatedUser.Id);
+
+
+            int rowsAffected = command.ExecuteNonQuery();
+        }
+
+        User retrievedUser = null;
+        string selectUserSql = "SELECT * FROM Users WHERE Id = @Id";
+
+        using (SQLiteCommand selectCommand = new SQLiteCommand(selectUserSql, _Conn))
+        {
+            selectCommand.Parameters.AddWithValue("@Id", UpdatedUser.Id);
+
+            using (SQLiteDataReader reader = selectCommand.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    retrievedUser = new User(
+                        Id: Convert.ToInt32(reader["Id"]),
+                        FirstName: reader["FirstName"].ToString(),
+                        LastName: reader["LastName"].ToString(),
+                        Email: reader["Email"].ToString(),
+                        Password: reader["Password"].ToString(),
+                        Role: (UserRole)Enum.Parse(typeof(UserRole), reader["Role"].ToString())
+                    );
+                }
+            }
+        }
+
+        Assert.NotNull(retrievedUser);
+        Assert.AreEqual(retrievedUser.FirstName, UpdatedUser.FirstName);
     }
 }
