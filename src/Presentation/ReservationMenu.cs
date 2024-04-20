@@ -108,38 +108,58 @@ public static class ReservationMenu
     }
     public static Reservation? ShowReservation(int loggedInUserId)
     {
-    List<Reservation> reservations = ReservationAccess.ReadReservations(loggedInUserId);
-    if (reservations.Count == 0)
-    {
-        Console.WriteLine("There are no reservations available to show.");
-        return null;
-    }
-    else
-    {
-        Console.WriteLine("Available Reservations:");
-        foreach (Reservation reservation in reservations)
+        List<Reservation> reservations = ReservationAccess.ReadReservations(loggedInUserId);
+        if (reservations.Count == 0)
         {
-            Console.WriteLine($"ID: {reservation.Id}, Room ID: {reservation.RoomId}, User ID: {reservation.UserId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
-        }
-        Console.Write("Enter the ID of the reservation to select: ");
-        int selectedId;
-        if (int.TryParse(Console.ReadLine(), out selectedId))
-        {
-            foreach (Reservation reservation in reservations)
-            {
-                if (reservation.Id == selectedId)
-                {
-                    return reservation;
-                }
-            }
+            Console.WriteLine("There are no reservations available to show.");
+            return null;
         }
         else
         {
-            Console.WriteLine("Invalid input. Please enter a valid ID.");
+            Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
+            foreach (Reservation reservation in reservations)
+            {
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+            }
+
+            reservationOptions.Add("Return to menu", null);
+
+            Reservation selectedReservation = null;
+            do
+            {
+                selectedReservation = MenuHelper.SelectFromList("Available Reservations", reservationOptions);
+
+                if (selectedReservation != null)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Reservation Details:");
+                    Console.WriteLine($"ID: {selectedReservation.Id}");
+                    Console.WriteLine($"Room ID: {selectedReservation.RoomId}");
+                    Console.WriteLine($"User ID: {selectedReservation.UserId}");
+                    Console.WriteLine($"Group Size: {selectedReservation.GroupSize}");
+                    Console.WriteLine($"Start Date: {selectedReservation.StartDate}");
+                    Console.WriteLine($"End Date: {selectedReservation.EndDate}");
+                    Console.WriteLine($"Price: {selectedReservation.Price}");
+                    Console.WriteLine("\nPress escape to return to the main menu...");
+
+                    while (true)
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }
+            } while (selectedReservation != null);
+
+            return null;
         }
     }
-    return null;
-    }
+
+
+
+
+
+
     public static void Error(){
         Console.Clear();
         Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
