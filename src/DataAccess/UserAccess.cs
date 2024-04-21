@@ -1,4 +1,8 @@
 public class UserAccess : DatabaseHandler{
+    public UserAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
+
+    }
+
     public bool AddUser(User user){
         _Conn.Open();
         string insertSql = @"
