@@ -127,7 +127,7 @@ public static class ReservationMenu
             Reservation selectedReservation = null;
             do
             {
-                selectedReservation = MenuHelper.SelectFromList("Available Reservations", reservationOptions);
+                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
 
                 if (selectedReservation != null)
                 {
