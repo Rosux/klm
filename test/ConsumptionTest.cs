@@ -95,9 +95,26 @@ public class ConsumptionTest
         }
         _Conn.Close();
         bool removeResult = c.DeleteConsumption(x);
-        if (removeResult)
-        {
-            Assert.Pass("Consumption successfully removed.");
+
+            bool isDatabaseEmpty;
+            using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
+            {
+                _Conn.Open();
+                int rowCount = Convert.ToInt32(checkCommand.ExecuteScalar());
+                isDatabaseEmpty = rowCount == 0;
+                _Conn.Close();
+            }
+
+            if (removeResult)
+            {
+            if (isDatabaseEmpty)
+            {
+                Assert.Pass("Consumption successfully removed and database is empty.");
+            }
+            else
+            {
+                Assert.Pass("Consumption successfully removed.");
+            }
         }
         else
         {
