@@ -1,71 +1,71 @@
-public class ConsumptionAccess : DatabaseHandler
-{
-    public ConsumptionAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
+public class RoomAccess : DatabaseHandler {
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath)
+    {
 
     }
-    
-    public bool CreateConsumption(Consumption consumption){
+
+    public int AddToRoomTable(Room room)
+    {
+        int newRoomId = -1;
         _Conn.Open();
-        string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
-        VALUES (@Name, @Price, @StartTime, @EndTime)";
-        int rowsAffected;
-        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
-        {
-            Launch.Parameters.AddWithValue("@Name", consumption.Name);
-            Launch.Parameters.AddWithValue("@Price", consumption.Price);
-            Launch.Parameters.AddWithValue("@StartTime", consumption.StartTime.Hour.ToString("00") + ":" + consumption.StartTime.Minute.ToString("00"));
-            Launch.Parameters.AddWithValue("@EndTime", consumption.EndTime.Hour.ToString("00") + ":" + consumption.EndTime.Minute.ToString("00"));
-            rowsAffected = Launch.ExecuteNonQuery();
-        }
+        string query = "INSERT INTO Rooms (Capacity) VALUES (@capacity); SELECT last_insert_rowid();";
+        var command = new SQLiteCommand(query, _Conn);
+        command.Parameters.AddWithValue("@capacity", room.Capacity);
+        newRoomId = Convert.ToInt32(command.ExecuteScalar());
         _Conn.Close();
-        return rowsAffected > 0;
-    }
-    public List<Consumption> ReadConsumption(){
-        List<Consumption> consumptions = new List<Consumption>();
-        _Conn.Open();
-        string NewQuery = @"SELECT * FROM Consumptions";
-        using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
-        {
-            SQLiteDataReader reader = Show.ExecuteReader();
-            while (reader.Read())
-            {
-                int id = reader.GetInt32(0);
-                string name = reader.GetString(1);
-                double price = reader.GetDouble(2);
-                TimeOnly startTime = TimeOnly.Parse(reader.GetString(3));
-                TimeOnly endTime = TimeOnly.Parse(reader.GetString(4));
-                consumptions.Add(new Consumption(id, name, price, startTime, endTime));
-            }
-        }
-        _Conn.Close();
-        return consumptions;
-    }
-    
-    public bool DeleteConsumption(Consumption consumption){
-        _Conn.Open();
-        string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
-        using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
-        {
-            Remove.Parameters.AddWithValue("@Id", consumption.Id);
-            int rowsAffected = Remove.ExecuteNonQuery();
-            _Conn.Close();
-            return rowsAffected > 0;
-        }
+        return newRoomId;
     }
 
-    public bool UpdateConsumption(Consumption consumption){
+    public void EditFromRoomTable(int id, int capacity)
+    {
         _Conn.Open();
-        int rowsAffected = -1;
-        string updateConsumption = @"UPDATE Consumptions SET Name = @Name, Price = @Price, StartTime = @StartTime, EndTime = @EndTime WHERE ID = @Id";
-        using (SQLiteCommand comm = new SQLiteCommand(updateConsumption, _Conn)){
-            comm.Parameters.AddWithValue("@Name", consumption.Name);
-            comm.Parameters.AddWithValue("@Price", consumption.Price);
-            comm.Parameters.AddWithValue("@StartTime", consumption.StartTime.Hour.ToString("00") + ":" + consumption.StartTime.Minute.ToString("00"));
-            comm.Parameters.AddWithValue("@EndTime", consumption.EndTime.Hour.ToString("00") + ":" + consumption.EndTime.Minute.ToString("00"));
-            comm.Parameters.AddWithValue("@Id", consumption.Id);
-            rowsAffected = comm.ExecuteNonQuery();
-        }
+        string query = "UPDATE Rooms SET Capacity=@capacity WHERE ID=@id";
+        var command = new SQLiteCommand(query, _Conn);
+        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@capacity", capacity);
+        command.ExecuteNonQuery();
         _Conn.Close();
-        return rowsAffected > 0;
     }
+
+    public void RemoveFromRoomTable(int roomid)
+    {
+        _Conn.Open();
+        string query = "DELETE FROM Rooms WHERE ID=@id";
+        var command = new SQLiteCommand(query, _Conn);
+        command.Parameters.AddWithValue("@id", roomid);
+        command.ExecuteNonQuery();
+        _Conn.Close();
+    }
+
+    public string GetRoom(int id)
+    {
+        string RoomInfo = "";
+        _Conn.Open();
+        string query = "SELECT * from Rooms WHERE ID=@id";
+        var command = new SQLiteCommand(query, _Conn);
+        command.Parameters.AddWithValue("@id", id);
+        SQLiteDataReader reader = command.ExecuteReader();
+        while (reader.Read()) 
+                {
+                    RoomInfo = $"Room-ID = {reader.GetValue(0).ToString()} Capacity = {reader.GetValue(1).ToString()}";
+                }
+        _Conn.Close();
+        return RoomInfo;
+    }
+
+    public List<string> _getAllRooms()
+    {
+        _Conn.Open();
+        List<string> roomlist = new List<string>();
+        string query = "SELECT * FROM Rooms";
+        var command = new SQLiteCommand(query, _Conn);
+        SQLiteDataReader reader = command.ExecuteReader();
+        while (reader.Read())  
+                {  
+                    roomlist.Add($"Room-ID = {reader.GetValue(0).ToString()} Capacity = {reader.GetValue(1).ToString()}");   
+                } 
+        _Conn.Close();
+        return roomlist;
+    }
+
 }
