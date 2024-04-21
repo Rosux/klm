@@ -11,10 +11,14 @@ public class ConsumptionTest
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        if(File.Exists("./DataSource/TEST.db")){
+        if (File.Exists("./DataSource/TEST.db"))
+        {
             File.Delete("./DataSource/TEST.db");
         }
-        Directory.Delete("./DataSource");
+        if (Directory.Exists("./DataSource"))
+        {
+            Directory.Delete("./DataSource");
+        }
     }
 
     [SetUp]
@@ -68,24 +72,70 @@ public class ConsumptionTest
         Assert.Fail("Inserted Consumption not found in the list.");
     }
     
-    // [Test]
-    // public void RemoveTest(){
-    //     var x = new Consumption(
-    //         Id: 1,
-    //         Name: "Testname",
-    //         Price: 2.50,
-    //         StartTime: new TimeOnly(11,20),
-    //         EndTime: new TimeOnly(12,20)
-    //     );
+    [Test]
+    public void RemoveTest(){
+        var x = new Consumption(
+            Id: 1,
+            Name: "Testname",
+            Price: 2.50,
+            StartTime: new TimeOnly(11,20),
+            EndTime: new TimeOnly(12,20)
+        );
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
+        VALUES (@Name, @Price, @StartTime, @EndTime)";
+        int rowsAffected;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@Name", x.Name);
+            Launch.Parameters.AddWithValue("@Price", x.Price);
+            Launch.Parameters.AddWithValue("@StartTime", x.StartTime.Hour.ToString("00") + ":" + x.StartTime.Minute.ToString("00"));
+            Launch.Parameters.AddWithValue("@EndTime", x.EndTime.Hour.ToString("00") + ":" + x.EndTime.Minute.ToString("00"));
+            rowsAffected = Launch.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        bool removeResult = c.DeleteConsumption(x);
+        if (removeResult)
+        {
+            Assert.Pass("Consumption successfully removed.");
+        }
+        else
+        {
+            Assert.Fail("Failed to remove Consumption.");
+        }
+    }
 
-    //     bool removeResult = c.DeleteConsumption(x);
-    //     if (removeResult)
-    //     {
-    //         Assert.Pass("Consumption successfully removed.");
-    //     }
-    //     else
-    //     {
-    //         Assert.Fail("Failed to remove Consumption.");
-    //     }
-    // }
+    [Test]
+    public void ReadTest(){
+        var x = new Consumption(
+            Id: 1,
+            Name: "Testname",
+            Price: 2.50,
+            StartTime: new TimeOnly(11,20),
+            EndTime: new TimeOnly(12,20)
+        );
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
+        VALUES (@Name, @Price, @StartTime, @EndTime)";
+        int rowsAffected;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@Name", x.Name);
+            Launch.Parameters.AddWithValue("@Price", x.Price);
+            Launch.Parameters.AddWithValue("@StartTime", x.StartTime.Hour.ToString("00") + ":" + x.StartTime.Minute.ToString("00"));
+            Launch.Parameters.AddWithValue("@EndTime", x.EndTime.Hour.ToString("00") + ":" + x.EndTime.Minute.ToString("00"));
+            rowsAffected = Launch.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        List<Consumption> readResult = c.ReadConsumption();
+        foreach (var consumption in readResult)
+        {
+            if (consumption.Id == x.Id && consumption.Name == x.Name && consumption.Price == x.Price && consumption.StartTime == x.StartTime && consumption.EndTime == x.EndTime)
+            {
+                Assert.Pass("Inserted Consumption found in the list.");
+            }
+        }
+
+        Assert.Fail("Inserted Consumption not found in the list.");
+    }
 }
