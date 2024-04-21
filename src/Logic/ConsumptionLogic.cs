@@ -9,6 +9,10 @@ public static class ConsumptionLogic
                 {"1. Add Consumption", ()=>{
                     //Retrieve product from the add menu and sends it to the database.
                     Consumption consumption = ConsumptionMenu.AddConsumptionMenu();
+                    if(consumption == null){
+                        ConsumptionMenu.NoItemsToAdd();
+                        return;
+                    }
                     bool added = c.CreateConsumption(consumption);
                 }},
                 {"2. Remove Consumption", ()=>{

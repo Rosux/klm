@@ -73,4 +73,9 @@ public class DatabaseHandler
         }
         _Conn.Close();
     }
+    
+    public void CloseAllConnections(){
+        _Conn.Close();
+        SQLiteConnection.ClearAllPools();
+    }
 }
