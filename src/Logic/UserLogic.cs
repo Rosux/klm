@@ -33,7 +33,6 @@ public static class UserLogic
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. Remove User", ()=>{
-                    //Check if there is a item to remove and if there is it send a message to get it removed.
                     User user =  UserMenu.RemoveUser();
                     if (user == null)
                     {
@@ -49,22 +48,18 @@ public static class UserLogic
                 }},
                 {"3. Edit User", ()=>{
                     User editedUser = UserMenu.EditUser();
-                    // if there are no products show error and return to the menu
                     if (editedUser == null){
-                        ConsumptionMenu.NoItems();
+                        UserMenu.NoUsersToRemove();
                         return;
                     }
-                    // send updated Consumption to DataAccess layer
-                    UserAccess u = new UserAccess();
-                    bool updated = u.UpdateUser(editedUser);
-                    // show user if its updated or not
+                    bool updated = c.UpdateUser(editedUser);
                     if (updated){
-                        ConsumptionMenu.Saved();
+                        UserMenu.UserRemoved();
                     }else{
-                        ConsumptionMenu.Error();
+                        UserMenu.Error();
                     }
                 }},
-                {"2. Exit to main menu", ()=>{
+                {"4. Exit to main menu", ()=>{
                     running = false;
                 }},
             });

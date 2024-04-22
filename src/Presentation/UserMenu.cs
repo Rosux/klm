@@ -36,7 +36,8 @@ public static class UserMenu{
                 Console.WriteLine("Email cannot be empty. Please try again.");
                 continue;
             }
-        } while (!IsValidEmail(email));
+        } 
+        while (!IsValidEmail(email));
         while(true){
             Console.WriteLine("Enter your password (totally secured btw):");
             password = Console.ReadLine();
@@ -152,7 +153,7 @@ public static class UserMenu{
         {
             return null;
         }
-        User editedUser = MenuHelper.SelectFromList("Select product to edit", cons);
+        User editedUser = MenuHelper.SelectFromList("Select user to edit", cons);
         bool changing = true;
         while (changing)
         {
@@ -166,8 +167,19 @@ public static class UserMenu{
                     editedUser.LastName = Console.ReadLine();
                 }},
                 {"Email", ()=>{
-                    Console.WriteLine("Enter the new Email of the User:");
-                    editedUser.Email = Console.ReadLine();
+                    string email;
+                    do
+                    {
+                        Console.WriteLine("Enter the new Email of the User:");
+                        email = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(email))
+                        {
+                            Console.WriteLine("Email cannot be empty. Please try again.");
+                            continue;
+                        }
+                    } 
+                    while (!IsValidEmail(email));
+                    editedUser.Email = email;
                 }},
                 {"Password", ()=>{
                     Console.WriteLine("Enter the new Password of the User:");
@@ -179,12 +191,12 @@ public static class UserMenu{
                     {
                         MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
                             {"1. User", ()=>{
-                                 editedUser.Role = UserRole.USER;
-                                  running = false;
+                                editedUser.Role = UserRole.USER;
+                                running = false;
                             }},
                             {"2. Admin", ()=>{
                                 editedUser.Role = UserRole.ADMIN;
-                                 running = false;
+                                running = false;
                             }},
                         });
                     }
@@ -216,6 +228,11 @@ public static class UserMenu{
     public static void WrongLogin(){
         Console.Clear();
         Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+    public static void Error(){
+        Console.Clear();
+        Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     

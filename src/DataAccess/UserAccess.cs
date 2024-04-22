@@ -3,6 +3,10 @@ public class UserAccess : DatabaseHandler{
 
     }
 
+    /// <summary>
+    /// adds a user to the database
+    /// </summary>
+    /// <returns>returns the user id</returns>
     public bool AddUser(User user){
         _Conn.Open();
         string insertSql = @"
@@ -28,6 +32,10 @@ public class UserAccess : DatabaseHandler{
         return userId != -1;
     }
 
+    /// <summary>
+    /// grabs the user from database that your searching for
+    /// </summary>
+    /// <returns>returns the current user</returns>
     public User CheckUser(User login)
     {
         _Conn.Open();
@@ -93,6 +101,11 @@ public class UserAccess : DatabaseHandler{
         _Conn.Close();
         return users;
     }
+
+    /// <summary>
+    /// deletes user if given an User user
+    /// </summary>
+    /// <returns>returns true if row was affected</returns>
     public bool DeleteUser(User user){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Users WHERE ID = @Id ";
@@ -104,6 +117,11 @@ public class UserAccess : DatabaseHandler{
             return rowsAffected > 0;
         }
     }
+
+    /// <summary>
+    /// upates the user with the information given.
+    /// </summary>
+    /// <returns>returns true if row was affected</returns>
 
     public bool UpdateUser(User user){
         _Conn.Open();
