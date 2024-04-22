@@ -16,8 +16,8 @@ public class ConsumptionAccess : DatabaseHandler
             Launch.Parameters.AddWithValue("@StartTime", consumption.StartTime.Hour.ToString("00") + ":" + consumption.StartTime.Minute.ToString("00"));
             Launch.Parameters.AddWithValue("@EndTime", consumption.EndTime.Hour.ToString("00") + ":" + consumption.EndTime.Minute.ToString("00"));
             rowsAffected = Launch.ExecuteNonQuery();
+            _Conn.Close();
         }
-        _Conn.Close();
         return rowsAffected > 0;
     }
     public List<Consumption> ReadConsumption(){
