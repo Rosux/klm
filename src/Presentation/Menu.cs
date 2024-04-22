@@ -61,10 +61,34 @@ class Menu
                 });
             }
         }
+    }
 
-        // DECLAN zet hieronder je logic call
-        // hier
-        // RoomMenu.AdminOverView();
-        // FilmSerieMenu.UI();
+    // used for testing purpose
+    public static void TestStart(){
+        Program.CurrentUser = new User(69, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
+        Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
+        Console.CursorVisible = false;
+        while(true)
+        {
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"Test", ()=>{
+                    // How to use MenuHelper.SelectMovieOrEpisode();
+                    object a = MenuHelper.SelectMovieOrEpisode();
+                    if(a is Film){
+                        Console.WriteLine(((Film)a).Title);
+                    }else if(a is Dictionary<Serie, List<Episode>>){
+                        Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Key.Title);
+                        Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Value.Count);
+                    }else if(a == null){
+                        Console.WriteLine("nothing selected");
+                    }
+                    Console.ReadKey(true);
+                }},
+                {"Exit", ()=>{
+                    // close application
+                    Environment.Exit(1);
+                }},
+            });
+        }
     }
 }
