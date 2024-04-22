@@ -21,7 +21,4 @@
     <ProjectReference Include="../src/klm.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\klm.csproj" />
-  </ItemGroup>
 </Project>
