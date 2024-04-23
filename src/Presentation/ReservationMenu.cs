@@ -32,8 +32,50 @@ public static class ReservationMenu
         bool save = false;
         while(addingToTimeline){
             MenuHelper.SelectOptions($"Select an option", new Dictionary<string, Action>(){
-                {"Add Movies/Series", ()=>{
-                    // TODO implement movies/series picking (better fucking ui pls)
+                {"Add Movies/Episode", ()=>{
+                    object FilmOrEpisode = MenuHelper.SelectMovieOrEpisode();
+                    if(FilmOrEpisode is Film){
+                        Film film = (Film)FilmOrEpisode;
+                        DateOnly d = MenuHelper.SelectDate($"Select the date and time you want {film.Title} to begin.", null, startDate, endDate);
+                        TimeOnly t;
+                        if (d == startDate && d == endDate){
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                        }else if (d == startDate){
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                        }else if (d == endDate){
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                        }else{
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                        }
+                        timeline.Add(
+                        film,
+                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(film.Duration)
+                        );
+                    }else if(FilmOrEpisode is Dictionary<Serie, List<Episode>>){
+                        List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)FilmOrEpisode).First().Value;
+                        foreach(Episode episode in ruru)
+                        {
+                            DateOnly d = MenuHelper.SelectDate($"Select the date and time you want the episode {episode.Title} to begin.", null, startDate, endDate);
+                            TimeOnly t;
+                            if (d == startDate && d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                            }else if (d == startDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                            }else if (d == endDate){
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                            }else{
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                            }
+                            timeline.Add(
+                            episode,
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
+                            );
+                        }
+                    }else if(FilmOrEpisode == null){
+                        Console.WriteLine("nothing selected");
+                    }
                 }},
                 {"Add Consumptions", ()=>{
                     Dictionary<string, Consumption> consumptions = new Dictionary<string, Consumption>();
