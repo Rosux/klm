@@ -2,7 +2,344 @@ using System;
 
 public static class MenuHelper{
     private static SearchAccess searchAccess = new SearchAccess();
+#region Integer
+    /// <summary>
+    /// Ask the user to select an integer between specified values and returns the chosen integer.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection; Returns null if canceled.</param>
+    /// <param name="defaultInt">The default integer shown to the user.</param>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>An integer chosen by the user or null if the user canceled the selection.</returns>
+    public static int? SelectInteger(string prefix="", string suffix="", bool canCancel = false, int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
+        int num = defaultInt;
+        string error = "";
+        string inputNum = defaultInt.ToString();
+        string keybinds = "Press Enter to confirm";
+        if (canCancel)
+        {
+            keybinds += "\nPress Escape to cancel";
+        }
+        ConsoleKey key;
+        ConsoleKeyInfo RawKey;
+        do{
+            // set error message
+            if (num < min || num > max)
+            {
+                error = $"Please select a value between {min} and {max}";
+            }
+            else
+            {
+                error = "";
+            }
 
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
+            RawKey = Console.ReadKey(true);
+            key = RawKey.Key;
+
+            // add number to string
+            if (char.IsDigit(RawKey.KeyChar))
+            {
+                inputNum += RawKey.KeyChar;
+            }
+            // remove last from string
+            if (key == ConsoleKey.Backspace){
+                if (inputNum.Length > 0)
+                {
+                    inputNum = inputNum.Remove(inputNum.Length-1);
+                }
+                if (inputNum.Length == 0)
+                {
+                    inputNum = "0";
+                }
+            }
+
+            // set num to inputNum
+            if(!int.TryParse(inputNum, out num)){
+                continue;
+            }
+
+            // up/down arrow increases/decreases number
+            if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
+            {
+                num += key == ConsoleKey.DownArrow ? -1 : 1;
+                inputNum = num.ToString();
+            }
+            // enter tries to see if the number is between the min/max and if not sets an suggestive error message
+            if (key == ConsoleKey.Enter)
+            {
+                if (num >= min && num <= max)
+                {
+                    break;
+                }
+            }
+            if (canCancel && key == ConsoleKey.Escape)
+            {
+                return null;
+            }
+        } while(true);
+        Console.Clear();
+        return num;
+    }
+
+    /// <summary>
+    /// Shortcut method to select an integer with default prefix and suffix and without the option to cancel.
+    /// </summary>
+    /// <param name="defaultInt">The default integer shown to the user.</param>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>An integer chosen by the user.</returns>
+    public static int SelectInteger(int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
+        return SelectInteger("", "", false, defaultInt, min, max) ?? defaultInt;
+    }
+
+    /// <summary>
+    /// Shortcut method to select an integer with custom prefix, default suffix, and without the option to cancel.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="defaultInt">The default integer shown to the user.</param>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>An integer chosen by the user.</returns>
+    public static int SelectInteger(string prefix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
+        return SelectInteger(prefix, "", false, defaultInt, min, max) ?? defaultInt;
+    }
+
+    /// <summary>
+    /// Shortcut method to select an integer with default prefix and suffix and the option to cancel.
+    /// </summary>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection; Returns null if canceled.</param>
+    /// <param name="defaultInt">The default integer shown to the user.</param>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>An integer chosen by the user or null if the user canceled the selection.</returns>
+    public static int? SelectInteger(bool canCancel = false, int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
+        return SelectInteger("", "", canCancel, defaultInt, min, max);
+    }
+
+    /// <summary>
+    /// Shortcut method to select an integer with default prefix and suffix, without the option to cancel, and with a specified range.
+    /// </summary>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>An integer chosen by the user.</returns>
+    public static int SelectInteger(int min=int.MinValue, int max=int.MaxValue){
+        return SelectInteger("", "", false, min, min, max) ?? -1;
+    }
+
+    /// <summary>
+    /// Shortcut method to select an integer with default prefix and suffix and without the option to cancel.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="defaultInt">The default integer shown to the user.</param>
+    /// <param name="min">The minimum allowed value of the integer.</param>
+    /// <param name="max">The maximum allowed value of the integer.</param>
+    /// <returns>
+    /// An integer chosen by the user.
+    /// </returns>
+    public static int SelectInteger(string prefix="", string suffix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
+        return SelectInteger(prefix, suffix, false, defaultInt, min, max) ?? defaultInt;
+    }
+#endregion
+
+#region Date
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly? SelectDate(string prefix="", string suffix="", bool canCancel = false, DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
+        DateOnly MinDate = minDate ?? DateOnly.MinValue;
+        DateOnly MaxDate = maxDate ?? DateOnly.MaxValue;
+        DateOnly SelectedDate = defaultTime ?? new DateOnly(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+        bool SelectMonth = true;
+        string keybinds = "Press Enter to confirm\nUse the arrows to select a date";
+        if (canCancel)
+        {
+            keybinds += "\nPress Escape to cancel";
+        }
+
+        ConsoleKey key;
+        do{
+            // some needed calulations
+            int startDay = ((int)new DateOnly(SelectedDate.Year, SelectedDate.Month, 1).DayOfWeek - 1 + 7) % 7;
+            // print callender
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{prefix}");
+            if(prefix != ""){
+                Console.Write("\n");
+            }
+            Console.BackgroundColor = SelectMonth ? ConsoleColor.DarkGray : ConsoleColor.Black;
+            Console.Write($"{SelectedDate.ToString("dd/MM/yyyy")}\n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"Mo Tu We Th Fr Sa Su\n");
+            int dayNum = 1;
+            for (int day = 0; day < DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month) + startDay; day++)
+            {
+                if (day < startDay)
+                {
+                    Console.Write("   ");
+                    continue;
+                }
+                Console.BackgroundColor = (!SelectMonth && dayNum == SelectedDate.Day) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                if ((SelectedDate.Year == MinDate.Year && SelectedDate.Month == MinDate.Month && MinDate.Day > dayNum) || (SelectedDate.Year == MaxDate.Year && SelectedDate.Month == MaxDate.Month && MaxDate.Day < dayNum))
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                }
+                Console.Write($"{dayNum,2}");
+                dayNum++;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write(((day+8) % 7 == 0) ? " \n" : " ");
+            }
+            Console.Write($"\n\n{keybinds}\n{suffix}");
+            // read input
+            key = Console.ReadKey(true).Key;
+            // handle input
+            if (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)
+            {
+                if (SelectMonth)
+                {
+                    if (
+                        SelectedDate.AddMonths(key == ConsoleKey.LeftArrow ? -1 : 1).Year  >= MinDate.Year  &&
+                        SelectedDate.AddMonths(key == ConsoleKey.LeftArrow ? -1 : 1).Month >= MinDate.Month &&
+                        SelectedDate.AddMonths(key == ConsoleKey.LeftArrow ? -1 : 1).Year  <= MaxDate.Year  &&
+                        SelectedDate.AddMonths(key == ConsoleKey.LeftArrow ? -1 : 1).Month <= MaxDate.Month
+                    ) {
+                        SelectedDate = SelectedDate.AddMonths(key == ConsoleKey.LeftArrow ? -1 : 1);
+                        SelectedDate = new DateOnly(SelectedDate.Year, SelectedDate.Month, 1);
+                    }
+                }
+                else
+                {
+                    if (SelectedDate.Day + ((key == ConsoleKey.LeftArrow) ? -1 : 1) <= 0 && SelectedDate.AddMonths(-1).Year >= MinDate.Year && SelectedDate.AddMonths(-1).Month >= MinDate.Month)
+                    {
+                        // previous month
+                        SelectedDate = SelectedDate.AddMonths(-1);
+                        SelectedDate = new DateOnly(SelectedDate.Year, SelectedDate.Month, DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month));
+                    }
+                    else if (SelectedDate.Day + ((key == ConsoleKey.LeftArrow) ? -1 : 1) > DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month) && SelectedDate.AddMonths(1).Year <= MaxDate.Year && SelectedDate.AddMonths(1).Month <= MaxDate.Month)
+                    {
+                        // next month
+                        SelectedDate = SelectedDate.AddMonths(1);
+                        SelectedDate = new DateOnly(SelectedDate.Year, SelectedDate.Month, 1);
+                    }
+                    else if (SelectedDate.Day + ((key == ConsoleKey.LeftArrow) ? -1 : 1) >= 1 && SelectedDate.Day + ((key == ConsoleKey.LeftArrow) ? -1 : 1) <= DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month))
+                    {
+                        SelectedDate = SelectedDate.AddDays((key == ConsoleKey.LeftArrow) ? -1 : 1);
+                    }
+                }
+            }
+            if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
+            {
+                if(!SelectMonth && key == ConsoleKey.UpArrow && SelectedDate.Day + startDay <= 7){
+                    SelectMonth = true;
+                }
+                if (!SelectMonth){
+                    int addAmount = (key == ConsoleKey.UpArrow ? -7 : 7);
+                    if (SelectedDate.Day + addAmount >= 1 && SelectedDate.Day + addAmount <= DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month))
+                    {
+                        SelectedDate = SelectedDate.AddDays(addAmount);
+                    }
+                    else if (addAmount > 0)
+                    {
+                        SelectedDate = new DateOnly(SelectedDate.Year, SelectedDate.Month, DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month));
+                    }
+                    else if (addAmount < 0)
+                    {
+                        SelectedDate = new DateOnly(SelectedDate.Year, SelectedDate.Month, 1);
+                    }
+                }
+                if(SelectMonth && key == ConsoleKey.DownArrow){
+                    SelectMonth = false;
+                }
+            }
+            if (key == ConsoleKey.Escape && canCancel)
+            {
+                return null;
+            }
+        }while(key != ConsoleKey.Enter || SelectMonth || SelectedDate < MinDate || SelectedDate > MaxDate);
+        return SelectedDate;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly SelectDate(DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
+        return SelectDate("", "", false, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly SelectDate(string prefix="", string suffix="", DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
+        return SelectDate(prefix, suffix, false, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly SelectDate(string prefix="", DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
+        return SelectDate(prefix, "", false, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly SelectDate(string prefix=""){
+        return SelectDate(prefix, "", false, null, null, null) ?? DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="canCancel">A boolean value indicating whether the user can cancel the operation.</param>
+    /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly? SelectDate(bool canCancel=false, DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
+        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
+    /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly SelectDate(DateOnly? minDate = null, DateOnly? maxDate = null){
+        return SelectDate("", "", false, null, minDate, maxDate) ?? DateOnly.MinValue;
+    }
+#endregion
+
+#region Time
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
@@ -45,7 +382,7 @@ public static class MenuHelper{
                 } else {
                     time = time.AddMinutes(TimeAmount);
                 }
-                
+
                 if (time < MinTime){
                     time = MinTime;
                 }
@@ -232,6 +569,8 @@ public static class MenuHelper{
         } while (key != ConsoleKey.Enter);
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
+#endregion
+
 
     #region Movie or Series/Episodes select
     /// <summary>
