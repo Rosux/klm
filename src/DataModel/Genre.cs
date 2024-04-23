@@ -15,6 +15,6 @@ public class Genre
 
     public void GenreSelect()
     {
-        IsSelected = true; 
+        IsSelected = !IsSelected;
     }
 }
