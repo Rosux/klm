@@ -280,15 +280,35 @@ public static class ReservationMenu
     }
     else
     {
-        Console.WriteLine("All your Reservations:");
-        int number = 1;
-        foreach (Reservation reservation in reservations)
-        {
-            Console.WriteLine($"Resrevation {number}: Room ID: {reservation.RoomId}, Group Size: {reservation.GroupSize}, Start Date: {reservation.StartDate}, End Date: {reservation.EndDate}, Price: {reservation.Price}");
-            number++;
+        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
+            foreach (Reservation reservation in reservations)
+            {
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+            }
+
+            reservationOptions.Add("Return to menu", null);
+
+            Reservation selectedReservation = null;
+            do
+            {
+                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
+
+                if (selectedReservation != null)
+                {
+                    Console.Clear();
+                    return selectedReservation;
+
+                    while (true)
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }
+            } while (selectedReservation != null);
+
+            return null;
         }
-    }
-    return null;
     }
 
     public static void Error(){

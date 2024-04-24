@@ -1,6 +1,6 @@
-public static class ReservationOverviewMenu
+public static class ReservationOverviewAdminMenu
 {
-    public static void ReservationOverview()
+    public static void ReservationAdminOverview()
     {
         ReservationOverviewLogic accesser = new ReservationOverviewLogic();
         bool running = true;
@@ -12,6 +12,11 @@ public static class ReservationOverviewMenu
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey();
                     }
@@ -60,6 +65,11 @@ public static class ReservationOverviewMenu
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey();
                     }
+                    else
+                    {
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey();
+                    }
                     Console.Clear();
                 }},
                 {"3. Choose date",()=> {
@@ -69,6 +79,11 @@ public static class ReservationOverviewMenu
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey();
                     }

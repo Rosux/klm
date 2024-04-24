@@ -1,5 +1,4 @@
 using System;
-
 class Menu
 {
     public static void Start()
@@ -41,8 +40,7 @@ class Menu
                         RoomMenu.AdminOverView();
                     }},
                     {"View reservations", ()=>{
-                        // close application
-                        ReservationOverviewMenu.ReservationOverview();
+                        ReservationOverviewAdminMenu.ReservationAdminOverview();
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -62,11 +60,9 @@ class Menu
                         // close application
                         ReservationLogic.BookReservation();
                     }},
-                    {"Show all your Reservations", ()=>{
+                    {"Manage reservations", ()=>{
                         // close application
-                        ReservationMenu.ShowSpecificReservationUser();
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        ReservationOverviewUserMenu.ReservationUserOverview();
                     }},
                 });
             }
