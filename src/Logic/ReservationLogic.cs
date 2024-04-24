@@ -7,8 +7,7 @@ public static class ReservationLogic
         {
             MenuHelper.SelectOptions("Reservations", new Dictionary<string, Action>(){
                 {"1. Book a Reservation", BookReservation},
-                {"2. View Reservations", ViewReservation},
-                {"3. Exit to main menu", ()=>{
+                {"2. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
@@ -19,7 +18,6 @@ public static class ReservationLogic
         Reservation? r = ReservationMenu.BookReservation();
         if (r == null)
         {
-            // exit out
             return;
         }
         else
