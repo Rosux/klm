@@ -1,8 +1,9 @@
 using System;
 
 public static class MenuHelper{
-    private static SearchAccess searchAccess = new SearchAccess();
-#region Integer
+private static SearchAccess searchAccess = new SearchAccess();
+
+    #region Integer
     /// <summary>
     /// Ask the user to select an integer between specified values and returns the chosen integer.
     /// </summary>
@@ -144,9 +145,9 @@ public static class MenuHelper{
     public static int SelectInteger(string prefix="", string suffix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
         return SelectInteger(prefix, suffix, false, defaultInt, min, max) ?? defaultInt;
     }
-#endregion
+    #endregion
 
-#region Date
+    #region Date
     /// <summary>
     /// Ask the user to select a date between specified values and returns the chosen date.
     /// </summary>
@@ -183,11 +184,19 @@ public static class MenuHelper{
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"Mo Tu We Th Fr Sa Su\n");
             int dayNum = 1;
-            for (int day = 0; day < DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month) + startDay; day++)
+            int OverFlowNum = 1;
+            for (int day = 0; day < (int)Math.Ceiling((double)(DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month) + startDay) / 7) * 7; day++)
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 if (day < startDay)
                 {
-                    Console.Write("   ");
+                    int d = DateTime.DaysInMonth(SelectedDate.AddMonths(-1).Year, SelectedDate.AddMonths(-1).Month);
+                    if ((SelectedDate.Year == MinDate.Year && SelectedDate.Month == MinDate.Month && MinDate.Day > dayNum) || (SelectedDate.Year == MaxDate.Year && SelectedDate.Month == MaxDate.Month && MaxDate.Day < dayNum)){
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                    }else{
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.Write($"{d-(startDay-day)+1,2} ");
                     continue;
                 }
                 Console.BackgroundColor = (!SelectMonth && dayNum == SelectedDate.Day) ? ConsoleColor.DarkGray : ConsoleColor.Black;
@@ -195,12 +204,26 @@ public static class MenuHelper{
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                 }
-                Console.Write($"{dayNum,2}");
-                dayNum++;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write(((day+8) % 7 == 0) ? " \n" : " ");
+                if(dayNum <= DateTime.DaysInMonth(SelectedDate.Year, SelectedDate.Month)){
+                    Console.Write($"{dayNum,2}");
+                    dayNum++;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(((day+8) % 7 == 0) ? " \n" : " ");
+                }else{
+                    if ((SelectedDate.Year == MinDate.Year && SelectedDate.Month == MinDate.Month && MinDate.Day > dayNum) || (SelectedDate.AddMonths(1).Year == MaxDate.Year && SelectedDate.AddMonths(1).Month == MaxDate.Month && MaxDate.Day < OverFlowNum)){
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                    }else{
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"{OverFlowNum,2}");
+                    OverFlowNum++;
+                    Console.Write(((day+8) % 7 == 0) ? " \n" : " ");
+                }
             }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"\n\n{keybinds}\n{suffix}");
             // read input
             key = Console.ReadKey(true).Key;
@@ -337,9 +360,9 @@ public static class MenuHelper{
     public static DateOnly SelectDate(DateOnly? minDate = null, DateOnly? maxDate = null){
         return SelectDate("", "", false, null, minDate, maxDate) ?? DateOnly.MinValue;
     }
-#endregion
+    #endregion
 
-#region Time
+    #region Time
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
@@ -350,6 +373,9 @@ public static class MenuHelper{
     public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
         TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
         TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
+        if(defaultTime <= MinTime){
+            defaultTime = MinTime;
+        }
         TimeOnly time = defaultTime;
         bool hour = true;
         ConsoleKey key;
@@ -403,9 +429,9 @@ public static class MenuHelper{
     public static TimeOnly SelectTime(TimeOnly defaultTime = new TimeOnly()){
         return SelectTime("", "", defaultTime, null, null);
     }
-#endregion
+    #endregion
 
-#region Callback options from a Dict
+    #region Callback options from a Dict
     /// <summary>
     /// Show a menu to the user of the given options and use the callback when the user selects a specific option.
     /// </summary>
@@ -479,9 +505,9 @@ public static class MenuHelper{
         // call callback method based on the users choice
         Options.Values.ElementAt(currentSelection).Invoke();
     }
-#endregion
+    #endregion
 
-#region Options from a Dict
+    #region Options from a Dict
     /// <summary>
     /// Shows a list of options to the user and return the value of the chosen option.
     /// </summary>
@@ -569,7 +595,7 @@ public static class MenuHelper{
         } while (key != ConsoleKey.Enter);
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
-#endregion
+    #endregion
 
 
     #region Movie or Series/Episodes select
@@ -596,7 +622,7 @@ public static class MenuHelper{
                 }else if(m is Serie && ((Serie)m).Title.Length+3 > longestWord){
                     longestWord = ((Serie)m).Title.Length + 3;
                 }
-            }
+            } 
             if (searchString.Length + 2 > longestWord){
                 longestWord = searchString.Length + 2;
             }

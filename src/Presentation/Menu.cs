@@ -50,6 +50,9 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                    {"Reservations", ()=>{
+                        ReservationLogic.Reservation();
+                    }},
                     {"Exit", ()=>{
                         // close application
                         Environment.Exit(1);
