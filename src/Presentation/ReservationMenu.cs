@@ -98,11 +98,6 @@ public static class ReservationMenu
                     }
                 }},
                 {"Add Consumptions", ()=>{
-                    Dictionary<string, Consumption> consumptions = new Dictionary<string, Consumption>();
-                    foreach(Consumption food in Consumptions.ReadConsumption()){
-                        consumptions.Add($"{food.Name} (Price: {food.Price.ToString("0.00")})", food);
-                    }
-                    Consumption c = MenuHelper.SelectFromList("Select the food", consumptions);
                     DateOnly d = MenuHelper.SelectDate("Select the date and time of your food", startDate, startDate, endDate);
                     TimeOnly t;
                     if (d == startDate && d == endDate){
@@ -114,12 +109,33 @@ public static class ReservationMenu
                     }else{
                         t = MenuHelper.SelectTime("Select the date and time of your food", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
                     }
-                    timeline.Add(
-                        c,
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0)
-                    );
-                    totalPrice += c.Price;
+                    Dictionary<string, Consumption> consumptions = new Dictionary<string, Consumption>();
+                    foreach(Consumption food in Consumptions.ReadConsumption()){
+                        if(food.EndTime.Hour == 0 && food.EndTime.Minute == 0){
+                            if(t >= food.StartTime){
+                                consumptions.Add($"{food.Name} (Price: {food.Price.ToString("0.00")})", food);
+                            }
+                        }else{
+                            if(t >= food.StartTime && t <= food.EndTime){
+                                consumptions.Add($"{food.Name} (Price: {food.Price.ToString("0.00")})", food);
+                            }
+                        }
+                    }
+                    bool cont = true;
+                    if(consumptions.Count == 0){
+                        Console.WriteLine("There are no foods available at the selected time.\n\nPress any button to return.");
+                        Console.ReadKey(true);
+                        cont = false;
+                    }
+                    if(cont){
+                        Consumption c = MenuHelper.SelectFromList("Select the food", consumptions);
+                        timeline.Add(
+                            c,
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0)
+                        );
+                        totalPrice += c.Price;
+                    }
                 }},
                 {"Add Breaks", ()=>{
                     int breakTime = MenuHelper.SelectInteger("Select the length for your break in minutes", 1, 1, int.MaxValue);
