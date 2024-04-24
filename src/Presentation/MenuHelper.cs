@@ -373,6 +373,9 @@ public static class MenuHelper{
     public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
         TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
         TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
+        if(defaultTime <= MinTime){
+            defaultTime = MinTime;
+        }
         TimeOnly time = defaultTime;
         bool hour = true;
         ConsoleKey key;

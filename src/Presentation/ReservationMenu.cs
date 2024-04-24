@@ -18,7 +18,7 @@ public static class ReservationMenu
         Room SelectedRoom = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
         DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
         TimeOnly startTime = MenuHelper.SelectTime("Select at what time you want to start your reservation:", "", new TimeOnly(), null, null);
-        DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", null, startDate, null);
+        DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", startDate, startDate, null);
         TimeOnly endTime = new TimeOnly();
         if (startDate == endDate){
             endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:", "", startTime.AddMinutes(1), startTime.AddMinutes(1), null);
@@ -33,45 +33,55 @@ public static class ReservationMenu
         while(addingToTimeline){
             MenuHelper.SelectOptions($"Select an option", new Dictionary<string, Action>(){
                 {"Add Movies/Episode", ()=>{
-                    object FilmOrEpisode = MenuHelper.SelectMovieOrEpisode();
-                    if(FilmOrEpisode is Film){
+                    object? FilmOrEpisode = MenuHelper.SelectMovieOrEpisode();
+                    if(FilmOrEpisode != null && FilmOrEpisode is Film){
                         Film film = (Film)FilmOrEpisode;
-                        DateOnly d = MenuHelper.SelectDate($"Select the date and time you want {film.Title} to begin.", null, startDate, endDate);
+                        DateOnly d = MenuHelper.SelectDate($"Select the date and time you want {film.Title} to begin.", startDate, startDate, endDate);
                         TimeOnly t;
                         if (d == startDate && d == endDate){
-                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", startTime, startTime, endTime);
                         }else if (d == startDate){
-                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                            t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", startTime, startTime, TimeOnly.MaxValue);
                         }else if (d == endDate){
                             t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
                         }else{
                             t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
                         }
                         timeline.Add(
-                        film,
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(film.Duration)
+                            film,
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(film.Duration)
                         );
-                    }else if(FilmOrEpisode is Dictionary<Serie, List<Episode>>){
+                    }else if(FilmOrEpisode != null && FilmOrEpisode is Dictionary<Serie, List<Episode>>){
                         List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)FilmOrEpisode).First().Value;
-                        foreach(Episode episode in ruru)
+                        DateTime serieTime = new DateTime();
+                        for(int i = 0; i < ruru.Count; i++)
                         {
-                            DateOnly d = MenuHelper.SelectDate($"Select the date and time you want the episode {episode.Title} to begin.", null, startDate, endDate);
+                            Episode episode = ruru[i];
+                            DateOnly d = MenuHelper.SelectDate($"Select the date and time you want the episode {episode.Title} to begin.", startDate, startDate, endDate);
                             TimeOnly t;
                             if (d == startDate && d == endDate){
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, endTime);
+                                if(i == 0){
+                                    serieTime = new DateTime(1, 1, 1, startTime.Hour, startTime.Minute, 0);
+                                }
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, endTime);
                             }else if (d == startDate){
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, TimeOnly.MaxValue);
                             }else if (d == endDate){
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, endTime);
                             }else{
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, TimeOnly.MaxValue);
                             }
                             timeline.Add(
-                            episode,
-                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
+                                episode,
+                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
+                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
                             );
+                            if(i == 0){
+                                serieTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length);
+                            }else{
+                                serieTime = serieTime.AddMinutes(episode.Length);
+                            }
                         }
                     }else if(FilmOrEpisode == null){
                         Console.WriteLine("nothing selected");
@@ -120,17 +130,17 @@ public static class ReservationMenu
                         new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(breakTime)
                     );
                 }},
-                {"Discard", ()=>{
-                    save = false;
-                    addingToTimeline = false;
-                }},
                 {"Save", ()=>{
                     save = true;
                     addingToTimeline = false;
                 }},
+                {"Return to menu", ()=>{
+                    save = false;
+                    addingToTimeline = false;
+                }},
             });
         }
-        
+
         if (Program.CurrentUser != null && save){
             Reservation r = new Reservation(
                 SelectedRoom.Id,
@@ -153,7 +163,7 @@ public static class ReservationMenu
         Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
-    
+
     public static void Saved(){
         Console.Clear();
         Console.WriteLine("Your reservation has been saved succesfully.\n\nPress any key to continue");
