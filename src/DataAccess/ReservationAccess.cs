@@ -102,4 +102,21 @@ public class ReservationAccess : DatabaseHandler
         _Conn.Close();
         return rowsAffected > 0;
     }
+
+    /// <summary>
+    /// delete a reservation from database
+    /// </summary>
+    /// <param name="Reservation">a object of Reservations</param>
+    /// <returns>a boolean true if deleted</returns>Conn
+    public bool DeleteReservation(Reservation reservation){
+        _Conn.Open();
+        string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id ";
+        using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Remove.Parameters.AddWithValue("@Id", reservation.Id);
+            int rowsAffected = Remove.ExecuteNonQuery();
+            _Conn.Close();
+            return rowsAffected > 0;
+        }
+    }
 }

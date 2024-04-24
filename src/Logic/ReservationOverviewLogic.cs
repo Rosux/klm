@@ -4,6 +4,8 @@ public class ReservationOverviewLogic
     public string Overview(Reservation selected_res)
     {
         string overview = "";
+        List<string> list_info = new List<string>();
+        List<string> list_info_timeline = new List<string>();
         if (selected_res != null)
         {
             ConsumptionAccess con_accesser = new ConsumptionAccess();
@@ -17,7 +19,8 @@ public class ReservationOverviewLogic
             Episode episode_cor = new("",-1,-1);
             Season season_cor = new("",-1);
             Serie serie_cor = new("","",-1);
-            overview = overview + $"\nReservation info:\nId: {selected_res.Id}.\nRoom: {selected_res.RoomId}.\nGroup size: {selected_res.GroupSize}.\n\nTimeline:\nStart of reservation at {selected_res.StartDate}.\n";
+            Console.Clear();
+
             foreach(TimeLine.Item actie in selected_res.TimeLine.t)
             {
                 condition_con = false;
@@ -75,22 +78,80 @@ public class ReservationOverviewLogic
                 }
                 if(condition_con == true && condition_film == false && condition_episode == false)
                 {
-                    overview = overview + $"\nAt {actie.StartTime} a order of {cons_cor.Name} for {cons_cor.Price} euro.";
+                    string cons_str = $"At {actie.StartTime} a order of {cons_cor.Name} for {cons_cor.Price} euro.";
+                    list_info_timeline.Add(cons_str);
                 }
                 else if(condition_con == false && condition_film == true && condition_episode == false)
                 {
-                    overview = overview + $"\nwatching the movie {film_cor.Title} from {actie.StartTime} to {actie.EndTime}.";
+                    string film_str = $"watching the movie {film_cor.Title} from {actie.StartTime} to {actie.EndTime}.";
+                    list_info_timeline.Add(film_str);
                 }
                 else if(condition_con == false && condition_film == false && condition_episode == true)
                 {
-                    overview = overview + $"\nwatching episode {episode_cor.Id}: {episode_cor.Title} from {serie_cor.Title} {season_cor.Title}, from {actie.StartTime} to {actie.EndTime}.";
+                    string episode_str = $"watching episode {episode_cor.Id}: {episode_cor.Title} from {serie_cor.Title} {season_cor.Title}, from {actie.StartTime} to {actie.EndTime}.";
+                    list_info_timeline.Add(episode_str);
                 }
                 else
                 {
-                    overview = overview + $"\nBreak form {actie.StartTime} to {actie.EndTime}.";
+                    string break_str = $"Break form {actie.StartTime} to {actie.EndTime}.";
+                    list_info_timeline.Add(break_str);
                 }
             }
-            overview = overview + $"\n\nEnd of reservation at {selected_res.EndDate}.";
+            int longest = 0;
+            foreach(string str in list_info_timeline)
+            {
+                if(str.Length > longest)
+                {
+                    longest = str.Length+4;
+                }
+            }
+
+            string id_string = $"Id: {selected_res.Id}";
+            string room_string = $"Room: {selected_res.RoomId}";
+            string groupsize_string = $"Group size: {selected_res.GroupSize}";
+            string userid_string = $"User id: {selected_res.UserId}";
+            string start_string = $"Start date: {selected_res.StartDate}";
+            string end_string = $"End date: {selected_res.EndDate}";
+            list_info.Add(id_string);
+            list_info.Add(room_string);
+            list_info.Add(groupsize_string);
+            list_info.Add(userid_string);
+            list_info.Add(start_string);
+            list_info.Add(end_string);
+
+            foreach(string str in list_info)
+            {
+                if(str.Length > longest)
+                {
+                    longest = str.Length;
+                }
+            }
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            overview = overview + $"┌─{new string('─', Math.Max(0, longest))}─┐\n";
+            overview = overview + $"│";
+            overview = overview + $"reservation info:";
+            overview = overview + $"{new string(' ', Math.Max(0, longest+2- "reservation info:".Length))}│\n";
+            Console.BackgroundColor = ConsoleColor.Black;
+            overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
+            foreach (string infos in list_info)
+            {
+                overview = overview + "│" + infos;
+                overview = overview + $"{new string(' ', Math.Max(0, longest+2 - infos.Length))}│\n";
+            }
+            overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
+            overview = overview + $"│";
+            overview = overview + $"timeline:";
+            overview = overview + $"{new string(' ', Math.Max(0, longest+2- "timeline:".Length))}│\n";
+            int i = 1;
+            foreach (string infos in list_info_timeline)
+            {
+                overview = overview + $"│{i}: " + infos;
+                overview = overview + $"{new string(' ', Math.Max(0, longest - infos.Length-1))}│\n";
+                i++;
+            }
+            overview = overview + $"└─{new string('─', Math.Max(0, longest ))}─┘\n";
+
             return overview;
         }
         else
