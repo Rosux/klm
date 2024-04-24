@@ -63,6 +63,11 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    /// <summary>
+    /// Returns a list of all rooms.
+    /// </summary>
+    /// <param name="filterMinSize">Set the minimum size filter. will only return rooms that are bigger or equal in size.</param>
+    /// <returns>A list of rooms.</returns>
     public List<Room> GetAllRooms(int filterMinSize=0){
         List<Room> roomlist = new List<Room>();
         _Conn.Open();
@@ -81,6 +86,10 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    /// <summary>
+    /// Get the biggest room capacity currently available.
+    /// </summary>
+    /// <returns>An integer defining the biggest room capacity.</returns>
     public int GetMaxRoomCapacity()
     {
         int maxCapacity = 0;

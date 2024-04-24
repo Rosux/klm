@@ -1,7 +1,12 @@
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
-    
+
+    /// <summary>
+    /// Save a reservation to the database.
+    /// </summary>
+    /// <param name="reservation">A Reservation object containing the detail.</param>
+    /// <returns>A boolean indicating if it was saved succesfully or not. true = saved, false = error</returns>
     public bool CreateReservation(Reservation reservation){
         _Conn.Open();
         string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
