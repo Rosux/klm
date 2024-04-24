@@ -55,15 +55,26 @@ public static class ReservationMenu
                     }else if(FilmOrEpisode != null && FilmOrEpisode is Dictionary<Serie, List<Episode>>){
                         List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)FilmOrEpisode).First().Value;
                         DateTime serieTime = new DateTime();
+                        int lastDay = -1;
                         for(int i = 0; i < ruru.Count; i++)
                         {
                             Episode episode = ruru[i];
                             DateOnly d = MenuHelper.SelectDate($"Select the date and time you want the episode {episode.Title} to begin.", startDate, startDate, endDate);
                             TimeOnly t;
+                            if(i == 0){
+                                serieTime = new DateTime(d.Year, d.Month, d.Day, startTime.Hour, startTime.Minute, 0);
+                                lastDay = d.Day;
+                            }
+                            if(d.Day != lastDay){
+                                serieTime = DateTime.MinValue;
+                            }
+                            if(serieTime < new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0)){
+                                serieTime = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0);
+                            }
+                            if(serieTime > new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0)){
+                                serieTime = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0);
+                            }
                             if (d == startDate && d == endDate){
-                                if(i == 0){
-                                    serieTime = new DateTime(1, 1, 1, startTime.Hour, startTime.Minute, 0);
-                                }
                                 t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, endTime);
                             }else if (d == startDate){
                                 t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, TimeOnly.MaxValue);
@@ -72,6 +83,7 @@ public static class ReservationMenu
                             }else{
                                 t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, TimeOnly.MaxValue);
                             }
+                            lastDay = d.Day;
                             timeline.Add(
                                 episode,
                                 new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
@@ -83,8 +95,6 @@ public static class ReservationMenu
                                 serieTime = serieTime.AddMinutes(episode.Length);
                             }
                         }
-                    }else if(FilmOrEpisode == null){
-                        Console.WriteLine("nothing selected");
                     }
                 }},
                 {"Add Consumptions", ()=>{
@@ -93,7 +103,7 @@ public static class ReservationMenu
                         consumptions.Add($"{food.Name} (Price: {food.Price.ToString("0.00")})", food);
                     }
                     Consumption c = MenuHelper.SelectFromList("Select the food", consumptions);
-                    DateOnly d = MenuHelper.SelectDate("Select the date and time of your food", null, startDate, endDate);
+                    DateOnly d = MenuHelper.SelectDate("Select the date and time of your food", startDate, startDate, endDate);
                     TimeOnly t;
                     if (d == startDate && d == endDate){
                         t = MenuHelper.SelectTime("Select the date and time of your food", "", new TimeOnly(), startTime, endTime);
@@ -113,7 +123,7 @@ public static class ReservationMenu
                 }},
                 {"Add Breaks", ()=>{
                     int breakTime = MenuHelper.SelectInteger("Select the length for your break in minutes", 1, 1, int.MaxValue);
-                    DateOnly d = MenuHelper.SelectDate("Select break date and time", null, startDate, endDate);
+                    DateOnly d = MenuHelper.SelectDate("Select break date and time", startDate, startDate, endDate);
                     TimeOnly t;
                     if (d == startDate && d == endDate){
                         t = MenuHelper.SelectTime("Select the date and time for your break", "", new TimeOnly(), startTime, endTime);

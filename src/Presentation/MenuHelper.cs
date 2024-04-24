@@ -1,9 +1,9 @@
 using System;
 
 public static class MenuHelper{
-    private static SearchAccess searchAccess = new SearchAccess();
+private static SearchAccess searchAccess = new SearchAccess();
 
-#region Integer
+    #region Integer
     /// <summary>
     /// Ask the user to select an integer between specified values and returns the chosen integer.
     /// </summary>
@@ -40,7 +40,7 @@ public static class MenuHelper{
             Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
             key = RawKey.Key;
-            
+
             // add number to string
             if (char.IsDigit(RawKey.KeyChar))
             {
@@ -145,9 +145,9 @@ public static class MenuHelper{
     public static int SelectInteger(string prefix="", string suffix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
         return SelectInteger(prefix, suffix, false, defaultInt, min, max) ?? defaultInt;
     }
-#endregion
+    #endregion
 
-#region Date
+    #region Date
     /// <summary>
     /// Ask the user to select a date between specified values and returns the chosen date.
     /// </summary>
@@ -329,7 +329,7 @@ public static class MenuHelper{
     public static DateOnly SelectDate(string prefix="", DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
         return SelectDate(prefix, "", false, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
     }
-    
+
     /// <summary>
     /// Ask the user to select a date between specified values and returns the chosen date.
     /// </summary>
@@ -360,9 +360,9 @@ public static class MenuHelper{
     public static DateOnly SelectDate(DateOnly? minDate = null, DateOnly? maxDate = null){
         return SelectDate("", "", false, null, minDate, maxDate) ?? DateOnly.MinValue;
     }
-#endregion
+    #endregion
 
-#region Time
+    #region Time
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
@@ -408,7 +408,7 @@ public static class MenuHelper{
                 } else {
                     time = time.AddMinutes(TimeAmount);
                 }
-                
+
                 if (time < MinTime){
                     time = MinTime;
                 }
@@ -429,9 +429,9 @@ public static class MenuHelper{
     public static TimeOnly SelectTime(TimeOnly defaultTime = new TimeOnly()){
         return SelectTime("", "", defaultTime, null, null);
     }
-#endregion
+    #endregion
 
-#region Callback options from a Dict
+    #region Callback options from a Dict
     /// <summary>
     /// Show a menu to the user of the given options and use the callback when the user selects a specific option.
     /// </summary>
@@ -505,9 +505,9 @@ public static class MenuHelper{
         // call callback method based on the users choice
         Options.Values.ElementAt(currentSelection).Invoke();
     }
-#endregion
+    #endregion
 
-#region Options from a Dict
+    #region Options from a Dict
     /// <summary>
     /// Shows a list of options to the user and return the value of the chosen option.
     /// </summary>
@@ -595,8 +595,10 @@ public static class MenuHelper{
         } while (key != ConsoleKey.Enter);
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
-#endregion
-#region Movie or Series/Episodes select
+    #endregion
+
+
+    #region Movie or Series/Episodes select
     /// <summary>
     /// Ask the user to select a movie or series episodes.
     /// </summary>
@@ -620,7 +622,7 @@ public static class MenuHelper{
                 }else if(m is Serie && ((Serie)m).Title.Length+3 > longestWord){
                     longestWord = ((Serie)m).Title.Length + 3;
                 }
-            }
+            } 
             if (searchString.Length + 2 > longestWord){
                 longestWord = searchString.Length + 2;
             }
