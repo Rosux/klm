@@ -148,6 +148,11 @@ public static class ReservationMenu
         }
         return null;
     }
+
+    /// <summary>
+    /// gives a list of all reservations to pick one
+    /// </summary>
+    /// <returns>a object of Reservation</returns>
     public static Reservation? ShowReservation()
     {
         List<Reservation> reservations = ReservationAccess.ReadReservations();
@@ -188,6 +193,11 @@ public static class ReservationMenu
             return null;
         }
     }
+
+    /// <summary>
+    /// gives a list of all reservations to pick one
+    /// </summary>
+    /// <returns>a object of Reservation</returns>
     public static Reservation? ShowAllReservation()
     {
         List<Reservation> reservations = ReservationAccess.ReadReservations();
@@ -228,7 +238,11 @@ public static class ReservationMenu
             return null;
         }
     }
-
+    /// <summary>
+    /// shows a list of all reservation on or durig the given date
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns>object of Reservations</returns>
     public static Reservation? ShowSpecificReservation(DateTime date)
     {
     List<Reservation> reservations = ReservationAccess.PickReservations(date);
@@ -270,6 +284,56 @@ public static class ReservationMenu
         }
     }
 
+    /// <summary>
+    /// shows a list of all reservation on or durig the week of given date
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns>object of Reservations</returns>
+    public static Reservation? ShowSpecificReservationWeek(DateTime date)
+    {
+    List<Reservation> reservations = ReservationAccess.PickReservationsWeek(date);
+    if (reservations.Count == 0)
+    {
+        Console.WriteLine("There are no reservations during this time period.");
+        return null;
+    }
+    else
+    {
+        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
+            foreach (Reservation reservation in reservations)
+            {
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+            }
+
+            reservationOptions.Add("Return to menu", null);
+
+            Reservation selectedReservation = null;
+            do
+            {
+                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
+
+                if (selectedReservation != null)
+                {
+                    Console.Clear();
+                    return selectedReservation;
+
+                    while (true)
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }
+            } while (selectedReservation != null);
+
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// gives the user a list of all his reservations
+    /// </summary>
+    /// <returns>a object of Reservations</returns>
     public static Reservation? ShowSpecificReservationUser()
     {
     List<Reservation> reservations = ReservationAccess.PickReservationsUser();

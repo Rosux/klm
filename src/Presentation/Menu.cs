@@ -40,6 +40,7 @@ class Menu
                         RoomMenu.AdminOverView();
                     }},
                     {"View reservations", ()=>{
+                        // takes admin to his reservation menu
                         ReservationOverviewAdminMenu.ReservationAdminOverview();
                     }},
                     {"Exit", ()=>{

@@ -58,7 +58,7 @@ public static class ReservationOverviewAdminMenu
                             date_cor = date.Subtract(date_s);
                             break;
                     }
-                    Reservation selected_res = ReservationMenu.ShowSpecificReservation(date_cor);
+                    Reservation selected_res = ReservationMenu.ShowSpecificReservationWeek(date_cor);
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
@@ -74,7 +74,7 @@ public static class ReservationOverviewAdminMenu
                 }},
                 {"3. Choose date",()=> {
                     DateOnly date = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
-                    DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+                    DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
                     Reservation selected_res = ReservationMenu.ShowSpecificReservation(date_2);
                     if (selected_res != null)
                     {

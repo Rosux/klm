@@ -28,7 +28,11 @@ public class ReservationAccess : DatabaseHandler
         _Conn.Close();
         return reservations;
     }
-
+    /// <summary>
+    /// looks through the database for reservations with teh given date
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns>a list of all reservations on or during the given date</returns>
     public List<Reservation> PickReservations(DateTime date){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
@@ -55,7 +59,45 @@ public class ReservationAccess : DatabaseHandler
         _Conn.Close();
         return reservations;
     }
-
+    /// <summary>
+    /// uses the given date to look through the database to pick all reservations for current week
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns>a list of all reservations during the week of given date</returns>
+     public List<Reservation> PickReservationsWeek(DateTime date){
+        List<Reservation> reservations = new List<Reservation>();
+        TimeSpan date_s = new TimeSpan(7, 0, 0, 0, 0, 0);
+        DateTime date_e = date.Add(date_s);
+        DateTime date_e_cor = new DateTime(date_e.Year, date_e.Month, date_e.Day, 23, 59, 59);
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @sDate AND StartDate <= @eDate";
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@sDate", date.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@eDate", date_e_cor.ToString("yyyy-MM-dd HH:mm:ss"));
+            SQLiteDataReader reader = Launch.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int roomid = reader.GetInt32(1);
+                int userid = reader.GetInt32(2);
+                int groupsize = reader.GetInt32(3);
+                DateTime startdate = DateTime.Parse(reader.GetString(4));
+                DateTime enddate = DateTime.Parse(reader.GetString(5));
+                double price = reader.GetDouble(6);
+                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
+                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
+                TimelineHolder.t = timeline;
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+            }
+        }
+        _Conn.Close();
+        return reservations;
+    }
+    /// <summary>
+    /// searches the database for all reservations for a user
+    /// </summary>
+    /// <returns>a list of all reservations for the user</returns>
     public List<Reservation> PickReservationsUser(){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
