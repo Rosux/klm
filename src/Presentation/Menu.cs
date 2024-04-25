@@ -27,8 +27,8 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Movies", ()=>{
-                        // movie editor
+                    {"Manage movies/series", ()=>{
+                        // takes admin to movie editor
                         FilmSerieMenu.UI();
                     }},
                     {"Consumptions", ()=>{
@@ -53,17 +53,20 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Exit", ()=>{
-                        // close application
-                        Environment.Exit(1);
+                    {"Reservations", ()=>{
+                        ReservationLogic.Reservation();
                     }},
                     {"Make reservation", ()=>{
-                        // close application
+                        // takes user to book reseravtion
                         ReservationLogic.BookReservation();
                     }},
                     {"Manage reservations", ()=>{
-                        // close application
+                        // takes user to reservation menu
                         ReservationOverviewUserMenu.ReservationUserOverview();
+                    }},
+                    {"Exit", ()=>{
+                        // close application
+                        Environment.Exit(1);
                     }},
                 });
             }
@@ -104,6 +107,4 @@ class Menu
             });
         }
     }
-
-    // used for testing purpose
 }

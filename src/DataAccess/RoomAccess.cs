@@ -1,6 +1,5 @@
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath)
-    {
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
 
     }
 
@@ -15,7 +14,6 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return newRoomId;
     }
-
     public void EditFromRoomTable(int id, int capacity)
     {
         _Conn.Open();
@@ -26,7 +24,6 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-
     public void RemoveFromRoomTable(int roomid)
     {
         _Conn.Open();
@@ -36,7 +33,6 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-
     public string GetRoom(int id)
     {
         string RoomInfo = "";
@@ -52,7 +48,6 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return RoomInfo;
     }
-
     public List<string> _getAllRooms()
     {
         _Conn.Open();
@@ -68,6 +63,11 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    /// <summary>
+    /// Returns a list of all rooms.
+    /// </summary>
+    /// <param name="filterMinSize">Set the minimum size filter. will only return rooms that are bigger or equal in size.</param>
+    /// <returns>A list of rooms.</returns>
     public List<Room> GetAllRooms(int filterMinSize=0){
         List<Room> roomlist = new List<Room>();
         _Conn.Open();
@@ -86,6 +86,10 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    /// <summary>
+    /// Get the biggest room capacity currently available.
+    /// </summary>
+    /// <returns>An integer defining the biggest room capacity.</returns>
     public int GetMaxRoomCapacity()
     {
         int maxCapacity = 0;

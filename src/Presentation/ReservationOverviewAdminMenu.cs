@@ -8,7 +8,8 @@ public static class ReservationOverviewAdminMenu
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. View all reservations",()=> {
-                    Reservation selected_res = ReservationMenu.ShowAllReservation();
+                    // lets admin pick from a list of all reservations to see that reservations info.
+                    Reservation selected_res = ReservationMenu.GetAllReservation();
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
@@ -23,6 +24,7 @@ public static class ReservationOverviewAdminMenu
                     Console.Clear();
                 }},
                 {"2. View all reservations for this week",()=> {
+                    // lets admin pick from a list of all reservations during current week to see that reservations info.
                     DateTime date = DateTime.Now;
                     DayOfWeek day = DateTime.Now.DayOfWeek;
                     TimeSpan date_s = new TimeSpan(0, 0, 0, 0, 0, 0);
@@ -58,7 +60,7 @@ public static class ReservationOverviewAdminMenu
                             date_cor = date.Subtract(date_s);
                             break;
                     }
-                    Reservation selected_res = ReservationMenu.ShowSpecificReservationWeek(date_cor);
+                    Reservation selected_res = ReservationMenu.GetSpecificReservationWeek(date_cor);
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
@@ -73,9 +75,10 @@ public static class ReservationOverviewAdminMenu
                     Console.Clear();
                 }},
                 {"3. Choose date",()=> {
+                    // lets admin pick from a list of all reservations during the date that the admin can choose and shows all that reservations info.
                     DateOnly date = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
                     DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
-                    Reservation selected_res = ReservationMenu.ShowSpecificReservation(date_2);
+                    Reservation selected_res = ReservationMenu.GetSpecificReservation(date_2);
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));

@@ -29,17 +29,20 @@ public class ReservationAccess : DatabaseHandler
         return reservations;
     }
     /// <summary>
-    /// looks through the database for reservations with teh given date
+    /// looks through the database for reservations during given date
     /// </summary>
     /// <param name="date"></param>
     /// <returns>a list of all reservations on or during the given date</returns>
-    public List<Reservation> PickReservations(DateTime date){
+    public List<Reservation> ReadReservationsDate(DateTime date){
         List<Reservation> reservations = new List<Reservation>();
+        TimeSpan date_s = new TimeSpan(0, 23, 59, 59, 0, 0);
+        DateTime date_e_cor = date.Subtract(date_s);
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date";
+        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date OR StartDate >= @SDate AND EndDate <= @Date";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
             Launch.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@SDate", date_e_cor.ToString("yyyy-MM-dd HH:mm:ss"));
             SQLiteDataReader reader = Launch.ExecuteReader();
             while (reader.Read())
             {
@@ -64,7 +67,7 @@ public class ReservationAccess : DatabaseHandler
     /// </summary>
     /// <param name="date"></param>
     /// <returns>a list of all reservations during the week of given date</returns>
-     public List<Reservation> PickReservationsWeek(DateTime date){
+     public List<Reservation> ReadReservationsWeek(DateTime date){
         List<Reservation> reservations = new List<Reservation>();
         TimeSpan date_s = new TimeSpan(7, 0, 0, 0, 0, 0);
         DateTime date_e = date.Add(date_s);
@@ -98,7 +101,7 @@ public class ReservationAccess : DatabaseHandler
     /// searches the database for all reservations for a user
     /// </summary>
     /// <returns>a list of all reservations for the user</returns>
-    public List<Reservation> PickReservationsUser(){
+    public List<Reservation> ReadReservationsUser(){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
         string NewQuery = @"SELECT * FROM Reservations WHERE UserId = @UserId";
@@ -126,12 +129,12 @@ public class ReservationAccess : DatabaseHandler
     }
 
     public bool CreateReservation(Reservation reservation){
-    _Conn.Open();
-    string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
-    VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
-    int rowsAffected;
-    using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
-    {
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
+        int rowsAffected;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
             Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
             Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
             Launch.Parameters.AddWithValue("@GroupSize", reservation.GroupSize);
