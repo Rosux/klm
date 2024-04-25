@@ -131,21 +131,21 @@ public class ReservationOverviewLogic
             // sets the lengt of the tabel if there is a timeline
             foreach(string str in list_info_timeline)
             {
-                string string_cor = $"│{i}: " + str;
+                string string_cor = $"│o{i}: " + str;
                 if(string_cor.Length > longest)
                 {
-                    longest = string_cor.Length;
+                    longest = string_cor.Length-2;
                 }
                 i++;
             }
             // converts all reservation info to a string and adds it to list_info
-            string id_string = $"Id: {selected_res.Id}";
-            string room_string = $"Room: {selected_res.RoomId}";
-            string groupsize_string = $"Group size: {selected_res.GroupSize}";
-            string userid_string = $"User id: {selected_res.UserId}";
-            string start_string = $"Start date: {selected_res.StartDate}";
-            string end_string = $"End date: {selected_res.EndDate}";
-            string price_string = $"Price: {selected_res.Price} euro";
+            string id_string = $" Id: {selected_res.Id}";
+            string room_string = $" Room: {selected_res.RoomId}";
+            string groupsize_string = $" Group size: {selected_res.GroupSize}";
+            string userid_string = $" User id: {selected_res.UserId}";
+            string start_string = $" Start date: {selected_res.StartDate}";
+            string end_string = $" End date: {selected_res.EndDate}";
+            string price_string = $" Price: {selected_res.Price} euro";
             list_info.Add(id_string);
             list_info.Add(room_string);
             list_info.Add(groupsize_string);
@@ -166,8 +166,8 @@ public class ReservationOverviewLogic
             Console.BackgroundColor = ConsoleColor.Black;
             overview = overview + $"┌─{new string('─', Math.Max(0, longest))}─┐\n";
             overview = overview + $"│";
-            overview = overview + $"reservation info:";
-            overview = overview + $"{new string(' ', Math.Max(0, longest+2- "reservation info:".Length))}│\n";
+            overview = overview + $" reservation info:";
+            overview = overview + $"{new string(' ', Math.Max(0, longest+1- "reservation info:".Length))}│\n";
             Console.BackgroundColor = ConsoleColor.Black;
             overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
             // adds all reservation info to the tabel from list_info
@@ -178,14 +178,14 @@ public class ReservationOverviewLogic
             }
             overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
             overview = overview + $"│";
-            overview = overview + $"timeline:";
-            overview = overview + $"{new string(' ', Math.Max(0, longest+2- "timeline:".Length))}│\n";
+            overview = overview + $" timeline:";
+            overview = overview + $"{new string(' ', Math.Max(0, longest+1- "timeline:".Length))}│\n";
             i = 1;
             // adds all timeline info to the tabel from list_info_timeline
             foreach (string infos in list_info_timeline)
             {
-                overview = overview + $"│{i}: " + infos;
-                overview = overview + $"{new string(' ', Math.Max(0, longest - infos.Length-1))}│\n";
+                overview = overview + $"│ {i}: " + infos;
+                overview = overview + $"{new string(' ', Math.Max(0, longest - infos.Length-2))}│\n";
                 i++;
             }
             overview = overview + $"└─{new string('─', Math.Max(0, longest ))}─┘\n";
