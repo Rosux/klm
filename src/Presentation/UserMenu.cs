@@ -179,12 +179,12 @@ public static class UserMenu{
                     {
                         MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
                             {"1. User", ()=>{
-                                 editedUser.Role = UserRole.USER;
-                                  running = false;
+                                editedUser.Role = UserRole.USER;
+                                running = false;
                             }},
                             {"2. Admin", ()=>{
                                 editedUser.Role = UserRole.ADMIN;
-                                 running = false;
+                                running = false;
                             }},
                         });
                     }

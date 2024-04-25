@@ -115,6 +115,12 @@ public static class MenuHelper{
         Options.Values.ElementAt(currentSelection).Invoke();
     }
 
+
+
+
+
+
+
     /// <summary>
     /// Shows a list of options to the user and return the value of the chosen option.
     /// </summary>
@@ -188,11 +194,11 @@ public static class MenuHelper{
 
             // if the user presses uo/down we increase/decrease the current choice
             if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
-               currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
+                currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
             }
             if (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
-               currentPage += (key == ConsoleKey.RightArrow) ? 1 : -1;
-               currentSelection = 0;
+                currentPage += (key == ConsoleKey.RightArrow) ? 1 : -1;
+                currentSelection = 0;
             }
 
             // limit the current choice so it doesnt cause out of range errors
