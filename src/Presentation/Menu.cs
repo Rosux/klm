@@ -39,7 +39,7 @@ class Menu
                         // room editor
                         RoomMenu.AdminOverView();
                     }},
-                    {"View reservations", ()=>{
+                    {"Reservations", ()=>{
                         // takes admin to his reservation menu
                         ReservationOverviewAdminMenu.ReservationAdminOverview();
                     }},
@@ -55,14 +55,6 @@ class Menu
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                     {"Reservations", ()=>{
                         ReservationLogic.Reservation();
-                    }},
-                    {"Make reservation", ()=>{
-                        // takes user to book reseravtion
-                        ReservationLogic.BookReservation();
-                    }},
-                    {"Manage reservations", ()=>{
-                        // takes user to reservation menu
-                        ReservationOverviewUserMenu.ReservationUserOverview();
                     }},
                     {"Exit", ()=>{
                         // close application
