@@ -159,7 +159,7 @@ public class ReservationOverviewLogic
             {
                 if(str.Length > longest)
                 {
-                    longest = str.Length;
+                    longest = str.Length-1;
                 }
             }
             // makes the tabel with all the info
