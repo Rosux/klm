@@ -1,5 +1,4 @@
 using System;
-
 class Menu
 {
     public static void Start()
@@ -28,8 +27,8 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Movies", ()=>{
-                        // movie editor
+                    {"Manage movies/series", ()=>{
+                        // takes admin to movie editor
                         FilmSerieMenu.UI();
                     }},
                     {"Consumptions", ()=>{
@@ -39,6 +38,10 @@ class Menu
                     {"Rooms", ()=>{
                         // room editor
                         RoomMenu.AdminOverView();
+                    }},
+                    {"Reservations", ()=>{
+                        // takes admin to his reservation menu
+                        ReservationOverviewAdminMenu.ReservationAdminOverview();
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -76,8 +79,14 @@ class Menu
                     if(a is Film){
                         Console.WriteLine(((Film)a).Title);
                     }else if(a is Dictionary<Serie, List<Episode>>){
+                        List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)a).First().Value;
+                        foreach(Episode ep in ruru)
+                        {
+
+                        }
                         Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Key.Title);
                         Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Value.Count);
+                        Console.ReadKey(true);
                     }else if(a == null){
                         Console.WriteLine("nothing selected");
                     }

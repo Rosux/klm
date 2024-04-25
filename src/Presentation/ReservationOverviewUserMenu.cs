@@ -1,14 +1,13 @@
-public static class ReservationLogic
+public class ReservationOverviewUserMenu
 {
-    private static ReservationAccess ReservationAccess = new ReservationAccess();
-    public static void Reservation(){
-        bool running = true;
+    public static void ReservationUserOverview()
+    {
         ReservationOverviewLogic accesser = new ReservationOverviewLogic();
+        bool running = true;
         while(running)
         {
-            MenuHelper.SelectOptions("Reservations", new Dictionary<string, Action>(){
-                {"1. Book a Reservation", BookReservation},
-                {"2. View Reservation", ()=>{
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. View reservation", ()=>{
                     // lets the user choose a reservation from a list of all his reservations to seethe info
                     Reservation selected_res = ReservationMenu.GetSpecificReservationUser();
                     if (selected_res != null)
@@ -24,32 +23,10 @@ public static class ReservationLogic
                     }
                     Console.Clear();
                 }},
-                {"3. Exit to main menu", ()=>{
+                {"2. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
         }
-    }
-
-    public static void BookReservation(){
-        Reservation? r = ReservationMenu.BookReservation();
-        if (r == null)
-        {
-            return;
-        }
-        else
-        {
-            // save reservation
-            bool success = ReservationAccess.CreateReservation(r);
-            if(success){
-                ReservationMenu.Saved();
-            }else{
-                ReservationMenu.Error();
-            }
-        }
-    }
-
-    public static void ViewReservation(){
-
     }
 }
