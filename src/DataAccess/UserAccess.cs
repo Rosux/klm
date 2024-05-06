@@ -66,4 +66,85 @@ public class UserAccess : DatabaseHandler{
 
         return currentUser;
     }
+
+    /// <summary>
+    /// gets all users from  database. 
+    /// </summary>
+    /// <returns>returns a list with all the users that are registered</returns>
+    public List<User> GetAllUsers(){
+        List<User> users = new List<User>();
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Users";
+        using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
+        {
+            SQLiteDataReader reader = Show.ExecuteReader();
+            while (reader.Read())
+            {
+                UserRole r;
+                Enum.TryParse(reader["Role"].ToString(), out r);
+                int id = reader.GetInt32(0);
+                string name = reader.GetString(1);
+                string lastname = reader.GetString(2);
+                string email = reader.GetString(3);
+                string password = reader.GetString(4);
+                string Role = reader.GetString(5);
+                users.Add(new User(id, name, lastname, email, password, r));
+            }
+        }
+        _Conn.Close();
+        return users;
+    }
+    public bool DeleteUser(User user){
+        _Conn.Open();
+        string NewQuery = @"DELETE FROM Users WHERE ID = @Id ";
+        using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Remove.Parameters.AddWithValue("@Id", user.Id);
+            int rowsAffected = Remove.ExecuteNonQuery();
+            _Conn.Close();
+            return rowsAffected > 0;
+        }
+    }
+
+    public User GetUsers(int id){
+        User users = null;
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Users WHERE ID = @id";
+        using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Show.Parameters.AddWithValue("@id", id);
+            SQLiteDataReader reader = Show.ExecuteReader();
+            while (reader.Read())
+            {
+                UserRole r;
+                Enum.TryParse(reader["Role"].ToString(), out r);
+                int userId = reader.GetInt32(0);
+                string name = reader.GetString(1);
+                string lastname = reader.GetString(2);
+                string email = reader.GetString(3);
+                string password = reader.GetString(4);
+                string Role = reader.GetString(5);
+                users = new User(userId, name, lastname, email, password, r);
+            }
+        }
+        _Conn.Close();
+        return users;
+    }
+
+    public bool UpdateUser(User user){
+        _Conn.Open();
+        int rowsAffected = -1;
+        string updateUser = @"UPDATE Users SET FirstName = @Name, LastName= @LastName, Email = @Email, Password = @Password, Role = @Role WHERE ID = @Id";
+        using (SQLiteCommand comm = new SQLiteCommand(updateUser, _Conn)){
+            comm.Parameters.AddWithValue("@Name", user.FirstName);
+            comm.Parameters.AddWithValue("@LastName", user.LastName);
+            comm.Parameters.AddWithValue("@Email", user.Email);
+            comm.Parameters.AddWithValue("@Password", user.Password);
+            comm.Parameters.AddWithValue("@Role", user.Role.ToString());
+            comm.Parameters.AddWithValue("@Id", user.Id);
+            rowsAffected = comm.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        return rowsAffected > 0;
+    }
 }

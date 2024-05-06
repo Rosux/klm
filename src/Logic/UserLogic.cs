@@ -16,6 +16,10 @@ public static class UserLogic
     {
         UserAccess u = new UserAccess();
         User Credentials = UserMenu.Register();
+        if (Credentials == null)
+        {
+            return;
+        }
         u.AddUser(Credentials);
     }
 }
