@@ -247,7 +247,7 @@ public static class ReservationMenu
             Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
@@ -292,7 +292,7 @@ public static class ReservationMenu
         Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
@@ -338,7 +338,7 @@ public static class ReservationMenu
         Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
