@@ -1,55 +1,123 @@
+using System.Text.RegularExpressions;
 public static class UserMenu{
     private static UserAccess u = new UserAccess();
 
     public static User Register()
     {
-        string firstName= "";
-        string lastName= "";
-        string password = "";
-        while(true){
-            Console.WriteLine("Enter your first name:");
-            firstName = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                Console.WriteLine("First name cannot be empty. Please try again.");
-                continue;
-            }
-            break;
-        }
-        while(true){
-            Console.WriteLine("Enter your last name:");
-            lastName = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                Console.WriteLine("Last name cannot be empty. Please try again.");
-                continue;
-            }
-            break;
-        }
+        string firstName = GetValidInput("Enter your first name:", 3, 20);
+        string lastName = GetValidInput("Enter your last name:", 3, 20);
+
         string email;
+            Console.WriteLine("Enter your email:");
+            email = GetValidEmail("Enter your email:", 3, 32);
+        string password;
         do
         {
-            Console.WriteLine("Enter your email:");
-            email = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(email))
+            password = GetValidInput("Enter your password (totally secured btw):", 6, 20);
+            if (!IsStrongPassword(password))
             {
-                Console.WriteLine("Email cannot be empty. Please try again.");
+                Console.WriteLine("Password must contain at least 1 lowercase letter, 1 uppercase letter, 1 special character, and 1 number. Please try again.");
                 continue;
             }
-        } while (!IsValidEmail(email));
-        while(true){
-            Console.WriteLine("Enter your password (totally secured btw):");
-            password = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                Console.WriteLine("Password cannot be empty. Please try again.");
-                continue;
-            }
-            break;
-        }
+        } while (!IsStrongPassword(password));
+
         User user = new User(firstName, lastName, email, password);
         Console.WriteLine("User has been added");
         return user;
+    }
+
+    private static string GetValidInput(string prompt, int minLength, int maxLength)
+    {
+        string input = "";
+        while (true)
+        {
+            Console.WriteLine(prompt);
+            string currentInput = "";
+            ConsoleKeyInfo keyInfo;
+            while (true)
+            {
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace)
+                {
+                    if (currentInput.Length > 0)
+                    {
+                        currentInput = currentInput.Substring(0, currentInput.Length - 1);
+                        Console.Write("\b \b");
+                    }
+                }
+                else if (!char.IsControl(keyInfo.KeyChar))
+                {
+                    currentInput += keyInfo.KeyChar;
+                    Console.Write(keyInfo.KeyChar);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(currentInput))
+            {
+                Console.WriteLine("Input cannot be empty. Please try again.");
+                continue;
+            }
+            if (currentInput.Length < minLength || currentInput.Length > maxLength)
+            {
+                Console.WriteLine($"Input must be between {minLength} and {maxLength} characters. Please try again.");
+                continue;
+            }
+            input = currentInput;
+            break;
+        }
+        return input;
+    }
+
+    private static string GetValidEmail(string prompt, int minLength, int maxLength)
+    {
+        string input = "";
+        while (true)
+        {
+            Console.Clear();
+            Console.Write(prompt);
+            string currentInput = "";
+            ConsoleKeyInfo keyInfo;
+            while (true)
+            {
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Enter && !string.IsNullOrWhiteSpace(currentInput))
+                {
+                    Console.WriteLine();
+                    break;
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace)
+                {
+                    if (currentInput.Length > 0)
+                    {
+                        currentInput = currentInput.Substring(0, currentInput.Length - 1);
+                    }
+                }
+                else if (!char.IsControl(keyInfo.KeyChar))
+                {
+                    currentInput += keyInfo.KeyChar;
+                    Console.Write(keyInfo.KeyChar);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(currentInput))
+            {
+                Console.WriteLine("Input cannot be empty. Please try again.");
+                continue;
+            }
+            if (currentInput.Length < minLength || currentInput.Length > maxLength)
+            {
+                Console.WriteLine($"Input must be between {minLength} and {maxLength} characters. Please try again.");
+                continue;
+            }
+            input = currentInput;
+            break;
+        }
+        return input;
     }
 
     public static User Login()
@@ -64,7 +132,6 @@ public static class UserMenu{
 
     static bool IsValidEmail(string email)
     {
-        // Basic email format validation
         if (email.Contains("@") && (email.EndsWith(".com") || email.EndsWith(".nl")))
         {
             return true;
@@ -74,6 +141,16 @@ public static class UserMenu{
             Console.WriteLine("Invalid email format. Please enter a valid email address.");
             return false;
         }
+    }
+
+    private static bool IsStrongPassword(string password)
+    {
+        var hasLowercase = new Regex(@"[a-z]").IsMatch(password);
+        var hasUppercase = new Regex(@"[A-Z]").IsMatch(password);
+        var hasSpecialChar = new Regex(@"\W").IsMatch(password);
+        var hasNumber = new Regex(@"\d").IsMatch(password);
+
+        return hasLowercase && hasUppercase && hasSpecialChar && hasNumber;
     }
 
     public static User AddNewUser()

@@ -3,10 +3,11 @@
 class Program
 {
     public static User? CurrentUser = null;
+    
     public static void Main(){
 
-        // Menu.Start();
-        UserTable.EditUsers();
+        Menu.Start();
+        // UserTable.EditUsers();
 
     }
 }

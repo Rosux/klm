@@ -135,6 +135,7 @@ public class UserTable{
                     Console.Write($" │ {email[i]}{new string(' ', Math.Max(0, mailMax - email[i].Length))}");
                     Console.Write($" │ {password[i]}{new string(' ', Math.Max(0, passMax - password[i].Length))}");
                     Console.BackgroundColor = ConsoleColor.Black;
+
                     Console.Write($" │\n");
                 }
                 Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┴─{new string('─', Math.Max(0, passMax ))}─┘");
@@ -158,7 +159,8 @@ public class UserTable{
                     else
                     {
                         User selecedUser = u.GetUsers(id[CurrentSelected]);
-                        UserMenu.EditUser(selecedUser);
+                        User EditUser = UserMenu.EditUser(selecedUser);
+                        u.UpdateUser(EditUser);
                     }
                     break;
                 }
