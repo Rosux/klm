@@ -1,46 +1,33 @@
 public class RoomMenu
 {   
-    
+    private static RoomAccess r = new RoomAccess();
     public static void AdminOverView()
     {
-        
-
-        Console.Clear();
-        Console.WriteLine("Welcome to Admin overview for Rooms\nSelect an action:\n1. Show all rooms\n2. Add a room\n3. Remove a room\n4. Edit a room\n5. Show specified room\n6. Exit");
-        if (int.TryParse(Console.ReadLine(), out int option))
+        bool running = true;
+        while(running)
         {
-            switch(option)
-            {
-                case 1:
+            Console.WriteLine("Welcome to Admin overview for Rooms");
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. Show all rooms", ()=>{
                     Action1();
-                    break;
-                case 2:
+                }},
+                {"2. Add a room", ()=>{
                     Action2();
-                    break;
-                case 3:
+                }},
+                {"3. Remove a room", ()=>{
                     Action3();
-                    break;
-                case 4:
+                }},
+                {"4. Edit a room", ()=>{
                     Action4();
-                    break;
-                case 5:
+                }},
+                {"5. Show specified room", ()=>{
                     Action5();
-                    break;
-                case 6:
-                    break;
-                default:
-                    Console.WriteLine("Fill in a valid number");
-                    break;
-            }
+                }},
+                {"6. Exit to main menu", ()=>{
+                    running = false;
+                }},
+            });
         }
-        else
-        {
-            Console.WriteLine("Invalid input. Please enter a valid number.");
-            Console.ReadKey();
-            AdminOverView();
-        }
-
-
     }
     private static void Action1()
     {
@@ -48,94 +35,126 @@ public class RoomMenu
         PrintAllRooms();
         Console.WriteLine("\n\nPress any key to continue");
         Console.ReadKey();
-        AdminOverView();
     }
     private static void Action2()
     {
         Console.Clear();
-        Console.Write("Creating new room:\nCapacity: ");
-        if (int.TryParse(Console.ReadLine(), out int GivenCapacity))
+        int GivenCapacity = MenuHelper.SelectInteger("Capacity: ",0,1,2147483647);
+        if (GivenCapacity > 0)
         {
             RoomLogic.CreateRoom(GivenCapacity);
         }
-        else
-        {
-            Console.WriteLine("Invalid input. Please enter a valid number.\n\n New room not created.");
-            Console.ReadKey();
-            AdminOverView();
-        }
-        Console.Clear();
-        AdminOverView();
     }
     private static void Action3()
     {
-        Console.Clear();
-        Console.Write("Removing room:\nRoom id: ");
-        string givenid = Console.ReadLine();
-        bool checkParse = int.TryParse(givenid, out int roomid);
-        if(checkParse == true)
+        List<Room> rooms = r.GetAllRooms();
+        if (rooms.Count == 0)
         {
-            RoomLogic.RemoveRoom(roomid);
+            Console.WriteLine("There are no rooms.");
         }
         else
         {
-            Console.Write("\nInvalid parameter given, please insert a number.\n\nPress any key to continue...");
-            Console.ReadKey();
+            Dictionary<string, Room> roomOptions = new Dictionary<string, Room>();
+            foreach (Room room in rooms)
+            {
+                roomOptions.Add($"Room ID: {room.Id}, Room capacity: {room.Capacity}", room);
+            }
+
+            roomOptions.Add("Return to menu", null);
+
+            Room selectedRoom = null;
+            do
+            {
+                selectedRoom = MenuHelper.SelectFromList("Choose a room to remove", roomOptions);
+
+                if (selectedRoom != null)
+                {
+                    Console.Clear();
+                    RoomLogic.RemoveRoom(selectedRoom.Id);
+                    break;
+                    
+                    Console.Clear();
+                    while (true)
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }
+            } while (selectedRoom != null);
         }
-        Console.Clear();
-        AdminOverView();
     }
     private static void Action4()
     {
-        Console.Clear();
-        Console.Write("Editing room:\nRoom id:");
-        string givenid = Console.ReadLine();
-        Console.Write("Change room capacity to: ");
-        string givenCapacity = Console.ReadLine();
-        bool checkParseCapacity = int.TryParse(givenCapacity, out int capacity);
-        bool checkParseId = int.TryParse(givenid, out int roomid);
-        if(checkParseId == true && checkParseCapacity == true)
+        List<Room> rooms = r.GetAllRooms();
+        if (rooms.Count == 0)
         {
-            RoomLogic.EditRoom(capacity, roomid);
+            Console.WriteLine("There are no rooms.");
         }
         else
         {
-            Console.Write("\nInvalid parameter given, please insert a number.\n\nPress any key to continue...");
-            Console.ReadKey();
+            Dictionary<string, Room> roomOptions = new Dictionary<string, Room>();
+            foreach (Room room in rooms)
+            {
+                roomOptions.Add($"Room ID: {room.Id}, Room capacity: {room.Capacity}", room);
+            }
+
+            roomOptions.Add("Return to menu", null);
+
+            Room selectedRoom = null;
+            do
+            {
+                selectedRoom = MenuHelper.SelectFromList("Choose a room to remove", roomOptions);
+
+                if (selectedRoom != null)
+                {
+                    Console.Clear();
+                    int new_capacity = MenuHelper.SelectInteger("Select new capacity: ",0,1,2147483647);
+                    RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
+                    break;
+                    
+                    Console.Clear();
+                    while (true)
+                    {
+                        ConsoleKeyInfo key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                            break;
+                    }
+                }
+            } while (selectedRoom != null);
         }
-        Console.Clear();
-        AdminOverView();
     }
     private static void Action5()
     {
         Console.Clear();
-        Console.Write("Fetch specific room:\nRoom id: ");
-        string givenid = Console.ReadLine();
-        bool checkParse = int.TryParse(givenid, out int roomid);
-        if(checkParse == true)
-        {  
-            RoomLogic.FetchRoom(roomid);
-        }
-        else
-        {
-            Console.Write("\nInvalid parameter given, please insert a number.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }
-        Console.Clear();
-        AdminOverView();
+        int roomid = MenuHelper.SelectInteger("Select room id: ",0,1,2147483647);
+        RoomLogic.FetchRoom(roomid);
+    
 
     }
     private static void PrintAllRooms()
     {
+        int longest = 0;
         List<string> roomlist = RoomLogic.GetAllRooms();
         bool isEmpty = !roomlist.Any();
+
+        foreach(string str in roomlist)
+        {
+            if(str.Length > longest)
+            {
+                longest = str.Length;
+            }
+        }
+
+        Console.WriteLine($"┌─All Rooms{new String('─', Math.Max(0, longest - "all rooms".Length))}─┐");
         if(!isEmpty)
         {
             foreach(string rooms in roomlist)
             {
-                Console.WriteLine(rooms);
+                Console.WriteLine($"│ {rooms}{new String(' ', Math.Max(0, longest - rooms.Length))} │");
             }
-        } 
+            Console.WriteLine($"└─{new string('─', Math.Max(0, longest ))}─┘\n");
+        }
         else
         {
             Console.WriteLine("There are currently no rooms.");
