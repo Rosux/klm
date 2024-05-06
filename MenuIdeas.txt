@@ -27,3 +27,47 @@ menu ideas
 │ 6         │ 1         │ versloot │ 1              │ 1                        │
 │ 9         │ sdsd      │ sdsd     │ ssd@mail.com   │ asd                      │
 └───────────┴───────────┴──────────┴────────────────┴──────────────────────────┘
+movie select:
+
+┌─Start typing to search─┐
+│ >                      │
+└────────────────────────┘
+
+┌─Start typing to search─┐
+│ > Mud                  │
+└── Mudrunner           ─┘
+    Mud runner 2.0
+    muddy place
+    muddy business
+    SnowRunner
+
+season/episode select:
+
+Title: The Boys
+Seasons: 1, 2
+Episodes: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3
+
+┌─Select season─┐ -> ┌─Select Episode──────────┐
+│ 1. Season 1   │    │ 1. The name of the game │
+│ 2. Season 2   │    │ 2. Cherry               │
+└───────────────┘    │ 3. Get some             │
+                     └─────────────────────────┘
+
+
+
+TimeLine???:
+
+  2024-04-24                                        2024-04-25
+  |----------------|-------|----------------|-------|--------------------|
+00:00            00:40   01:00            02:20   00:00                02:34
+  | The boys (1.1) | break | The boys (1.2) |       | Breaking Bad (1.1) |
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ <-                                   13/18                              ->│
+├───────────────────────────────────────────────────────────────────────────┤
+│ firstname │  lastname  │	    email       │   password   │    Role    │   │
+└───────────────────────────────────────────────────────────────────────────┘ 
+│ 2         │ admin     │ 1        │ admin@mail.com │ 523523523532523523523523 │
+│ 6         │ 1         │ versloot │ 1              │ 1                        │
+│ 9         │ sdsd      │ sdsd     │ ssd@mail.com   │ asd                      │
+└───────────┴───────────┴──────────┴────────────────┴──────────────────────────┘

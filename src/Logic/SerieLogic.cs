@@ -5,9 +5,15 @@ public class SerieLogic
     public string Add_Serie(Serie serie)
     {
         SerieAcesser serieacesser = new();
+        IdAccess Idacesser = new();
         List<Serie> list_serie = serieacesser.Get_info();
-        serie.Id = list_serie.Count();
+        List<int> list_Id = Idacesser.Get_Id();
+        int new_Id = list_Id[1] + 1;
+        serie.Id = new_Id;
+        list_Id.RemoveAt(1);
+        list_Id.Insert(1, new_Id);
         list_serie.Add(serie);
+        Idacesser.Return_Id(list_Id);
         serieacesser.Return_info(list_serie);
         return $"you succesfully added the serie {serie.Title}.";
     }
@@ -43,7 +49,7 @@ public class SerieLogic
         return all_info;
     }
 
-    public bool Check_Serie(int id = 0)
+    public bool Check_Serie(int id)
     {
         bool all_info = false;
         SerieAcesser serieacesser = new();
@@ -54,6 +60,17 @@ public class SerieLogic
             {
                 all_info = true;
             }
+        }
+        return all_info;
+    }
+    public bool Check_Series_exist()
+    {
+        bool all_info = false;
+        SerieAcesser serieacesser = new();
+        List<Serie> list_series = serieacesser.Get_info();
+        if(list_series.Count() != 0)
+        {
+            all_info = true;
         }
         return all_info;
     }
@@ -92,15 +109,8 @@ public class SerieLogic
                 r_serie = serie;
             }
         }
-
         list_series.Remove(r_serie);
-        int i = 0;
         string info = $"you sucesfully removed {r_serie.Title}.";
-        foreach(Serie serie in list_series)
-        {
-            serie.Id = i;
-            i++;
-        }
         serieacesser.Return_info(list_series);
         return info;
     }

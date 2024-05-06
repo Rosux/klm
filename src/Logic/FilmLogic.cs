@@ -22,12 +22,34 @@ public class FilmLogic
 
     public string Add_film(Film film)
     {
+        bool duplicate = true;
         FilmAcesser filmacesser = new();
         List<Film> list_films = filmacesser.Get_info();
-        film.Id = list_films.Count();
-        list_films.Add(film);
-        filmacesser.Return_info(list_films);
-        return $"you succesfully added the movie {film.Title}.";
+        foreach(Film film_2 in list_films)
+        {
+            if (film_2.Title.ToUpper() != film.Title.ToUpper()){}
+            else
+            {
+                duplicate = false;
+            }
+        }
+        if (duplicate)
+        {
+            IdAccess Idacesser = new();
+            List<int> list_Id = Idacesser.Get_Id();
+            int new_Id = list_Id[0] + 1;
+            film.Id = new_Id;
+            list_Id.RemoveAt(0);
+            list_Id.Insert(0, new_Id);
+            Idacesser.Return_Id(list_Id);
+            list_films.Add(film);
+            filmacesser.Return_info(list_films);
+            return $"you succesfully added the movie {film.Title}.";
+        }
+        else
+        {
+            return "you can not add duplicate movie.";
+        }
     }
 
     public string Remove_film(int id)
@@ -46,11 +68,6 @@ public class FilmLogic
         list_films.Remove(r_film);
         int i = 0;
         string info = $"you sucesfully removed {r_film.Title}.";
-        foreach(Film film in list_films)
-        {
-            film.Id = i;
-            i++;
-        }
         filmacesser.Return_info(list_films);
         return info;
     }
@@ -66,6 +83,18 @@ public class FilmLogic
             {
                 all_info = true;
             }
+        }
+        return all_info;
+    }
+
+    public bool Check_films_exist()
+    {
+        bool all_info = false;
+        FilmAcesser filmacesser = new();
+        List<Film> list_films = filmacesser.Get_info();
+        if(list_films.Count() != 0)
+        {
+            all_info = true;
         }
         return all_info;
     }

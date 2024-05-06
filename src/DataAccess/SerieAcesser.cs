@@ -16,4 +16,17 @@ public class SerieAcesser
         writer.Write(string_series);
         writer.Close();
     }
+
+    public List<Genre> Get_Genres()
+    {
+        string path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"DataSource\Series.json"));
+        string string_series = File.ReadAllText(path);
+        List<Serie> list_series = JsonConvert.DeserializeObject<List<Serie>>(string_series);
+        List<Genre> genres = list_series
+            .SelectMany(serie => serie.Seasons.Select(season => serie.Genre))
+            .Distinct()
+            .Select(genreName => new Genre(genreName))
+            .ToList();
+        return genres;
+    }
 }

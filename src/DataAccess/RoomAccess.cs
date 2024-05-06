@@ -1,6 +1,5 @@
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath)
-    {
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
 
     }
 
@@ -15,7 +14,6 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return newRoomId;
     }
-
     public void EditFromRoomTable(int id, int capacity)
     {
         _Conn.Open();
@@ -26,7 +24,6 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-
     public void RemoveFromRoomTable(int roomid)
     {
         _Conn.Open();
@@ -36,7 +33,6 @@ public class RoomAccess : DatabaseHandler {
         command.ExecuteNonQuery();
         _Conn.Close();
     }
-
     public string GetRoom(int id)
     {
         string RoomInfo = "";
@@ -52,7 +48,6 @@ public class RoomAccess : DatabaseHandler {
         _Conn.Close();
         return RoomInfo;
     }
-
     public List<string> _getAllRooms()
     {
         _Conn.Open();
@@ -68,4 +63,47 @@ public class RoomAccess : DatabaseHandler {
         return roomlist;
     }
 
+    /// <summary>
+    /// Returns a list of all rooms.
+    /// </summary>
+    /// <param name="filterMinSize">Set the minimum size filter. will only return rooms that are bigger or equal in size.</param>
+    /// <returns>A list of rooms.</returns>
+    public List<Room> GetAllRooms(int filterMinSize=0){
+        List<Room> roomlist = new List<Room>();
+        _Conn.Open();
+        string query = "SELECT * FROM Rooms WHERE Capacity >= @MinRoomSize";
+        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@MinRoomSize", filterMinSize);
+            SQLiteDataReader reader = Command.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int nocap = reader.GetInt32(1);
+                roomlist.Add(new Room(id, nocap));
+            }
+        }
+        _Conn.Close();
+        return roomlist;
+    }
+
+    /// <summary>
+    /// Get the biggest room capacity currently available.
+    /// </summary>
+    /// <returns>An integer defining the biggest room capacity.</returns>
+    public int GetMaxRoomCapacity()
+    {
+        int maxCapacity = 0;
+        _Conn.Open();
+        string query = "SELECT MAX(Capacity) FROM Rooms";
+        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn))
+        {
+            object result = Command.ExecuteScalar();
+            if (result != DBNull.Value)
+            {
+                maxCapacity = Convert.ToInt32(result);
+            }
+        }
+        _Conn.Close();
+        return maxCapacity;
+    }
 }

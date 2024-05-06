@@ -1,3 +1,4 @@
+
 public static class ConsumptionMenu
 {
     private static ConsumptionAccess c = new ConsumptionAccess();
