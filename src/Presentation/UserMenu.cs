@@ -143,16 +143,8 @@ public static class UserMenu{
         }
     }
 
-    public static User? EditUser(){
-        Dictionary<string, User> cons = new Dictionary<string, User>();
-        foreach (User user in u.GetAllUsers()){
-            cons.Add(user.FirstName, user);
-        }
-        if (cons.Count == 0)
-        {
-            return null;
-        }
-        User editedUser = MenuHelper.SelectFromList("Select product to edit", cons);
+    public static User? EditUser(User USR){
+        User editedUser = USR;
         bool changing = true;
         while (changing)
         {
