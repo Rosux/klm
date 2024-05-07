@@ -30,6 +30,7 @@ public static class UserLogic
         {
             return;
         }
-        u.AddUser(Credentials);
+        bool added = u.AddUser(Credentials);
+        UserMenu.NotifyAddUser(added);
     }
 }

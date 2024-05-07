@@ -26,21 +26,32 @@ public static class UserMenu{
         if (password == null)
         {
             return null;
-        }else
-        {
-            passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
         }
         string? password2 = GetValidPassword("Enter your password again:", 6, 20, true, password);
         if (password2 == null)
         {
             return null;
         }
+        passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
         User user = new User(firstName, lastName, email, passwordHash);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("User has been added. Press any key to continue");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.ReadLine();
         return user;
+    }
+
+    public static void NotifyAddUser(bool x)
+    {
+        if(x)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("User has been added. Press any key to continue");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.ReadLine();
+        }else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("User has not been added. Press any key to continue");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.ReadLine();
+        }
     }
 
     private static string? GetValidInput(string prompt, int minLength, int maxLength)
@@ -96,15 +107,20 @@ public static class UserMenu{
         string error= "";
         do 
         {
+            error = "";
+            User? user = u.VerifyUser(input);
+            if (user != null)
+            {
+                error += $"Email already exists.\n";
+                
+            }
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(error);
             Console.ForegroundColor = ConsoleColor.White;
-            error = "";
             ConsoleKeyInfo keyInfo;
             MailAddress b;
-            User? user = u.VerifyUser(input);
             keyInfo = Console.ReadKey(true);
             if (!char.IsControl(keyInfo.KeyChar))
             {
@@ -127,11 +143,6 @@ public static class UserMenu{
                 {
                     input = input.Substring(0, input.Length - 1);
                 }
-            }
-            if (user != null)
-            {
-                error += $"Email already exists.\n";
-                
             }
             if (input.Length < minLength || input.Length > maxLength)
             {
