@@ -1,5 +1,6 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using BCrypt.Net;
 public static class UserMenu{
     private static UserAccess u = new UserAccess();
 
@@ -20,17 +21,21 @@ public static class UserMenu{
         {
             return null;
         }
-        string? password = GetValidPassword("Enter your password (totally secured btw):", 6, 20);
+        string passwordHash = "";
+        string? password = GetValidPassword("Enter your password:", 6, 20);
         if (password == null)
         {
             return null;
+        }else
+        {
+            passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
         }
-        string? password2 = GetValidPassword("Enter your password (totally secured btw):", 6, 20, true, password);
+        string? password2 = GetValidPassword("Enter your password again:", 6, 20, true, password);
         if (password2 == null)
         {
             return null;
         }
-        User user = new User(firstName, lastName, email, password);
+        User user = new User(firstName, lastName, email, passwordHash);
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("User has been added. Press any key to continue");
         Console.ForegroundColor = ConsoleColor.White;
@@ -99,6 +104,7 @@ public static class UserMenu{
             error = "";
             ConsoleKeyInfo keyInfo;
             MailAddress b;
+            User? user = u.VerifyUser(input);
             keyInfo = Console.ReadKey(true);
             if (!char.IsControl(keyInfo.KeyChar))
             {
@@ -110,7 +116,10 @@ public static class UserMenu{
             }
             if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
             {
-                break;
+                if (user == null)
+                {
+                    break;
+                }
             }
             if (keyInfo.Key == ConsoleKey.Backspace)
             {
@@ -118,6 +127,11 @@ public static class UserMenu{
                 {
                     input = input.Substring(0, input.Length - 1);
                 }
+            }
+            if (user != null)
+            {
+                error += $"Email already exists.\n";
+                
             }
             if (input.Length < minLength || input.Length > maxLength)
             {

@@ -94,6 +94,37 @@ public class UserAccess : DatabaseHandler{
         _Conn.Close();
         return users;
     }
+
+    public User? VerifyUser(string Email){
+        User? user = null;
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Users WHERE Email = @Email";
+        using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Show.Parameters.AddWithValue("@Email", Email);
+            SQLiteDataReader reader = Show.ExecuteReader();
+            if (reader.Read())
+            {
+                UserRole r;
+                Enum.TryParse(reader["Role"].ToString(), out r);
+                int id = reader.GetInt32(0);
+                string name = reader.GetString(1);
+                string lastname = reader.GetString(2);
+                string email = reader.GetString(3);
+                string password = reader.GetString(4);
+                string Role = reader.GetString(5);
+                user = new User(id, name, lastname, email, password, r);
+                
+                if (reader.Read())
+                {
+                    user = null;
+                }
+            }
+        }
+        _Conn.Close();
+        return user;
+    }
+
     public bool DeleteUser(User user){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Users WHERE ID = @Id ";

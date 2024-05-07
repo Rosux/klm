@@ -4,13 +4,23 @@ public static class UserLogic
     {
         UserAccess u = new UserAccess();
         User Credentials = UserMenu.Login();
-        User LoggedUser = u.CheckUser(Credentials);
-        if (LoggedUser == null)
+        List<User> allUsers = u.GetAllUsers(); 
+        foreach (User k in allUsers)
         {
-            Program.CurrentUser = null;
-        }else{
-            Program.CurrentUser = LoggedUser;
+            bool found = BCrypt.Net.BCrypt.EnhancedVerify(Credentials.Password, k.Password);
+            if (found)
+            {
+                Program.CurrentUser = k;
+                return;
+            }
         }
+        Program.CurrentUser = null;
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Wrong email or password. Press any key to continue");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadLine();
+        return;
     }
     public static void Register()
     {
