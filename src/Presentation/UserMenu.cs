@@ -44,13 +44,13 @@ public static class UserMenu{
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("User has been added. Press any key to continue");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.ReadLine();
+            Console.ReadKey(true);
         }else
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("User has not been added. Press any key to continue");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.ReadLine();
+            Console.ReadKey(true);
         }
     }
 
@@ -58,7 +58,7 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
-        do 
+        do
         {
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
@@ -90,7 +90,6 @@ public static class UserMenu{
             if (input.Length < minLength || input.Length > maxLength)
             {
                 error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
-                
             }
             if (!Regex.IsMatch(input, "[A-z]"))
             {
@@ -105,14 +104,13 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
-        do 
+        do
         {
             error = "";
             User? user = u.VerifyUser(input);
             if (user != null)
             {
                 error += $"Email already exists.\n";
-                
             }
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
@@ -122,6 +120,10 @@ public static class UserMenu{
             ConsoleKeyInfo keyInfo;
             MailAddress b;
             keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                return null;
+            }
             if (!char.IsControl(keyInfo.KeyChar))
             {
                 input += keyInfo.KeyChar;
@@ -147,7 +149,6 @@ public static class UserMenu{
             if (input.Length < minLength || input.Length > maxLength)
             {
                 error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
-                
             }
             if (!Regex.IsMatch(input, "[A-z]"))
             {
@@ -162,7 +163,7 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
-        do 
+        do
         {
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
@@ -208,7 +209,6 @@ public static class UserMenu{
             if (input.Length < minLength || input.Length > maxLength)
             {
                 error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
-                
             }
             if (!Regex.IsMatch(input, "[A-z]"))
             {
@@ -278,28 +278,28 @@ public static class UserMenu{
             }
             break;
         }
-            string email;
-            do
+        string email;
+        do
+        {
+            Console.WriteLine("Enter user email:");
+            email = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(email))
             {
-                Console.WriteLine("Enter user email:");
-                email = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    Console.WriteLine("Email cannot be empty. Please try again.");
-                    continue;
-                }
-            } 
-            while (!IsValidEmail(email));
-                Console.WriteLine("Enter user password (totally secured btw):");
-                while(true){
-                password = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(password))
-                {
-                    Console.WriteLine("Password cannot be empty. Please try again.");
-                    continue;
-                }
-                break;
+                Console.WriteLine("Email cannot be empty. Please try again.");
+                continue;
             }
+        }
+        while (!IsValidEmail(email));
+            Console.WriteLine("Enter user password (totally secured btw):");
+            while(true){
+            password = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                Console.WriteLine("Password cannot be empty. Please try again.");
+                continue;
+            }
+            break;
+        }
         User user = new User(firstName, lastName, email, password);
         Console.WriteLine("User has been added");
         return user;
@@ -362,7 +362,6 @@ public static class UserMenu{
                 }},
             });
         }
-        
         return editedUser;
     }
 
@@ -386,5 +385,4 @@ public static class UserMenu{
         Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
-    
 }
