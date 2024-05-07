@@ -270,7 +270,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -284,7 +284,7 @@ public static class ReservationMenu
     List<Reservation> reservations = ReservationAccess.ReadReservationsDate(date);
     if (reservations.Count == 0)
     {
-        Console.WriteLine("There are no reservations during this time period.");
+        Console.WriteLine("\nThere are no reservations during this time period.");
         return null;
     }
     else
@@ -315,7 +315,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -361,7 +361,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -406,7 +406,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }

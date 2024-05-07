@@ -37,10 +37,17 @@ public class RoomMenu
     private static void Action2()
     {
         Console.Clear();
-        int GivenCapacity = MenuHelper.SelectInteger("Capacity: ",0,1,2147483647);
-        if (GivenCapacity > 0)
+        int? GivenCapacity_p = MenuHelper.SelectInteger("Select capacity: ", "", true, 0, 1, 2147483647);
+        if (GivenCapacity_p  != null)
         {
+            int GivenCapacity = (int)GivenCapacity_p;
             RoomLogic.CreateRoom(GivenCapacity);
+        }
+        else
+        {
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
     }
     private static void Action3()
@@ -107,9 +114,20 @@ public class RoomMenu
                 if (selectedRoom != null)
                 {
                     Console.Clear();
-                    int new_capacity = MenuHelper.SelectInteger("Select new capacity: ",0,1,2147483647);
-                    RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
-                    break;
+                    int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", "", true, 0, 1, 2147483647);
+                    if(new_capacity_p == null)
+                    {
+                        Console.WriteLine("Action cancelled.");
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey(true);
+                        break;
+                    }
+                    else
+                    {
+                        int  new_capacity = (int) new_capacity_p;
+                        RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
+                        break;
+                    }
                     
                     Console.Clear();
                     while (true)
@@ -125,10 +143,18 @@ public class RoomMenu
     private static void Action5()
     {
         Console.Clear();
-        int roomid = MenuHelper.SelectInteger("Select room id: ",0,1,2147483647);
-        RoomLogic.FetchRoom(roomid);
-    
-
+        int? roomid_p = MenuHelper.SelectInteger("Select room id: ", "", true, 0, 1, 2147483647);
+        if (roomid_p != null)
+        {
+            int roomid = (int) roomid_p;
+            RoomLogic.FetchRoom(roomid);
+        }
+        else
+        {
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
+        }
     }
     private static void PrintAllRooms()
     {

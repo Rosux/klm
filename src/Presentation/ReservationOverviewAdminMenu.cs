@@ -13,13 +13,13 @@ public static class ReservationOverviewAdminMenu
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.Write($"\n\n Press any key to continue...");
+                        Console.ReadKey(true);
                     }
                     else
                     {
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.Write($"\n\n Press any key to continue...");
+                        Console.ReadKey(true);
                     }
                     Console.Clear();
                 }},
@@ -65,32 +65,43 @@ public static class ReservationOverviewAdminMenu
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
                         Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.ReadKey(true);
                     }
                     else
                     {
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.Write($"\n\n Press any key to continue...");
+                        Console.ReadKey(true);
+                        Console.Clear();
                     }
                     Console.Clear();
                 }},
                 {"3. Choose date",()=> {
                     // lets admin pick from a list of all reservations during the date that the admin can choose and shows all that reservations info.
-                    DateOnly date = MenuHelper.SelectDate("Select at what date you want see all reservations:", null, DateOnly.FromDateTime(DateTime.Now), null);
-                    DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
-                    Reservation selected_res = ReservationMenu.GetSpecificReservation(date_2);
-                    if (selected_res != null)
+                    DateOnly? date_p = MenuHelper.SelectDate("Select at what date you want see all reservations:", "", true, null, DateOnly.FromDateTime(DateTime.Now), null);
+                    if (date_p == null)
                     {
-                        Console.WriteLine(accesser.Overview(selected_res));
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.WriteLine("\nNo date selected.");
+                        Console.Write($"Press any key to continue...\n");
+                        Console.ReadKey(true);
                     }
                     else
                     {
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        DateOnly date = (DateOnly)date_p;
+                        DateTime date_2 = new DateTime(date.Year, date.Month, date.Day, 23, 59, 59);
+                        Reservation selected_res = ReservationMenu.GetSpecificReservation(date_2);
+                        if (selected_res != null)
+                        {
+                            Console.WriteLine(accesser.Overview(selected_res));
+                            Console.Write($"\n\n Press any key to continue...");
+                            Console.ReadKey(true);
+                        }
+                        else
+                        {
+                            Console.Write($"\n\n Press any key to continue...");
+                            Console.ReadKey(true);
+                            Console.Clear();
+                        }
                     }
-                    Console.Clear();
                 }},
                 {"4. Exit to main menu", ()=>{
                     running = false;
