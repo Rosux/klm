@@ -7,41 +7,17 @@ class Menu
         Console.CursorVisible = false;
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
         // asks the user to choose either of these options
-        while(Program.CurrentUser == null){
-            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"Register", ()=>{
-                    // run Register method
-                    UserLogic.Register();
-                }},
-                {"Login", ()=>{
-                    // run Login method
-                    UserLogic.Login();
-                }},
-                {"Exit", ()=>{
-                    // close application
-                    Environment.Exit(1);
-                }},
-            });
-        }
-        if(Program.CurrentUser.Role == UserRole.ADMIN){
-            while(true)
+        while(true){
+            if(Program.CurrentUser == null)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Manage movies/series", ()=>{
-                        // takes admin to movie editor
-                        FilmSerieMenu.UI();
+                    {"Register", ()=>{
+                        // run Register method
+                        UserLogic.Register();
                     }},
-                    {"Consumptions", ()=>{
-                        // consumption editor
-                        ConsumptionLogic.Consumption();
-                    }},
-                    {"Rooms", ()=>{
-                        // room editor
-                        RoomMenu.AdminOverView();
-                    }},
-                    {"Reservations", ()=>{
-                        // takes admin to his reservation menu
-                        ReservationOverviewAdminMenu.ReservationAdminOverview();
+                    {"Login", ()=>{
+                        // run Login method
+                        UserLogic.Login();
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -49,18 +25,52 @@ class Menu
                     }},
                 });
             }
-        }else if(Program.CurrentUser.Role == UserRole.USER){
-            while(true)
+            else if(Program.CurrentUser.Role == UserRole.ADMIN)
             {
-                MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Reservations", ()=>{
-                        ReservationLogic.Reservation();
-                    }},
-                    {"Exit", ()=>{
-                        // close application
-                        Environment.Exit(1);
-                    }},
-                });
+                bool uwu = true;
+                while(uwu)
+                {
+                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                        {"Manage movies/series", ()=>{
+                            // takes admin to movie editor
+                            FilmSerieMenu.UI();
+                        }},
+                        {"Consumptions", ()=>{
+                            // consumption editor
+                            ConsumptionLogic.Consumption();
+                        }},
+                        {"Rooms", ()=>{
+                            // room editor
+                            RoomMenu.AdminOverView();
+                        }},
+                        {"Reservations", ()=>{
+                            // takes admin to his reservation menu
+                            ReservationOverviewAdminMenu.ReservationAdminOverview();
+                        }},
+                        {"Logout", ()=>{
+                            // goto login screen
+                            uwu = false;
+                            Program.CurrentUser = null;
+                        }},
+                    });
+                }
+            }
+            else if(Program.CurrentUser.Role == UserRole.USER)
+            {
+                bool uwu = true;
+                while(uwu)
+                {
+                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                        {"Reservations", ()=>{
+                            ReservationLogic.Reservation();
+                        }},
+                        {"Logout", ()=>{
+                            // goto login screen
+                            uwu = false;
+                            Program.CurrentUser = null;
+                        }},
+                    });
+                }
             }
         }
     }

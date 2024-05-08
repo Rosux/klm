@@ -78,7 +78,7 @@ public class UserAccess : DatabaseHandler{
     }
 
     /// <summary>
-    /// gets all users from  database. 
+    /// gets all users from  database.
     /// </summary>
     /// <returns>returns a list with all the users that are registered.</returns>
     public List<User> GetAllUsers(){
@@ -129,7 +129,6 @@ public class UserAccess : DatabaseHandler{
                 string password = reader.GetString(4);
                 string Role = reader.GetString(5);
                 user = new User(id, name, lastname, email, password, r);
-                
                 if (reader.Read())
                 {
                     user = null;

@@ -4,15 +4,10 @@ public static class UserLogic
     {
         UserAccess u = new UserAccess();
         User Credentials = UserMenu.Login();
-        List<User> allUsers = u.GetAllUsers(); 
-        foreach (User k in allUsers)
-        {
-            bool found = BCrypt.Net.BCrypt.EnhancedVerify(Credentials.Password, k.Password);
-            if (found)
-            {
-                Program.CurrentUser = k;
-                return;
-            }
+        User? user = u.VerifyUser(Credentials.Email);
+        if(user != null && BCrypt.Net.BCrypt.EnhancedVerify(Credentials.Password, user.Password)){
+            Program.CurrentUser = user;
+            return;
         }
         Program.CurrentUser = null;
         Console.Clear();
