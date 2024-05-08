@@ -3,6 +3,11 @@ public class UserAccess : DatabaseHandler{
 
     }
 
+    /// <summary>
+    /// Adds a user to the database if given a user class.
+    /// </summary>
+    /// <param name="user">Given the user class adds it to the database.</param>
+    /// <returns>Returns a true if the user has been added to the database and a false if not.</returns>
     public bool AddUser(User user){
         _Conn.Open();
         string insertSql = @"
@@ -28,6 +33,11 @@ public class UserAccess : DatabaseHandler{
         return userId != -1;
     }
 
+    /// <summary>
+    /// This method checks if the user exists in the database with the email and password.
+    /// </summary>
+    /// <param name="login">Given a user checks if it exists in the database.</param>
+    /// <returns>Returns the user that it has found. if it doesnt find anything returns a null.</returns>
     public User CheckUser(User login)
     {
         _Conn.Open();
@@ -70,7 +80,7 @@ public class UserAccess : DatabaseHandler{
     /// <summary>
     /// gets all users from  database. 
     /// </summary>
-    /// <returns>returns a list with all the users that are registered</returns>
+    /// <returns>returns a list with all the users that are registered.</returns>
     public List<User> GetAllUsers(){
         List<User> users = new List<User>();
         _Conn.Open();
@@ -95,6 +105,11 @@ public class UserAccess : DatabaseHandler{
         return users;
     }
 
+   /// <summary>
+   /// Gets everything from the database with the given email parameter.
+   /// </summary>
+   /// <param name="Email">Here you give an email string and it gets searched for in the database.</param>
+   /// <returns>Returns the user if it has been found if not returns null.</returns>
     public User? VerifyUser(string Email){
         User? user = null;
         _Conn.Open();
@@ -125,6 +140,11 @@ public class UserAccess : DatabaseHandler{
         return user;
     }
 
+    /// <summary>
+    /// Deltes the user if given a user class parameter.
+    /// </summary>
+    /// <param name="user">Given a parameter deltes it if it exists in the database.</param>
+    /// <returns>Returns true if the user has been found/delted and false if not.</returns>
     public bool DeleteUser(User user){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Users WHERE ID = @Id ";
@@ -137,6 +157,11 @@ public class UserAccess : DatabaseHandler{
         }
     }
 
+    /// <summary>
+    /// Gets a user from the database with the matching id provided.
+    /// </summary>
+    /// <param name="id">This is the id you provide that your going to search in the database with.</param>
+    /// <returns>Returns the user if it has been found if not returns null.</returns>
     public User GetUsers(int id){
         User users = null;
         _Conn.Open();
@@ -162,6 +187,11 @@ public class UserAccess : DatabaseHandler{
         return users;
     }
 
+    /// <summary>
+    /// updates the user in the database with the given user class parameter.
+    /// </summary>
+    /// <param name="user">Here you give the updated user.</param>
+    /// <returns>Returns true if it has been upated, false if not.</returns>
     public bool UpdateUser(User user){
         _Conn.Open();
         int rowsAffected = -1;

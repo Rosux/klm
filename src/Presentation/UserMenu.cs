@@ -53,7 +53,13 @@ public static class UserMenu{
             Console.ReadLine();
         }
     }
-
+    /// <summary>
+    /// This checks allot of statements that need to be true before you can press enter and go to the next valid input.
+    /// </summary>
+    /// <param name="prompt">Here you can give the promt that should be printed at the top before you get the readkey.</param>
+    /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
+    /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
+    /// <returns>Return the user given string.</returns>
     private static string? GetValidInput(string prompt, int minLength, int maxLength)
     {
         string input = "";
@@ -157,7 +163,15 @@ public static class UserMenu{
         Console.Clear();
         return input;
     }
-
+    /// <summary>
+    /// This is the same as the above but a little different because you need to use this twice to check if both passwords are the same.
+    /// </summary>
+    /// <param name="prompt">Here you type the promt that should be written above the readkey.</param>
+    /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
+    /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
+    /// <param name="secondPass">Her you give a true if its the second password your providing or false if its the first password.</param>
+    /// <param name="firstPassword">Here you give the first password if secondPass is true.</param>
+    /// <returns>Return the user given string.</returns>
     private static string? GetValidPassword(string prompt, int minLength, int maxLength, bool secondPass = false, string firstPassword = "")
     {
         string input = "";
