@@ -6,54 +6,72 @@ public static class RoomLogic
     {
         Room newRoom = new Room(GivenCapacity);
         Console.Clear();
-        MenuHelper.SelectOptions($"Save room with capcity: {GivenCapacity}?", new Dictionary<string, Action>(){
-        {"1. Save.", ()=>{
-            Console.Clear();
-            int newRoomId = r.AddToRoomTable(newRoom);
-            Console.WriteLine($"New room created: \nID: {newRoomId}. \nCapacity: {GivenCapacity}.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        {"2. Discard.", ()=>{
-            Console.Clear();
-            Console.WriteLine($"Room discarded.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        });
+        bool? choice = ConformationRoom("Save this room?", $"New room created with capacity: {GivenCapacity}.");
+        if(choice!= null)
+        {
+            if((bool)choice)
+            {
+                int newRoomId = r.AddToRoomTable(newRoom);
+                Console.WriteLine($"New room created: \nID: {newRoomId}. \nCapacity: {GivenCapacity}.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.WriteLine($"Room discarded.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+        }
+        else
+        {
+            RoomMenu.Action2();
+        }
     }
-    public static void RemoveRoom(int roomid)
+    public static void RemoveRoom(Room room)
     {
-        MenuHelper.SelectOptions($"remove room {roomid}?", new Dictionary<string, Action>(){
-        {"1. Remove.", ()=>{
-            Console.Clear();
-            r.RemoveFromRoomTable(roomid);
-            Console.WriteLine($"Room with id {roomid} removed.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        {"2. Cancel.", ()=>{
-            Console.Clear();
-            Console.WriteLine($"Room not removed.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        });
+        List<string> options = new List<string>(){"Yes", "No"};
+        bool? choice = ConformationRoom($"remove this room?", $"Selected room:\nId: {room.Id}.\nCapacity: {room.Capacity}.",options);
+        if(choice!= null)
+        {
+            if((bool)choice)
+            {
+                r.RemoveFromRoomTable(room.Id);
+                Console.WriteLine($"Room succesfully removed.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.WriteLine($"Room not removed.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+        }
+        else
+        {
+            RoomMenu.Action3();
+        }
     }
-    public static void EditRoom(int capacity, int roomid)
+    public static void EditRoom(Room room, int capacity)
     {
-        Console.Write($"Old room: {r.GetRoom(roomid)}.\n");
-        Console.Write($"New room: Room-ID = {roomid} Capacity = {capacity}.\n\nPress any key to continue...");
-        Console.ReadKey();
-        MenuHelper.SelectOptions($"Save these changes?", new Dictionary<string, Action>(){
-        {"1. Save.", ()=>{
-            Console.Clear();
-            r.EditFromRoomTable(roomid, capacity);
-            Console.WriteLine($"Changes saved succesfully.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        {"2. Cancel.", ()=>{
-            Console.Clear();
-            Console.WriteLine($"Changes not saved.\n\nPress any key to continue...");
-            Console.ReadKey();
-        }},
-        });
+        List<string> options = new List<string>(){"Yes", "No"};
+        string text = $"Old room: {r.GetRoom(room.Id)}.\n" + $"New room: Room-ID = {room.Id} Capacity = {capacity}.";
+        bool? choice = ConformationRoom($"Save these changes?", text, options);
+        if(choice!= null)
+        {
+            if((bool)choice)
+            {
+                r.EditFromRoomTable(room.Id, capacity);
+                Console.WriteLine($"Changes saved succesfully.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.WriteLine($"Changes not saved.\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+        }
+        else
+        {
+            RoomMenu.Action4(room);
+        }
     }
     public static void FetchRoom(int roomid)
     {
@@ -62,13 +80,13 @@ public static class RoomLogic
             Console.WriteLine("Room: ");
             Console.WriteLine(r.GetRoom(roomid));
             Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey();
+            Console.ReadKey(true);
         }
         else
         {
             Console.WriteLine($"there is no room with ID {roomid}.");
             Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey();
+            Console.ReadKey(true);
         }
     }
     public static List<string> GetAllRooms()
@@ -216,6 +234,80 @@ public static class RoomLogic
                 break;
             }
         } while (key != ConsoleKey.Escape);   
+        return null;
+    }
+    
+    public static bool? ConformationRoom(string prefix = "", string text = "", List<string> options = null)
+    {
+        int choice = 0;
+        int longest = 0;
+        int i = 0;
+        if (options == null)
+        {
+            options ??= new List<string>();
+            options.Add("Save");
+            options.Add("Discard");
+        }
+        i = 1;
+        foreach(string option in options)
+        {
+            string option_str = $"{i}. "+ option + ".";
+            if(option_str.Length > longest)
+            {
+                longest = option_str.Length;
+            }
+            i++;
+        }
+        if (prefix.Length > longest)
+        {
+            longest = prefix.Length;
+        }
+        Console.WriteLine(options[0]);
+        ConsoleKey key;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("Press escape to go back.\n");
+            if(text != "")
+            {
+                Console.WriteLine(text +"\n");
+            }
+            Console.WriteLine($"┌─{prefix}{new String('─', Math.Max(0, longest - prefix.Length))}─┐");
+            i = 0;
+            foreach(string option in options)
+            {
+                Console.Write("│ ");
+                if (i == choice){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write($"{i+1}. {options[i]}.");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{new String(' ', Math.Max(0, longest - $"{i+1}. {options[i]}.".Length))} │\n");
+                i++;
+            }
+            Console.Write($"└─{new string('─', Math.Max(0, longest ))}─┘\n");
+            
+            key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.UpArrow && choice > 0) 
+            {  
+                Console.Clear();
+                choice --;
+            }
+            else if (key == ConsoleKey.DownArrow && choice < options.Count-1)
+            {  
+                Console.Clear();
+                choice ++;
+            }
+            else if (key == ConsoleKey.Enter)
+            { 
+                if (choice == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }while(key != ConsoleKey.Escape);
         return null;
     }
 }

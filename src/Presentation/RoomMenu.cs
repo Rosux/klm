@@ -34,10 +34,10 @@ public class RoomMenu
         Console.Clear();
         PrintAllRooms();
     }
-    private static void Action2()
+    public static void Action2()
     {
         Console.Clear();
-        int? GivenCapacity_p = MenuHelper.SelectInteger("Select capacity: ", "", true, 0, 1, 2147483647);
+        int? GivenCapacity_p = MenuHelper.SelectInteger("Select capacity for new room: ", "", true, 0, 1, 2147483647);
         if (GivenCapacity_p  != null)
         {
             int GivenCapacity = (int)GivenCapacity_p;
@@ -50,7 +50,7 @@ public class RoomMenu
             Console.ReadKey(true);
         }
     }
-    private static void Action3()
+    public static void Action3()
     {
         Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to remove");
         if (selectRoom_p == null)
@@ -62,12 +62,20 @@ public class RoomMenu
         else
         {
             Room selectedRoom = (Room)selectRoom_p;
-            RoomLogic.RemoveRoom(selectedRoom.Id);
+            RoomLogic.RemoveRoom(selectedRoom);
         }
     }
-    private static void Action4()
+    public static void Action4(Room selectedroom = null)
     {
-        Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
+        Room? selectRoom_p = null;
+        if(selectedroom != null)
+        {
+            selectRoom_p = selectedroom;
+        }
+        else
+        {
+            selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
+        }
         if (selectRoom_p == null)
         {
             Console.WriteLine("Action cancelled.");
@@ -76,18 +84,16 @@ public class RoomMenu
         }
         else
         {
-            int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", "", true, 0, 1, 2147483647);
+            Room selectedRoom = (Room)selectRoom_p;
+            int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", $"Current capacity: {selectedRoom.Capacity}.", true, 0, 1, 2147483647);
             if(new_capacity_p == null)
             {
-                Console.WriteLine("Action cancelled.");
-                Console.Write($"\n\nPress any key to continue...");
-                Console.ReadKey(true);
+                Action4();
             }
             else
             {
                 int  new_capacity = (int) new_capacity_p;
-                Room selectedRoom = (Room)selectRoom_p;
-                RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
+                RoomLogic.EditRoom(selectedRoom, new_capacity);
             }
         }
     }
