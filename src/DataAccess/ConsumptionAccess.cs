@@ -3,7 +3,12 @@ public class ConsumptionAccess : DatabaseHandler
     public ConsumptionAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
 
     }
-    
+
+    /// <summary>
+    /// Creates a new consumption item.
+    /// </summary>
+    /// <param name="consumption">A consumption instance to save. The id property will not be used.</param>
+    /// <returns>A boolean indicating if the creation was successful.</returns>
     public bool CreateConsumption(Consumption consumption){
         _Conn.Open();
         string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
@@ -20,6 +25,11 @@ public class ConsumptionAccess : DatabaseHandler
         }
         return rowsAffected > 0;
     }
+
+    /// <summary>
+    /// Gets all consumptions from the database and returns them.
+    /// </summary>
+    /// <returns>A list of all consumptions.</returns>
     public List<Consumption> ReadConsumption(){
         List<Consumption> consumptions = new List<Consumption>();
         _Conn.Open();
@@ -40,7 +50,12 @@ public class ConsumptionAccess : DatabaseHandler
         _Conn.Close();
         return consumptions;
     }
-    
+
+    /// <summary>
+    /// Deletes a consumption item.
+    /// </summary>
+    /// <param name="consumption">A consumption instance to delete. Must have a valid id.</param>
+    /// <returns>A boolean indicating if the deletion was successful.</returns>
     public bool DeleteConsumption(Consumption consumption){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
@@ -53,6 +68,11 @@ public class ConsumptionAccess : DatabaseHandler
         }
     }
 
+    /// <summary>
+    /// Updates a consumption item.
+    /// </summary>
+    /// <param name="consumption">A consumption instance to update. Must hold the new data and have a valid id.</param>
+    /// <returns>A boolean indicating if the update was successful.</returns>
     public bool UpdateConsumption(Consumption consumption){
         _Conn.Open();
         int rowsAffected = -1;
@@ -67,5 +87,27 @@ public class ConsumptionAccess : DatabaseHandler
         }
         _Conn.Close();
         return rowsAffected > 0;
+    }
+
+    /// <summary>
+    /// Checks if any Consumption item with the same name already exists.
+    /// </summary>
+    /// <param name="name">The search name to use.</param>
+    /// <returns>A boolean indicating if an item with the same name already exists.</returns>
+    public bool ConsumptionExists(string name){
+        bool exists = false;
+        _Conn.Open();
+        string existsQuery = @"SELECT * FROM Consumptions WHERE Name = @Name";
+        using (SQLiteCommand command = new SQLiteCommand(existsQuery, _Conn))
+        {
+            command.Parameters.AddWithValue("@Name", name);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                exists = true;
+            }
+        }
+        _Conn.Close();
+        return exists;
     }
 }
