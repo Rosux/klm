@@ -233,17 +233,48 @@ public static class UserMenu{
         return input;
     }
 
-    public static User Login()
+    public static User? Login()
     {
-        Console.WriteLine("Enter your email:");
-        string LoginEmail = Console.ReadLine();
-        Console.WriteLine("Enter your password:");
-        string LoginPassword = Console.ReadLine();
-        User Login = new User(null, null, LoginEmail, LoginPassword);
-        return Login;
+        string Email = "";
+        do{
+            Console.Clear();
+            Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if(keyInfo.Key == ConsoleKey.Enter){
+                break;
+            }
+            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0){
+                Email = Email.Remove(Email.Length-1);
+            }
+            if(!char.IsControl(keyInfo.KeyChar)){
+                Email += keyInfo.KeyChar;
+            }
+            if(keyInfo.Key == ConsoleKey.Escape){
+                return null;
+            }
+        }while(true);
+        string Password = "";
+        do{
+            Console.Clear();
+            Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if(keyInfo.Key == ConsoleKey.Enter){
+                break;
+            }
+            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0){
+                Password = Password.Remove(Password.Length-1);
+            }
+            if(!char.IsControl(keyInfo.KeyChar)){
+                Password += keyInfo.KeyChar;
+            }
+            if(keyInfo.Key == ConsoleKey.Escape){
+                return null;
+            }
+        }while(true);
+        return new User(null, null, Email, Password);
     }
 
-    static bool IsValidEmail(string email)
+    private static bool IsValidEmail(string email)
     {
         if (email.Contains("@") && (email.EndsWith(".com") || email.EndsWith(".nl")))
         {
@@ -396,7 +427,9 @@ public static class UserMenu{
     }
     public static void WrongLogin(){
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
+        Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
     }
 }
