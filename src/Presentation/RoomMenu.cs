@@ -118,7 +118,7 @@ public class RoomMenu
     {
         int page = 0;
         int i = 0;
-        int choice = 0;
+        int j = 0;
         List<List<Room>> allroomlist = new List<List<Room>>();
         List<Room> roomlist_room = r.GetAllRooms();
         List<Room> roomlist_p = new List<Room>();
@@ -133,7 +133,7 @@ public class RoomMenu
             {
                 longest = room_str.Length;
             }
-            if(i == 10)
+            if(i == 9)
             {
                 alllength.Add(longest);
                 longest = 0;
@@ -168,8 +168,15 @@ public class RoomMenu
             {
                 Console.Clear();
                 Console.WriteLine("Press escape to exit.\n");
+                if(alllength[page] % 2 == 0)
+                {
+                    j = 2;
+                }
+                else
+                {
+                    j = 1;
+                }
                 Console.WriteLine($"┌─All rooms{new String('─', Math.Max(0, alllength[page] - "All rooms".Length))}─┐");
-                i = 0 +10 * page;
                 foreach(Room room in allroomlist[page])
                 {
                     string zin = $"Id: {room.Id}, capacity: {room.Capacity}";
@@ -189,22 +196,22 @@ public class RoomMenu
                     if(page == 0)
                     {
                         Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                        Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
-                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                        Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 1 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 * j ))} -> │\n");
                         Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                     else if(page == allroomlist.Count-1)
                     {
                         Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                        Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-2 ))} │\n");
+                        Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 2 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 2 - j + 1 ))} │\n");
                         Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                     else
                     {
                         Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                        Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                        Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - j ))} -> │\n");
                         Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                 }
@@ -213,25 +220,14 @@ public class RoomMenu
                 {  
                     Console.Clear();
                     page ++;
-                    choice = 10 * page;
                 }
                 else if (key == ConsoleKey.LeftArrow && page != 0)
                 {  
                     Console.Clear();
                     page --;
-                    choice = 10 * page;
-                }
-                else if (key == ConsoleKey.Enter)
-                {  
-                    break;
+
                 }
             } while (key != ConsoleKey.Escape);   
         }
-        else
-        {
-            Console.WriteLine("There are currently no rooms.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
-        } 
     }
 }

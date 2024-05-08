@@ -98,6 +98,7 @@ public static class RoomLogic
     {
         int page = 0;
         int i = 0;
+        int j = 0;
         int choice = 0;
         List<List<Room>> allroomlist = new List<List<Room>>();
         List<Room> roomlist_room = r.GetAllRooms();
@@ -112,7 +113,7 @@ public static class RoomLogic
             {
                 longest = room_str.Length;
             }
-            if(i == 10)
+            if(i == 9)
             {
                 if(longest < prefix.Length)
                 {
@@ -140,7 +141,6 @@ public static class RoomLogic
                 alllength.Add(longest);
             }
         }
-
         i = 0;
         foreach(Room room in roomlist_room)
         {
@@ -162,6 +162,14 @@ public static class RoomLogic
         {
             Console.Clear();
             Console.WriteLine("Press escape to exit.\n");
+            if(alllength[page] % 2 == 0)
+            {
+                j = 2;
+            }
+            else
+            {
+                j = 1;
+            }
             Console.WriteLine($"┌─{prefix}{new String('─', Math.Max(0, alllength[page] - prefix.Length))}─┐");
             i = 0 +10 * page;
             foreach(Room room in allroomlist[page])
@@ -186,22 +194,22 @@ public static class RoomLogic
                 if(page == 0)
                 {
                     Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 1 ))} {page+1}/{allroomlist.Count}");
+                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 * j ))} -> │\n");
                     Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                 }
                 else if(page == allroomlist.Count-1)
                 {
                     Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-2 ))} │\n");
+                    Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 2 ))} {page+1}/{allroomlist.Count}");
+                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 2 - j + 1 ))} │\n");
                     Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                 }
                 else
                 {
                     Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                    Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 ))} {page+1}/{allroomlist.Count}");
+                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - j ))} -> │\n");
                     Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                 }
             }
