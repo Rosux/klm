@@ -52,92 +52,43 @@ public class RoomMenu
     }
     private static void Action3()
     {
-        List<Room> rooms = r.GetAllRooms();
-        if (rooms.Count == 0)
+        Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to remove");
+        if (selectRoom_p == null)
         {
-            Console.WriteLine("There are no rooms.");
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
         else
         {
-            Dictionary<string, Room> roomOptions = new Dictionary<string, Room>();
-            foreach (Room room in rooms)
-            {
-                roomOptions.Add($"Room ID: {room.Id}, Room capacity: {room.Capacity}", room);
-            }
-
-            roomOptions.Add("Return to menu", null);
-
-            Room selectedRoom = null;
-            do
-            {
-                selectedRoom = MenuHelper.SelectFromList("Choose a room to remove", roomOptions);
-
-                if (selectedRoom != null)
-                {
-                    Console.Clear();
-                    RoomLogic.RemoveRoom(selectedRoom.Id);
-                    break;
-                    
-                    Console.Clear();
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedRoom != null);
+            Room selectedRoom = (Room)selectRoom_p;
+            RoomLogic.RemoveRoom(selectedRoom.Id);
         }
     }
     private static void Action4()
     {
-        List<Room> rooms = r.GetAllRooms();
-        if (rooms.Count == 0)
+        Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
+        if (selectRoom_p == null)
         {
-            Console.WriteLine("There are no rooms.");
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
         else
         {
-            Dictionary<string, Room> roomOptions = new Dictionary<string, Room>();
-            foreach (Room room in rooms)
+            int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", "", true, 0, 1, 2147483647);
+            if(new_capacity_p == null)
             {
-                roomOptions.Add($"Room ID: {room.Id}, Room capacity: {room.Capacity}", room);
+                Console.WriteLine("Action cancelled.");
+                Console.Write($"\n\nPress any key to continue...");
+                Console.ReadKey(true);
             }
-
-            roomOptions.Add("Return to menu", null);
-
-            Room selectedRoom = null;
-            do
+            else
             {
-                selectedRoom = MenuHelper.SelectFromList("Choose a room to edit", roomOptions);
-
-                if (selectedRoom != null)
-                {
-                    Console.Clear();
-                    int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", "", true, 0, 1, 2147483647);
-                    if(new_capacity_p == null)
-                    {
-                        Console.WriteLine("Action cancelled.");
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    }
-                    else
-                    {
-                        int  new_capacity = (int) new_capacity_p;
-                        RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
-                        break;
-                    }
-                    
-                    Console.Clear();
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedRoom != null);
+                int  new_capacity = (int) new_capacity_p;
+                Room selectedRoom = (Room)selectRoom_p;
+                RoomLogic.EditRoom(new_capacity, selectedRoom.Id);
+            }
         }
     }
     private static void Action5()
@@ -156,23 +107,25 @@ public class RoomMenu
             Console.ReadKey(true);
         }
     }
+
     private static void PrintAllRooms()
     {
-        string allrooms = "";
         int page = 0;
         int i = 0;
-        int j = 0;
-        List<string> allroomlist = new List<string>();
+        int choice = 0;
+        List<List<Room>> allroomlist = new List<List<Room>>();
+        List<Room> roomlist_room = r.GetAllRooms();
+        List<Room> roomlist_p = new List<Room>();
         List<int> alllength = new List<int>();
         int longest = 0;
-        List<string> roomlist = RoomLogic.GetAllRooms();
-        bool isEmpty = !roomlist.Any();
+        bool isEmpty = !roomlist_room.Any();
 
-        foreach(string str in roomlist)
+        foreach(Room room in roomlist_room)
         {
-            if(str.Length > longest)
+            string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
+            if(room_str.Length > longest)
             {
-                longest = str.Length;
+                longest = room_str.Length;
             }
             if(i == 10)
             {
@@ -189,81 +142,90 @@ public class RoomMenu
         if(!isEmpty)
         {
             i = 0;
-            j = 0;
-            allrooms = allrooms + ($"┌─All Rooms{new String('─', Math.Max(0, alllength[j] - "all rooms".Length))}─┐\n");
-            foreach(string rooms in roomlist)
+            foreach(Room room in roomlist_room)
             {
-                allrooms = allrooms + ($"│ {rooms}{new String(' ', Math.Max(0, alllength[j] - rooms.Length))} │\n");
+                roomlist_p.Add(room);
                 i++;
                 if (i == 10)
                 {
-                    allrooms = allrooms + ($"├─{new string('─', Math.Max(0, alllength[j] ))}─┤\n");
-                    allroomlist.Add(allrooms);
-                    i=0;
-                    allrooms = "";
-                    j++;
-                    allrooms = allrooms + ($"┌─All Rooms{new String('─', Math.Max(0, alllength[j] - "all rooms".Length))}─┐\n");
+                    allroomlist.Add(roomlist_p);
+                    roomlist_p = new List<Room>();
+                    i = 0;
                 }
             }
-            if(allrooms != $"┌─All Rooms{new String('─', Math.Max(0, alllength[j] - "all rooms".Length))}─┐\n")
+            if(roomlist_p.Count != 0)
             {
-                allrooms = allrooms + ($"├─{new string('─', Math.Max(0, alllength[j] ))}─┤\n");
-                allroomlist.Add(allrooms);
+                allroomlist.Add(roomlist_p);
             }
             ConsoleKey key;
             do
             {
                 Console.Clear();
                 Console.WriteLine("Press escape to exit.\n");
-                allrooms = allroomlist[page];
+                Console.WriteLine($"┌─All rooms{new String('─', Math.Max(0, alllength[page] - "All rooms".Length))}─┐");
+                i = 0 +10 * page;
+                foreach(Room room in allroomlist[page])
+                {
+                    string zin = $"Id: {room.Id}, capacity: {room.Capacity}";
+                    Console.Write("│ ");
+                    Console.Write(zin);
+                    Console.Write($"{new String(' ', Math.Max(0, alllength[page] - zin.Length))} │\n");
+                }
                 if(allroomlist.Count == 1 )
                 {
-                    allrooms = allrooms + ($"│ {new String(' ', Math.Max(0, alllength[page]/2 ))} {page+1}/{allroomlist.Count}");
-                    allrooms = allrooms + ($"{ new String(' ', Math.Max(0, alllength[page]/2-3 ))} │\n");
-                    allrooms = allrooms + ($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                    Console.WriteLine(allrooms);
+                    Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
+                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
+                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-1 ))} │\n");
+                    Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                 }
                 else
                 {
                     if(page == 0)
                     {
-                        allrooms = allrooms + ($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
-                        allrooms = allrooms + ($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
-                        allrooms = allrooms + ($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                        Console.WriteLine(allrooms);
+                        Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
+                        Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                        Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                     else if(page == allroomlist.Count-1)
                     {
-                        allrooms = allrooms + ($"│ <-{new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                        allrooms = allrooms + ($"{ new String(' ', Math.Max(0, alllength[page]/2-1 ))} │\n");
-                        allrooms = allrooms + ($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                        Console.WriteLine(allrooms);
+                        Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
+                        Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-2 ))} │\n");
+                        Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                     else
                     {
-                        allrooms = allrooms + ($"│ <-{new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
-                        allrooms = allrooms + ($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
-                        allrooms = allrooms + ($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                        Console.WriteLine(allrooms);
+                        Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
+                        Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2-4 ))} {page+1}/{allroomlist.Count}");
+                        Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-4 ))} -> │\n");
+                        Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                 }
                 key = Console.ReadKey(true).Key;
-
                 if (key == ConsoleKey.RightArrow && page != allroomlist.Count-1)
                 {  
                     Console.Clear();
                     page ++;
+                    choice = 10 * page;
                 }
                 else if (key == ConsoleKey.LeftArrow && page != 0)
                 {  
                     Console.Clear();
                     page --;
+                    choice = 10 * page;
+                }
+                else if (key == ConsoleKey.Enter)
+                {  
+                    break;
                 }
             } while (key != ConsoleKey.Escape);   
         }
         else
         {
             Console.WriteLine("There are currently no rooms.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         } 
     }
 }
