@@ -110,7 +110,7 @@ public class ReservationOverviewLogic
                 // checks if current object from timeline is a film and makes a string format with the film info an adds it to list list_info_timeline
                 else if(condition_con == false && condition_film == true && condition_episode == false)
                 {
-                    string film_str = $"watching the movie {film_cor.Title} from {actie.StartTime} to {actie.EndTime}.";
+                    string film_str = $"{film_cor.Title}";
                     list_info_timeline.Add(film_str);
                 }
                 // checks if current object from timeline is a episodde and makes a string format with the episode/sereie/season info an adds it to list list_info_timeline
@@ -122,7 +122,7 @@ public class ReservationOverviewLogic
                 // checks if current object from timeline is a break and makes a string format with the break info an adds it to list list_info_timeline
                 else
                 {
-                    string break_str = $"Break from {actie.StartTime} to {actie.EndTime}.";
+                    string break_str = $"Break";
                     list_info_timeline.Add(break_str);
                 }
             }
@@ -138,22 +138,34 @@ public class ReservationOverviewLogic
                 }
                 i++;
             }
-            // converts all reservation info to a string and adds it to list_info
-            string id_string = $" Id: {selected_res.Id}";
-            string room_string = $" Room: {selected_res.RoomId}";
-            string groupsize_string = $" Group size: {selected_res.GroupSize}";
-            string userid_string = $" User id: {selected_res.UserId}";
-            string start_string = $" Start date: {selected_res.StartDate}";
-            string end_string = $" End date: {selected_res.EndDate}";
-            string price_string = $" Price: {selected_res.Price} euro";
-            list_info.Add(id_string);
-            list_info.Add(room_string);
-            list_info.Add(groupsize_string);
-            list_info.Add(userid_string);
-            list_info.Add(start_string);
-            list_info.Add(end_string);
-            list_info.Add(price_string);
-
+            if(Program.CurrentUser.Role ==  UserRole.ADMIN){
+                // converts all reservation info to a string and adds it to list_info
+                string id_string = $" Id: {selected_res.Id}";
+                string room_string = $" Room: {selected_res.RoomId}";
+                string groupsize_string = $" Group size: {selected_res.GroupSize}";
+                string userid_string = $" User id: {selected_res.UserId}";
+                string start_string = $" Start date: {selected_res.StartDate}";
+                string end_string = $" End date: {selected_res.EndDate}";
+                string price_string = $" Price: {selected_res.Price} euro";
+                list_info.Add(id_string);
+                list_info.Add(room_string);
+                list_info.Add(groupsize_string);
+                list_info.Add(userid_string);
+                list_info.Add(start_string);
+                list_info.Add(end_string);
+                list_info.Add(price_string);
+            } else{
+                string room_string = $" Room: {selected_res.RoomId}";
+                string groupsize_string = $" Group size: {selected_res.GroupSize}";
+                string start_string = $" Start date: {selected_res.StartDate}";
+                string end_string = $" End date: {selected_res.EndDate}";
+                string price_string = $" Price: {selected_res.Price} euro";
+                list_info.Add(room_string);
+                list_info.Add(groupsize_string);
+                list_info.Add(start_string);
+                list_info.Add(end_string);
+                list_info.Add(price_string);
+            }
             // sets the lengt of the tabel in case there is no timeline
             foreach(string str in list_info)
             {
@@ -166,8 +178,8 @@ public class ReservationOverviewLogic
             Console.BackgroundColor = ConsoleColor.Black;
             overview = overview + $"┌─{new string('─', Math.Max(0, longest))}─┐\n";
             overview = overview + $"│";
-            overview = overview + $" reservation info:";
-            overview = overview + $"{new string(' ', Math.Max(0, longest+1- "reservation info:".Length))}│\n";
+            overview = overview + $" Reservation Info:";
+            overview = overview + $"{new string(' ', Math.Max(0, longest+1- "Reservation Info:".Length))}│\n";
             Console.BackgroundColor = ConsoleColor.Black;
             overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
             // adds all reservation info to the tabel from list_info
@@ -176,19 +188,33 @@ public class ReservationOverviewLogic
                 overview = overview + "│" + infos;
                 overview = overview + $"{new string(' ', Math.Max(0, longest+2 - infos.Length))}│\n";
             }
-            overview = overview + $"│─{new string('─', Math.Max(0, longest ))}─│\n";
-            overview = overview + $"│";
-            overview = overview + $" timeline:";
-            overview = overview + $"{new string(' ', Math.Max(0, longest+1- "timeline:".Length))}│\n";
-            i = 1;
-            // adds all timeline info to the tabel from list_info_timeline
-            foreach (string infos in list_info_timeline)
-            {
-                overview = overview + $"│ {i}: " + infos;
-                overview = overview + $"{new string(' ', Math.Max(0, longest - infos.Length-2))}│\n";
-                i++;
-            }
             overview = overview + $"└─{new string('─', Math.Max(0, longest ))}─┘\n";
+            // adds all timeline info to the tabel from list_info_timeline
+            string startdate_string = selected_res.StartDate.ToString("d");
+            overview += $"{startdate_string}{new string(' ', Math.Max(longest - startdate_string.Length, 0))}\n";
+            overview += $"│─{new string('─', Math.Max(longest - startdate_string.Length, 0))}\n";
+            foreach (TimeLine.Item item in selected_res.TimeLine.t)
+            {      
+                string startTimeString = item.StartTime.ToString("HH:mm");
+                string endTimeString = item.EndTime.ToString("HH:mm");
+                int longestline2 = -1;
+                if (list_info_timeline.Count > 0)
+                {
+                    string content = list_info_timeline[0];
+                    if(content.Length > longestline2)
+                    {
+                        longestline2 = content.Length;    
+                    }
+                    if(startTimeString.Length > longestline2)
+                    {
+                        longestline2 = startTimeString.Length;
+                    }
+                    overview += $"{startTimeString} - {endTimeString} \n";
+                    overview += $"│ {content} ";
+
+                    list_info_timeline.RemoveAt(0);
+                }
+            }
             return overview;
         }
         else

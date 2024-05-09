@@ -41,7 +41,7 @@ class Menu
                     }},
                     {"Reservations", ()=>{
                         // takes admin to his reservation menu
-                        ReservationOverviewAdminMenu.ReservationAdminOverview();
+                        ReservationOverviewAdminMenu.ReservationAdminOverview(Program.CurrentUser.Id);
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -54,7 +54,7 @@ class Menu
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                     {"Reservations", ()=>{
-                        ReservationLogic.Reservation();
+                        ReservationLogic.Reservation(Program.CurrentUser.Id);
                     }},
                     {"Exit", ()=>{
                         // close application

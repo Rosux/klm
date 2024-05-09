@@ -1,6 +1,6 @@
 public static class ReservationOverviewAdminMenu
 {
-    public static void ReservationAdminOverview()
+    public static void ReservationAdminOverview(int loggedInUserId)
     {
         ReservationOverviewLogic accesser = new ReservationOverviewLogic();
         bool running = true;
@@ -9,7 +9,7 @@ public static class ReservationOverviewAdminMenu
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. View all reservations",()=> {
                     // lets admin pick from a list of all reservations to see that reservations info.
-                    Reservation selected_res = ReservationMenu.GetAllReservation();
+                    Reservation selected_res = ReservationMenu.GetAllReservation(loggedInUserId);
                     if (selected_res != null)
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
