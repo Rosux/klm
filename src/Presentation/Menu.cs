@@ -1,5 +1,4 @@
 using System;
-
 class Menu
 {
     public static void Start()
@@ -28,8 +27,8 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                    {"Movies", ()=>{
-                        // movie editor
+                    {"Manage movies/series", ()=>{
+                        // takes admin to movie editor
                         FilmSerieMenu.UI();
                     }},
                     {"Consumptions", ()=>{
@@ -39,6 +38,10 @@ class Menu
                     {"Rooms", ()=>{
                         // room editor
                         RoomMenu.AdminOverView();
+                    }},
+                    {"Reservations", ()=>{
+                        // takes admin to his reservation menu
+                        ReservationOverviewAdminMenu.ReservationAdminOverview();
                     }},
                     {"Exit", ()=>{
                         // close application
@@ -50,6 +53,9 @@ class Menu
             while(true)
             {
                 MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                    {"Reservations", ()=>{
+                        ReservationLogic.Reservation();
+                    }},
                     {"Exit", ()=>{
                         // close application
                         Environment.Exit(1);
@@ -57,11 +63,6 @@ class Menu
                 });
             }
         }
-
-        // DECLAN zet hieronder je logic call
-        // hier
-        // RoomMenu.AdminOverView();
-        // FilmSerieMenu.UI();
     }
 
     // used for testing purpose
@@ -74,6 +75,23 @@ class Menu
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"Test", ()=>{
                     ReservationLogic.Reservation(Program.CurrentUser.Id);
+                    // How to use MenuHelper.SelectMovieOrEpisode();
+                    object a = MenuHelper.SelectMovieOrEpisode();
+                    if(a is Film){
+                        Console.WriteLine(((Film)a).Title);
+                    }else if(a is Dictionary<Serie, List<Episode>>){
+                        List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)a).First().Value;
+                        foreach(Episode ep in ruru)
+                        {
+
+                        }
+                        Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Key.Title);
+                        Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Value.Count);
+                        Console.ReadKey(true);
+                    }else if(a == null){
+                        Console.WriteLine("nothing selected");
+                    }
+                    Console.ReadKey(true);
                 }},
                 {"Exit", ()=>{
                     // close application
