@@ -6,6 +6,7 @@ public class RoomMenu
         bool running = true;
         while(running)
         {
+            /// gives the admin an UI with all options
             Console.WriteLine("Welcome to Admin overview for Rooms");
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. Show all rooms", ()=>{
@@ -29,14 +30,17 @@ public class RoomMenu
             });
         }
     }
+    /// calls the method print allrooms
     private static void Action1()
     {
         Console.Clear();
         PrintAllRooms();
     }
+    /// first asks the user for a capacity after that calls the method createroom with the given capacity to create a new room
     public static void Action2()
     {
         Console.Clear();
+        /// asks the user for a capcity he can also cancel action
         int? GivenCapacity_p = MenuHelper.SelectInteger("Select capacity for new room: ", "", true, 0, 1, 2147483647);
         if (GivenCapacity_p  != null)
         {
@@ -50,11 +54,16 @@ public class RoomMenu
             Console.ReadKey(true);
         }
     }
+    /// first cheks if there even are rooms then calls the method ChooseRoom wich returns a Room or null
+    /// if it returns a room it calls the method RemoveRoom with the chosen room
+    /// if it returns null it cancels the action
     public static void Action3()
     {
         List<Room> listroom = r.GetAllRooms();
+        /// checks if there even are rooms
         if (listroom.Count != 0)
         {
+            /// lets user choose room from all rooms
             Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to remove");
             if (selectRoom_p == null)
             {
@@ -75,18 +84,23 @@ public class RoomMenu
             Console.ReadKey(true);
         }
     }
+    /// lets user edit a room the room is either given via the parameter or chosen with method ChooseRoom
+    /// <param name="selectedroom">Room object to edit.</param>
     public static void Action4(Room selectedroom = null)
     {
         List<Room> listroom = r.GetAllRooms();
+        /// checks if there even are rooms
         if (listroom.Count != 0)
         {
             Room? selectRoom_p = null;
+            /// checks if there is a room given via paramaeter else lets user choose a room with method ChooseRoom
             if(selectedroom != null)
             {
                 selectRoom_p = selectedroom;
             }
             else
             {
+                /// lets user choose room from all rooms to edit
                 selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
             }
             if (selectRoom_p == null)
@@ -98,6 +112,7 @@ public class RoomMenu
             else
             {
                 Room selectedRoom = (Room)selectRoom_p;
+                /// asks user for new capacity
                 int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", $"Current capacity: {selectedRoom.Capacity}.", true, 0, 1, 2147483647);
                 if(new_capacity_p == null)
                 {
@@ -105,6 +120,7 @@ public class RoomMenu
                 }
                 else
                 {
+                    /// cals method EditRoom with the slected room and new capacity
                     int  new_capacity = (int) new_capacity_p;
                     RoomLogic.EditRoom(selectedRoom, new_capacity);
                 }
@@ -117,15 +133,19 @@ public class RoomMenu
             Console.ReadKey(true);
         }
     }
+    /// lets user view a specific room
     private static void Action5()
     {
         Console.Clear();
         List<Room> listroom = r.GetAllRooms();
+        /// checks if there even are rooms
         if (listroom.Count != 0)
         {
+            /// asks user for room id
             int? roomid_p = MenuHelper.SelectInteger("Select room id: ", "", true, 0, 1, 2147483647);
             if (roomid_p != null)
             {
+                /// cals method FetchRoom with the given id
                 int roomid = (int) roomid_p;
                 RoomLogic.FetchRoom(roomid);
             }
@@ -144,17 +164,24 @@ public class RoomMenu
         }
     }
 
+    /// gives the user an Interface where he can see all the rooms 
+    /// each page holds a maximum of 10 rooms
     private static void PrintAllRooms()
     {
         int page = 0;
         int i = 0;
         int j = 0;
+        /// holds the pages
         List<List<Room>> allroomlist = new List<List<Room>>();
+        /// holds all rooms
         List<Room> roomlist_room = r.GetAllRooms();
+        /// is a list that gets filled with all rooms per page and then added to allroomlist
         List<Room> roomlist_p = new List<Room>();
+        /// holds longest sting per page
         List<int> alllength = new List<int>();
         int longest = 0;
         bool isEmpty = !roomlist_room.Any();
+        /// checks for longest string per page and adds it to list alllength
         foreach(Room room in roomlist_room)
         {
             string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
@@ -174,9 +201,11 @@ public class RoomMenu
         {
             alllength.Add(longest);
         }
+        /// checks if there even are rooms
         if(!isEmpty)
         {
             i = 0;
+            /// makes and adds all pages to allroomlist
             foreach(Room room in roomlist_room)
             {
                 roomlist_p.Add(room);
@@ -192,11 +221,13 @@ public class RoomMenu
             {
                 allroomlist.Add(roomlist_p);
             }
+            /// prints the UI
             ConsoleKey key;
             do
             {
                 Console.Clear();
                 Console.WriteLine("Press escape to exit.\n");
+                /// checks if the longest string is even or odd so the printing of the UI is corect
                 if(alllength[page] % 2 == 0)
                 {
                     j = 2;
@@ -205,7 +236,9 @@ public class RoomMenu
                 {
                     j = 1;
                 }
+                ///prints header
                 Console.WriteLine($"┌─All rooms{new String('─', Math.Max(0, alllength[page] - "All rooms".Length))}─┐");
+                /// prints all info
                 foreach(Room room in allroomlist[page])
                 {
                     string zin = $"Id: {room.Id}, capacity: {room.Capacity}";
@@ -213,6 +246,7 @@ public class RoomMenu
                     Console.Write(zin);
                     Console.Write($"{new String(' ', Math.Max(0, alllength[page] - zin.Length))} │\n");
                 }
+                /// prints the arrows under the page
                 if(allroomlist.Count == 1 )
                 {
                     Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
@@ -244,6 +278,7 @@ public class RoomMenu
                         Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                     }
                 }
+                /// lets user go through pages
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.RightArrow && page != allroomlist.Count-1)
                 {  
