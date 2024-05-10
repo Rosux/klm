@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 
 public static class MenuHelper{
@@ -1200,16 +1201,57 @@ private static SearchAccess searchAccess = new SearchAccess();
 
     #region TimeLine
     public static void PrintTimeLine(List<TimeLine.Item> t)
-    {
-        if(t[0] is Film){
-
-        }else if(t[0] is Episode){
-            
-        }else if(t[0] is Break){
-            
-        }else if(t[0] is Consumption){
-            
+    {   
+        List<string> Times = new List<string>();
+        List<string> Action = new List<string>();
+        int longestline = -1;
+        // Foreach loop to check what the action is in the timeline and prints that out.
+        foreach(var x in t)
+        {
+            if(x.Action is Film film){
+                string StartTimeString = x.StartTime.ToString("HH:mm");
+                string EndTimeString = x.EndTime.ToString("HH:mm");
+                Times.Add(StartTimeString);
+                Times.Add(EndTimeString);
+                Action.Add(film.Title);
+                foreach (var f in t){
+                    if(film.Title.Length > longestline){
+                        longestline = film.Title.Length;
+                    }
+                }
+                if(StartTimeString.Length > longestline){
+                    longestline = StartTimeString.Length;
+                }
+            }else if(x.Action is Episode episode){
+                string StartTimeString = x.StartTime.ToString("HH:mm");
+                string EndTimeString = x.EndTime.ToString("HH:mm");
+                Times.Add(StartTimeString);
+                Times.Add(EndTimeString);
+                Action.Add(episode.Title);
+            }else if(x.Action is Break breaks){
+                string StartTimeString = x.StartTime.ToString("HH:mm");
+                string EndTimeString = x.EndTime.ToString("HH:mm");
+                string time = breaks.Time.ToString();
+                Times.Add(StartTimeString);
+                Times.Add(EndTimeString);
+                Action.Add(time);
+            }else if(x.Action is Consumption consumption){
+                string StartTimeString = x.StartTime.ToString("HH:mm");
+                string EndTimeString = x.EndTime.ToString("HH:mm");
+                Times.Add(StartTimeString);
+                Times.Add(EndTimeString);
+                Action.Add(consumption.Name);
+            }
         }
+        for(int i = 0; i < Times.Count; i++){  
+            Console.Write($"{Times[i]}{new string(' ', Math.Max(longestline +5 - Times[i].Length, 0))}");
+        }
+        Console.Write("\n");
+        for(int i = 0; i < Action.Count; i++){  
+                Console.Write($"  | {Action[i]}{new string(' ', Math.Max(longestline - Action[i].Length, 0))} ");
+        }
+        Console.Write($"|");
+        
         // string Dates = "";
         // string Lines = "";
         // string Times = "";
@@ -1222,3 +1264,27 @@ private static SearchAccess searchAccess = new SearchAccess();
 
     #endregion
 }
+
+// ┌─┬┐  
+// │ ││  
+// ├─┼┤  
+// └─┴┘
+                //            int longestline = -1;
+                // int longestline2 = -1;
+                // foreach (var f in t){
+                //     if(film.Title.Length > longestline){
+                //         longestline = film.Title.Length;
+                //     }
+                // }
+                // if(StartTimeString.Length > longestline){
+                //     longestline = StartTimeString.Length;
+                // }
+                // foreach (var f in t){
+                //     if(film.Title.Length > longestline2){
+                //         longestline2 = film.Title.Length;
+                //     }
+                // }
+                // if(EndTimeString.Length > longestline2){
+                //     longestline2 = EndTimeString.Length;
+                // }
+         
