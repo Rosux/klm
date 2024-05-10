@@ -52,63 +52,93 @@ public class RoomMenu
     }
     public static void Action3()
     {
-        Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to remove");
-        if (selectRoom_p == null)
+        List<Room> listroom = r.GetAllRooms();
+        if (listroom.Count != 0)
         {
-            Console.WriteLine("Action cancelled.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
+            Room? selectRoom_p = RoomLogic.ChooseRoom("Pick room to remove");
+            if (selectRoom_p == null)
+            {
+                Console.WriteLine("Action cancelled.");
+                Console.Write($"\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Room selectedRoom = (Room)selectRoom_p;
+                RoomLogic.RemoveRoom(selectedRoom);
+            }
         }
         else
         {
-            Room selectedRoom = (Room)selectRoom_p;
-            RoomLogic.RemoveRoom(selectedRoom);
+            Console.WriteLine("There are no rooms to remove.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
     }
     public static void Action4(Room selectedroom = null)
     {
-        Room? selectRoom_p = null;
-        if(selectedroom != null)
+        List<Room> listroom = r.GetAllRooms();
+        if (listroom.Count != 0)
         {
-            selectRoom_p = selectedroom;
-        }
-        else
-        {
-            selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
-        }
-        if (selectRoom_p == null)
-        {
-            Console.WriteLine("Action cancelled.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
-        }
-        else
-        {
-            Room selectedRoom = (Room)selectRoom_p;
-            int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", $"Current capacity: {selectedRoom.Capacity}.", true, 0, 1, 2147483647);
-            if(new_capacity_p == null)
+            Room? selectRoom_p = null;
+            if(selectedroom != null)
             {
-                Action4();
+                selectRoom_p = selectedroom;
             }
             else
             {
-                int  new_capacity = (int) new_capacity_p;
-                RoomLogic.EditRoom(selectedRoom, new_capacity);
+                selectRoom_p = RoomLogic.ChooseRoom("Pick room to edit");
             }
+            if (selectRoom_p == null)
+            {
+                Console.WriteLine("Action cancelled.");
+                Console.Write($"\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Room selectedRoom = (Room)selectRoom_p;
+                int? new_capacity_p = MenuHelper.SelectInteger("Select new capacity: ", $"Current capacity: {selectedRoom.Capacity}.", true, 0, 1, 2147483647);
+                if(new_capacity_p == null)
+                {
+                    Action4();
+                }
+                else
+                {
+                    int  new_capacity = (int) new_capacity_p;
+                    RoomLogic.EditRoom(selectedRoom, new_capacity);
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("There are no rooms to edit.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
     }
     private static void Action5()
     {
         Console.Clear();
-        int? roomid_p = MenuHelper.SelectInteger("Select room id: ", "", true, 0, 1, 2147483647);
-        if (roomid_p != null)
+        List<Room> listroom = r.GetAllRooms();
+        if (listroom.Count != 0)
         {
-            int roomid = (int) roomid_p;
-            RoomLogic.FetchRoom(roomid);
+            int? roomid_p = MenuHelper.SelectInteger("Select room id: ", "", true, 0, 1, 2147483647);
+            if (roomid_p != null)
+            {
+                int roomid = (int) roomid_p;
+                RoomLogic.FetchRoom(roomid);
+            }
+            else
+            {
+                Console.WriteLine("Action cancelled.");
+                Console.Write($"\n\nPress any key to continue...");
+                Console.ReadKey(true);
+            }
         }
         else
         {
-            Console.WriteLine("Action cancelled.");
+            Console.WriteLine("There are no rooms currently.");
             Console.Write($"\n\nPress any key to continue...");
             Console.ReadKey(true);
         }
@@ -125,7 +155,6 @@ public class RoomMenu
         List<int> alllength = new List<int>();
         int longest = 0;
         bool isEmpty = !roomlist_room.Any();
-
         foreach(Room room in roomlist_room)
         {
             string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
@@ -187,8 +216,8 @@ public class RoomMenu
                 if(allroomlist.Count == 1 )
                 {
                     Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-1 ))} │\n");
+                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - 2 ))} {page+1}/{allroomlist.Count}");
+                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - 1 * j ))} │\n");
                     Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
                 }
                 else
@@ -228,6 +257,12 @@ public class RoomMenu
 
                 }
             } while (key != ConsoleKey.Escape);   
+        }
+        else
+        {
+            Console.WriteLine("There are no rooms currently.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
     }
 }

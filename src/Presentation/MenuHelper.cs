@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 
 public static class MenuHelper{
 private static SearchAccess searchAccess = new SearchAccess();
@@ -144,6 +145,161 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// </returns>
     public static int SelectInteger(string prefix="", string suffix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
         return SelectInteger(prefix, suffix, false, defaultInt, min, max) ?? defaultInt;
+    }
+    #endregion
+
+    #region Text
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        string input = "";
+        string errorMessage = "";
+        string keybinds = "Press Enter to confirm";
+        if (canCancel){keybinds += "\nPress Escape to cancel";}
+        ConsoleKey key;
+        char keyChar;
+        do
+        {
+            errorMessage = "";
+            if (input.Length < minimumLength || input.Length > maximumLength)
+            {
+                errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
+            }
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"{errorMessage}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\n\n{keybinds}\n{suffix}");
+            ConsoleKeyInfo uwu = Console.ReadKey(true);
+            key = uwu.Key;
+            keyChar = uwu.KeyChar;
+
+            if(Regex.IsMatch(keyChar.ToString(), allowedRegexPattern)){
+                input += keyChar;
+            }
+            if (key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if (key == ConsoleKey.Enter)
+            {
+                if (input.Length >= minimumLength && input.Length <= maximumLength)
+                {
+                    break;
+                }
+            }
+            if (canCancel && key == ConsoleKey.Escape)
+            {
+                Console.Clear();
+                return null;
+            }
+        }while(true);
+        Console.Clear();
+        return input;
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", bool canCancel=false, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", canCancel, 0, int.MaxValue, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText("", "", canCancel, minimumLength, maximumLength, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false)
+    {
+        return SelectText(prefix, suffix, canCancel);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", bool canCancel=false)
+    {
+        return SelectText(prefix, "", canCancel);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(string prefix="", string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", false, 0, int.MaxValue, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(string prefix="", int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", false, minimumLength, maximumLength, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue)
+    {
+        return SelectText("", "", false, minimumLength, maximumLength);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText("", "", false, minimumLength, maximumLength, allowedRegexPattern);
     }
     #endregion
 
@@ -368,9 +524,12 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="CanCancel">A boolean indicating if the user can stop the select process.</param>
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
-    /// <returns>A TimeOnly object containing the user selected time.</returns>
-    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+    /// <param name="minTime">The minimum allowed selected time.</param>
+    /// <param name="maxTime">The maximum allowed selected time.</param>
+    /// <returns>A TimeOnly object containing the user selected time or null if the user cances the process.</returns>
+    public static TimeOnly? SelectTime(string prefix = "", string suffix = "", bool CanCancel=false, TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
         TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
         TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
         if(defaultTime <= MinTime){
@@ -392,6 +551,11 @@ private static SearchAccess searchAccess = new SearchAccess();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"\n\n{suffix}");
             key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.Escape && CanCancel)
+            {
+                Console.Clear();
+                return null;
+            }
             if (key == ConsoleKey.LeftArrow)
             {
                 hour = true;
@@ -424,10 +588,32 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
+    /// <param name="minTime">The minimum allowed selected time.</param>
+    /// <param name="maxTime">The maximum allowed selected time.</param>
+    /// <returns>A TimeOnly object containing the user selected time.</returns>
+    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+        return SelectTime(prefix, suffix, false, defaultTime, minTime, maxTime) ?? TimeOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <returns>A TimeOnly object containing the user selected time.</returns>
+    public static TimeOnly SelectTime(string prefix = ""){
+        return SelectTime(prefix, "", false, TimeOnly.MinValue, null, null) ?? TimeOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
+    /// </summary>
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
     public static TimeOnly SelectTime(TimeOnly defaultTime = new TimeOnly()){
-        return SelectTime("", "", defaultTime, null, null);
+        return SelectTime("", "", false, defaultTime, null, null) ?? TimeOnly.MinValue;
     }
     #endregion
 
@@ -596,7 +782,6 @@ private static SearchAccess searchAccess = new SearchAccess();
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
     #endregion
-
 
     #region Movie or Series/Episodes select
     /// <summary>
@@ -923,4 +1108,94 @@ private static SearchAccess searchAccess = new SearchAccess();
         }
     }
     #endregion
+
+    #region Price
+    /// <summary>
+    /// Ask the user to select a price and return the chosen price.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A double containing the user chosen price or null if the user chose to cancel the process.</returns>
+    public static double? SelectPrice(string prefix="", string suffix="", bool canCancel=false)
+    {
+        string input = "";
+        double price;
+        string keybinds = "Press Enter to confirm";
+        if(canCancel){keybinds += "\nPress Escape to cancel";}
+
+        ConsoleKey key;
+        ConsoleKeyInfo RawKey;
+        do
+        {
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n\n{keybinds}\n{suffix}");
+            RawKey = Console.ReadKey(true);
+            key = RawKey.Key;
+
+            if(key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if(key == ConsoleKey.Escape && canCancel){
+                Console.Clear();
+                return null;
+            }
+            if(key == ConsoleKey.Enter && double.TryParse(input, out price)){
+                break;
+            }
+            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
+                if(input.Length == 0){
+                    input += "0,";
+                }else{
+                    input += ",";
+                }
+            }
+            if(char.IsDigit(RawKey.KeyChar)){
+                if(input.Contains(',') && input.Length >= 3 && input[input.Length-3] == ','){
+                    continue;
+                }
+                input += RawKey.KeyChar.ToString();
+            }
+
+        }while(true);
+        Console.Clear();
+        return price;
+    }
+    #endregion
+
+    #region Confirmation
+        /// <summary>
+        /// Gives the user 2 options (true and false) and makes them choose one of these options.
+        /// </summary>
+        /// <param name="prompt">A string containing the question to confirm.</param>
+        /// <returns>A boolean indicating if the user confirms or not.</returns>
+        public static bool Confirm(string prompt=""){
+            bool selection = false;
+            ConsoleKey key;
+            do
+            {
+                Console.Clear();
+                Console.Write($"{prompt}\n\n");
+                Console.BackgroundColor = selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                Console.Write($">No");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"     ");
+                Console.BackgroundColor = !selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
+                Console.Write($">Yes");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write("\n\nPress Enter to confirm");
+                key = Console.ReadKey(true).Key;
+                if(key == ConsoleKey.Enter){
+                    return selection;
+                }
+                if(key == ConsoleKey.RightArrow){
+                    selection = true;
+                }
+                if(key == ConsoleKey.LeftArrow){
+                    selection = false;
+                }
+            }while(true);
+        }
+    #endregion
+
 }

@@ -8,7 +8,10 @@ public static class ConsumptionLogic
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. Add Consumption", ()=>{
                     //Retrieve product from the add menu and sends it to the database.
-                    Consumption consumption = ConsumptionMenu.AddConsumptionMenu();
+                    Consumption? consumption = ConsumptionMenu.AddConsumptionMenu();
+                    if(consumption == null){
+                        return;
+                    }
                     bool added = c.CreateConsumption(consumption);
                 }},
                 {"2. Remove Consumption", ()=>{

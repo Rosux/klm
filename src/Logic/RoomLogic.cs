@@ -185,8 +185,8 @@ public static class RoomLogic
             if(allroomlist.Count == 1 )
             {
                 Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2-2 ))} {page+1}/{allroomlist.Count}");
-                Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2-1 ))} │\n");
+                Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - 2 ))} {page+1}/{allroomlist.Count}");
+                Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - 1 * j ))} │\n");
                 Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
             }
             else
