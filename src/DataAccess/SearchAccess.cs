@@ -51,4 +51,26 @@ public class SearchAccess
         films.Sort((x, y) => x.Rating.CompareTo(y.Rating));
         return films;
     }
+    public List<Media> SearchFilm(string searchPattern){
+        List<Media> films = new List<Media>();
+        List<Film> AllMovies = AllFilms;
+        string[] tokens = searchPattern.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries);
+        foreach (Film f in AllMovies){
+            foreach (string token in tokens){
+                if(f.Title.ToLower().Contains(token.ToLower())){
+                    films.Add(f);
+                    break;
+                }else{
+                    foreach(string genre in f.Genres){
+                        if(genre.ToLower().Contains(token.ToLower())){
+                            films.Add(f);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        films.Sort((x, y) => x.Rating.CompareTo(y.Rating));
+        return films;
+    }
 }

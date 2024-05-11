@@ -931,7 +931,7 @@ private static SearchAccess searchAccess = new SearchAccess();
         ConsoleKeyInfo keyInfo;
         do{
             // calculate longest word
-            List<Media> results = searchAccess.Search(searchString);
+            List<Media> results = searchAccess.SearchFilm(searchString);
             longestWord = "Start typing to search".Length + 2;
             foreach(Media m in results){
                 if (m is Film && ((Film)m).Title.Length+3 > longestWord){
