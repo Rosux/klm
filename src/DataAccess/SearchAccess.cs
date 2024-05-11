@@ -27,10 +27,14 @@ public class SearchAccess
                 if(f.Title.ToLower().Contains(token.ToLower())){
                     films.Add(f);
                     break;
-                }else if(f.Genre.ToLower().Contains(token.ToLower())){
-                    films.Add(f);
-                    break;
-                }
+                }else{
+                    foreach(string genre in f.Genres){
+                        if(genre.ToLower().Contains(token.ToLower())){
+                            films.Add(f);
+                            break;
+                        }
+                    }
+                } 
             }
         }
         foreach (Serie f in AllSerie){

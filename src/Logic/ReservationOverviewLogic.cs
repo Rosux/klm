@@ -40,7 +40,7 @@ public class ReservationOverviewLogic
             bool condition_film = false;
             bool condition_episode = false;
             Consumption cons_cor = new(-1,"",4, TimeOnly.Parse("12:00:00"), TimeOnly.Parse("23:00:00"));
-            Film film_cor = new("","",-1,-1);
+            Film film_cor = new(-1, new List<string>(), "", "", "", -1, "", 0.0, "", new List<Dictionary<string, string>>());
             Episode episode_cor = new("",-1,-1);
             Season season_cor = new("",-1);
             Serie serie_cor = new("","",-1);
