@@ -337,8 +337,7 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine("Search for a movie you want to change");
-            object obj = MenuHelper.SelectMovie();
-            Film SelectedFilm = ConvertToFilm(obj);
+            Film SelectedFilm = MenuHelper.SelectMovie();
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
             {
@@ -489,17 +488,5 @@ class FilmSerieMenu
             voteAverage = 0;
         }
         return voteAverage;
-    }
-    public static Film ConvertToFilm(object obj)
-    {
-        if (obj is Film)
-        {
-            return (Film)obj;
-        }
-        else
-        {
-            // Handle the case where the object cannot be cast to a Film
-            throw new ArgumentException("The provided object cannot be cast to a Film.");
-        }
     }
 }

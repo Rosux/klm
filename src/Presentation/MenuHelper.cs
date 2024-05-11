@@ -920,7 +920,7 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// Ask the user to select only a movie.
     /// </summary>
     /// <returns>null if the user cancels the search. If a movie is selected it will return a Movie object.</returns>
-    public static object? SelectMovie(){
+    public static Film? SelectMovie(){
         Media selectedMedia;
         int longestWord;
         string searchString = "";
@@ -1025,7 +1025,7 @@ private static SearchAccess searchAccess = new SearchAccess();
             cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
         }while(true);
         Console.Clear();
-        return selectedMedia;
+        return (Film)selectedMedia;
     }
 
     /// <summary>
