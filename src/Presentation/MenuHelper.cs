@@ -2,6 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 public static class MenuHelper{
 private static SearchAccess searchAccess = new SearchAccess();
@@ -1202,112 +1203,137 @@ private static SearchAccess searchAccess = new SearchAccess();
 
     #region TimeLine
     public static void PrintTimeLine(List<TimeLine.Item> t)
-    {   
-        List<string> Times = new List<string>();
+    {
+        List<string> Dates = new List<string>();
+        List<DateTime> Times = new List<DateTime>();
         List<string> Action = new List<string>();
         t = t.OrderBy(o=>o.StartTime).ToList();
+        List<TimeLine.Item> watchables = new List<TimeLine.Item>();
+        foreach(var x in t){
+            if(x.Action is Episode || x.Action is Film){
+                watchables.Add(x);
+            }
+        }
         // Foreach loop to check what the action is in the timeline and prints that out.
-        for(int i = 0; i <  t.Count; i++)
-        {   
-            TimeLine.Item item = t[i];
-             if(item.Action is Episode  || item.Action is Film || item.Action is Consumption){
-                string StartTimeString = item.StartTime.ToString("HH:mm");
-                string EndTimeString = item.EndTime.ToString("HH:mm");
+        for(int i = 0; i < watchables.Count; i++)
+        {
+            TimeLine.Item item = watchables[i];
+            if(item.Action is Episode || item.Action is Film){
+                DateTime StartTimeString = item.StartTime;
+                DateTime EndTimeString = item.EndTime;
                 if (i > 0)
                 {
-                if(t[i - 1].EndTime != t[i].StartTime)
+                    if(watchables[i-1].EndTime != watchables[i].StartTime)
                     {
                         Times.Add(StartTimeString);
                     }
-                }else{
+                }else
+                {
                     Times.Add(StartTimeString);
                 }
                 Times.Add(EndTimeString);
                 if (i > 0)
                 {
-                    if (t[i - 1].EndTime < item.StartTime)
+                    if (watchables[i - 1].EndTime < item.StartTime)
                     {
                         Action.Add("");
+                        Dates.Add("");
                     }
                 }
-                if(item.Action is Film){
+                if(item.Action is Film)
+                {
                     Action.Add(((Film)item.Action).Title);
-                }else if(item.Action is Episode){
+                    Dates.Add(item.StartTime.Date.ToString("yyyy-MM-dd"));
+                }
+                else if(item.Action is Episode)
+                {
                     Action.Add(((Episode)item.Action).Title);
-                }else if(item.Action is Consumption){
-                    Action.Add(((Consumption)item.Action).Name);
+                    Dates.Add(item.StartTime.Date.ToString("yyyy-MM-dd"));
                 }
             }
         }
-        Console.Write("  ├");
+        string Line1 = "";
+        string Line2 = "";
+        string Line3 = "";
+        string Line4 = "";
+
+        Console.Clear();
+        Line1 += ($"  ");
+        for(int i=0;i<Dates.Count;i++){
+            if(i == 0){
+                Line1 += ($"{Dates[i]}{new string(' ', Math.Max(0, 3+Math.Max(10, Action[i].Length)-Dates[i].Length))}");
+            }else if(Dates[i] == "" || Action[i] == ""){
+                Line1 += ($"{new string(' ', 6)}");
+            }else if(Dates[i-1] == Dates[i]){
+                Line1 += ($"{new string(' ', Math.Max(10, Action[i].Length)+3)}");
+            }else{
+                Line1 += ($"{Dates[i]}{new string(' ', Math.Max(0, 3+Math.Max(10, Action[i].Length)-Dates[i].Length))}");
+            }
+        }
+        Line2 += ("  ├");
         for(int i=0;i<Action.Count;i++)
         {
-            if(Action[i] == ""){
-                Console.Write($"{new string('─',2 + 3)}┼");
-            }else{
-                if(i == Action.Count - 1)
-                {
-                    Console.Write($"{new string('─', Math.Max(0, 2 + Action[i].Length))}┤");
-                }else {
-                    Console.Write($"{new string('─', Math.Max(0, 2 + Action[i].Length))}┼");
-                }
+            if(Action[i] == "")
+            {
+                Line2 += ($"{new string('─', 5)}┼");
+            }
+            else
+            {
+                Line2 += ($"{new string('─', Math.Max(12, 2 + Action[i].Length))}");
+                Line2 += (i == Action.Count - 1 ? "┤" : "┼");
             }
         }
-        Console.Write("\n");
         int actionId = 0;
         for(int i=0;i<Times.Count;i++)
         {
             if(Action[actionId] == ""){
-                Console.Write($"{Times[i]}{new string(' ', 1)}");
+                Line3 += ($"{Times[i].ToString("HH:mm")}{new string(' ', 1)}");
             }else{
-                Console.Write($"{Times[i]}{new string(' ', Math.Max(0, Action[actionId].Length-2))}");
+                Line3 += ($"{Times[i].ToString("HH:mm")}{new string(' ', Math.Max(0, Math.Max(10, Action[actionId].Length))-2)}");
             }
             actionId++;
             actionId = Math.Clamp(actionId, 0, Action.Count-1);
         }
-        Console.Write("\n  |");
+        Line4 += ("  |");
         for(int i=0;i<Action.Count;i++)
         {
-            if(Action[i] == ""){
-                Console.Write($" {new string(' ', 3)} |");
-            }else{
-                Console.Write($" {Action[i]}{new string(' ', Math.Max(0, 2-Action[i].Length))} |");
+            if(Action[i] == "")
+            {
+                Line4 += ($" {new string(' ', 3)} |");
+            }
+            else
+            {
+                Line4 += ($" {Action[i]}{new string(' ', Math.Max(0, 10-Action[i].Length))} |");
             }
         }
-        Console.ReadLine();
-        // string Dates = "";
-        // string Lines = "";
-        // string Times = "";
-        // string Actions = "";
 
 
-        // Console.WriteLine((Film)(t.t[0].Action));
-        Console.ReadLine();
+        int scrollAmount = 0;
+        string[] Lines = {Line1, Line2, Line3, Line4};
+
+        ConsoleKey key;
+        do{
+            Console.Clear();
+            foreach(string Line in Lines){
+                string L = Line;
+                L = L.Substring(scrollAmount, Math.Min(Console.WindowWidth/2, L.Length - scrollAmount));
+                Console.WriteLine(L);
+            }
+            key = Console.ReadKey(true).Key;
+            if(key == ConsoleKey.LeftArrow){
+                scrollAmount -= 5;
+            }
+            if(key == ConsoleKey.RightArrow){
+                scrollAmount += 5;
+            }
+            scrollAmount = Math.Clamp(scrollAmount, 0, Lines.Min(line => line.Length)-5);
+        }while(key != ConsoleKey.Enter);
     }
 
     #endregion
 }
 
-// ┌─┬┐  
-// │ ││  
-// ├─┼┤  
+// ┌─┬┐
+// │ ││
+// ├─┼┤
 // └─┴┘
-                //            int longestline = -1;
-                // int longestline2 = -1;
-                // foreach (var f in t){
-                //     if(film.Title.Length > longestline){
-                //         longestline = film.Title.Length;
-                //     }
-                // }
-                // if(StartTimeString.Length > longestline){
-                //     longestline = StartTimeString.Length;
-                // }
-                // foreach (var f in t){
-                //     if(film.Title.Length > longestline2){
-                //         longestline2 = film.Title.Length;
-                //     }
-                // }
-                // if(EndTimeString.Length > longestline2){
-                //     longestline2 = EndTimeString.Length;
-                // }
-         

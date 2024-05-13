@@ -12,7 +12,7 @@ public static class ReservationLogic
         {
             MenuHelper.SelectOptions("Reservations", new Dictionary<string, Action>(){
                 {"1. Book a Reservation", BookReservation},
-                {"2. View Reservation", ()=> Val()},
+                {"2. View Reservation", ()=> ViewReservations()},
                 {"3. Exit to main menu", ()=>{
                     running = false;
                 }},
@@ -37,15 +37,18 @@ public static class ReservationLogic
             }
         }
     }
-    private static void Val()
+    private static void ViewReservations()
     {
         // get specific reservation
-        Reservation reservation = ReservationAccess.GetReservationById(1);
+        Dictionary<string, Reservation> reservationDict = new Dictionary<string, Reservation>();
+        int id = 1;
+        foreach(Reservation r in ReservationAccess.ReadReservationsUserId(Program.CurrentUser.Id)){
+            reservationDict.Add($"Reservation: {id} ({r.StartDate})", r);
+        }
+        Reservation? reservation = MenuHelper.SelectFromList("Select a reservation to view", reservationDict);
+        if(reservation == null){
+            return;
+        }
         MenuHelper.PrintTimeLine(reservation.TimeLine.t);
-
-        // Console.WriteLine(((Film)(reservation.TimeLine.t[0].Action)).Title);
-
-        Console.ReadKey(true);
-        // MenuHelper.PrintTimeLine(timeLine);
     }
 }
