@@ -1205,160 +1205,75 @@ private static SearchAccess searchAccess = new SearchAccess();
     {   
         List<string> Times = new List<string>();
         List<string> Action = new List<string>();
-        int longestline = -1;
+        t = t.OrderBy(o=>o.StartTime).ToList();
         // Foreach loop to check what the action is in the timeline and prints that out.
         for(int i = 0; i <  t.Count; i++)
-        {
-            var x = t[i];
-            if(x.Action is Film film){
-                string StartTimeString = x.StartTime.ToString("HH:mm");
-                string EndTimeString = x.EndTime.ToString("HH:mm");
-                Times.Add(StartTimeString);
-                Times.Add(EndTimeString);
-                Action.Add(film.Title);
-                // Check if end time of a movie is the same as a starting time of another action. IF NOT add a break between that time " "
-                if (t.Count > i + 1){
-                    if(t[i + 1].Action is Film){
-                        // t[i + 1].StartTime;
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
-                    } else if (t[i + 1].Action is Episode){
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
-                    }   else if (t[i + 1].Action is Consumption){
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
+        {   
+            TimeLine.Item item = t[i];
+             if(item.Action is Episode  || item.Action is Film || item.Action is Consumption){
+                string StartTimeString = item.StartTime.ToString("HH:mm");
+                string EndTimeString = item.EndTime.ToString("HH:mm");
+                if (i > 0)
+                {
+                if(t[i - 1].EndTime != t[i].StartTime)
+                    {
+                        Times.Add(StartTimeString);
                     }
-                    foreach (var f in Action){
-                        if(f.Length > longestline){
-                            longestline = f.Length;
-                            // Console.WriteLine(longestline);
-                        }
+                }else{
+                    Times.Add(StartTimeString);
+                }
+                Times.Add(EndTimeString);
+                if (i > 0)
+                {
+                    if (t[i - 1].EndTime < item.StartTime)
+                    {
+                        Action.Add("");
                     }
                 }
-            }else if(x.Action is Episode episode){
-                string StartTimeString = x.StartTime.ToString("HH:mm");
-                string EndTimeString = x.EndTime.ToString("HH:mm");
-                Times.Add(StartTimeString);
-                Times.Add(EndTimeString);
-                Action.Add(episode.Title);
-                if (t.Count > i + 1)
-                {
-                    if (t[i + 1].Action is Film)
-                    {   
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }
-                    else if (t[i + 1].Action is Episode)
-                    {
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }else if (t[i + 1].Action is Consumption){
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
-                    }
-                    foreach (var f in Action){
-                        if(f.Length > longestline){
-                            longestline = f.Length;
-                            // Console.WriteLine(longestline);
-                        }
-                        Console.WriteLine(f.Length);
-                    }
-                }
-            }else if(x.Action is Break breaks){
-                string StartTimeString = x.StartTime.ToString("HH:mm");
-                string EndTimeString = x.EndTime.ToString("HH:mm");
-                string time = breaks.Time.ToString();
-                Times.Add(StartTimeString);
-                Times.Add(EndTimeString);
-                Action.Add(time);
-                if (t.Count > i + 1)
-                {
-                    if (t[i + 1].Action is Film)
-                    {   
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }
-                    else if (t[i + 1].Action is Episode)
-                    {
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }else if (t[i + 1].Action is Consumption){
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
-                    }
-                    foreach (var f in Action){
-                        if(f.Length > longestline){
-                            longestline = f.Length;
-                            // Console.WriteLine(longestline);
-                        }
-                    }
-                }
-            }else if(x.Action is Consumption consumption){
-                string StartTimeString = x.StartTime.ToString("HH:mm");
-                string EndTimeString = x.EndTime.ToString("HH:mm");
-                Times.Add(StartTimeString);
-                Times.Add(EndTimeString);
-                Action.Add(consumption.Name);
-                if (t.Count > i + 1)
-                {
-                    if (t[i + 1].Action is Film)
-                    {   
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }
-                    else if (t[i + 1].Action is Episode)
-                    {
-                        if (t[i + 1].StartTime != x.EndTime)
-                        {
-                            Action.Add(" ");
-                        }
-                    }else if (t[i + 1].Action is Consumption){
-                        if(t[i + 1].StartTime != x.EndTime){
-                            Action.Add(" ");
-                        }
-                    }
-                    foreach (var f in Action){
-                        if(f.Length > longestline){
-                            longestline = f.Length;
-                            // Console.WriteLine(longestline);
-                        }
-                    }
+                if(item.Action is Film){
+                    Action.Add(((Film)item.Action).Title);
+                }else if(item.Action is Episode){
+                    Action.Add(((Episode)item.Action).Title);
+                }else if(item.Action is Consumption){
+                    Action.Add(((Consumption)item.Action).Name);
                 }
             }
         }
-        
-        Console.Write($"  ");
-        for(int i = 0; i < Action.Count; i++){  
-            Console.Write($"|{new string('─', Math.Max(longestline + 2, 0))}──");
+        Console.Write("  ├");
+        for(int i=0;i<Action.Count;i++)
+        {
+            if(Action[i] == ""){
+                Console.Write($"{new string('─',2 + 3)}┼");
+            }else{
+                if(i == Action.Count - 1)
+                {
+                    Console.Write($"{new string('─', Math.Max(0, 2 + Action[i].Length))}┤");
+                }else {
+                    Console.Write($"{new string('─', Math.Max(0, 2 + Action[i].Length))}┼");
+                }
+            }
         }
-        Console.Write($"|");
         Console.Write("\n");
-       for(int i = 0; i < Times.Count; i++){  
-            Console.Write($"{Times[i]}{new string(' ', Math.Max(longestline +5 - Times[i].Length, 0))}");
+        int actionId = 0;
+        for(int i=0;i<Times.Count;i++)
+        {
+            if(Action[actionId] == ""){
+                Console.Write($"{Times[i]}{new string(' ', 1)}");
+            }else{
+                Console.Write($"{Times[i]}{new string(' ', Math.Max(0, Action[actionId].Length-2))}");
+            }
+            actionId++;
+            actionId = Math.Clamp(actionId, 0, Action.Count-1);
         }
-
-        Console.Write("\n");
-        Console.Write($"  ");
-        for(int i = 0; i < Action.Count; i++){  
-            Console.Write($"| {Action[i]}{new string(' ', Math.Max(longestline + 2 - Action[i].Length, 0))} ");
+        Console.Write("\n  |");
+        for(int i=0;i<Action.Count;i++)
+        {
+            if(Action[i] == ""){
+                Console.Write($" {new string(' ', 3)} |");
+            }else{
+                Console.Write($" {Action[i]}{new string(' ', Math.Max(0, 2-Action[i].Length))} |");
+            }
         }
-        Console.Write($"|");
         Console.ReadLine();
         // string Dates = "";
         // string Lines = "";
