@@ -1,7 +1,14 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
+
+    /// <summary>
+    /// Get a list of all reservations.
+    /// </summary>
+    /// <returns>A list of all the reservations ever made.</returns>
     public List<Reservation> ReadReservations(){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
@@ -19,20 +26,18 @@ public class ReservationAccess : DatabaseHandler
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
                 string timeline_str = reader.GetString(7);
-                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(timeline_str)!;
-                TimeLine.Holder TimelineHolder = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
             }
         }
         _Conn.Close();
         return reservations;
     }
+
     /// <summary>
-    /// looks through the database for reservations during given date
+    /// Get a list of all the reservations falling on a specific date.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns>a list of all reservations on or during the given date</returns>
+    /// <param name="date">A DateTime object indicating the day to search for.</param>
+    /// <returns>A list of all reservations on or during the given date.</returns>
     public List<Reservation> ReadReservationsDate(DateTime date){
         List<Reservation> reservations = new List<Reservation>();
         TimeSpan date_s = new TimeSpan(0, 23, 59, 59, 0, 0);
@@ -53,20 +58,19 @@ public class ReservationAccess : DatabaseHandler
                 DateTime startdate = DateTime.Parse(reader.GetString(4));
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
-                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
-                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+                string timeline_str = reader.GetString(7);
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
             }
         }
         _Conn.Close();
         return reservations;
     }
+
     /// <summary>
-    /// uses the given date to look through the database to pick all reservations for current week
+    /// Get a list of all the reservations in the specified week of the date.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns>a list of all reservations during the week of given date</returns>
+    /// <param name="date">A DateTime object holding the week to search for.</param>
+    /// <returns>A list of all reservations during the week of given date</returns>
      public List<Reservation> ReadReservationsWeek(DateTime date){
         List<Reservation> reservations = new List<Reservation>();
         TimeSpan date_s = new TimeSpan(7, 0, 0, 0, 0, 0);
@@ -88,46 +92,49 @@ public class ReservationAccess : DatabaseHandler
                 DateTime startdate = DateTime.Parse(reader.GetString(4));
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
-                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
-                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
-            }
-        }
-        _Conn.Close();
-        return reservations;
-    }
-    /// <summary>
-    /// searches the database for all reservations for a user
-    /// </summary>
-    /// <returns>a list of all reservations for the user</returns>
-    public List<Reservation> ReadReservationsUser(){
-        List<Reservation> reservations = new List<Reservation>();
-        _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE UserId = @UserId";
-        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
-        {
-            Launch.Parameters.AddWithValue("@UserId", Program.CurrentUser.Id);
-            SQLiteDataReader reader = Launch.ExecuteReader();
-            while (reader.Read())
-            {
-                int id = reader.GetInt32(0);
-                int roomid = reader.GetInt32(1);
-                int userid = reader.GetInt32(2);
-                int groupsize = reader.GetInt32(3);
-                DateTime startdate = DateTime.Parse(reader.GetString(4));
-                DateTime enddate = DateTime.Parse(reader.GetString(5));
-                double price = reader.GetDouble(6);
-                List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
-                TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+                string timeline_str = reader.GetString(7);
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
             }
         }
         _Conn.Close();
         return reservations;
     }
 
+    /// <summary>
+    /// Get a list of all reservations for a specified user.
+    /// </summary>
+    /// <param name="id">The id of the user.</param>
+    /// <returns>A list of all reservations for the specified user.</returns>
+    public List<Reservation> ReadReservationsUserId(int id){
+        List<Reservation> reservations = new List<Reservation>();
+        _Conn.Open();
+        string NewQuery = @"SELECT * FROM Reservations WHERE UserId = @UserId";
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@UserId", id);
+            SQLiteDataReader reader = Launch.ExecuteReader();
+            while (reader.Read())
+            {
+                int reservationid = reader.GetInt32(0);
+                int roomid = reader.GetInt32(1);
+                int userid = reader.GetInt32(2);
+                int groupsize = reader.GetInt32(3);
+                DateTime startdate = DateTime.Parse(reader.GetString(4));
+                DateTime enddate = DateTime.Parse(reader.GetString(5));
+                double price = reader.GetDouble(6);
+                string timeline_str = reader.GetString(7);
+                reservations.Add(new Reservation(reservationid, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
+            }
+        }
+        _Conn.Close();
+        return reservations;
+    }
+
+    /// <summary>
+    /// Create a new reservation.
+    /// </summary>
+    /// <param name="reservation">A reservation object that gets saved.</param>
+    /// <returns>A boolean indicating if the reservation was saved.</returns>
     public bool CreateReservation(Reservation reservation){
         _Conn.Open();
         string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
@@ -149,10 +156,10 @@ public class ReservationAccess : DatabaseHandler
     }
 
     /// <summary>
-    /// delete a reservation from database
+    /// Delete a reservation from database.
     /// </summary>
-    /// <param name="Reservation">a object of Reservations</param>
-    /// <returns>a boolean true if deleted</returns>Conn
+    /// <param name="Reservation">A reservation object to delete.</param>
+    /// <returns>A boolean indicating if the reservation was deleted.</returns>
     public bool DeleteReservation(Reservation reservation){
         _Conn.Open();
         string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id ";
@@ -164,4 +171,72 @@ public class ReservationAccess : DatabaseHandler
             return rowsAffected > 0;
         }
     }
+
+    /// <summary>
+    /// Convert a json timeline string to a TimeLine.Holder object.
+    /// </summary>
+    /// <param name="timeLine">The json string containing the timeline data.</param>
+    /// <returns>A TimeLine.Holder object with actual values.</returns>
+    public static TimeLine.Holder StringToTimeLine(string timeLine){
+        List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(timeLine)!;
+        TimeLine.Holder TimelineHolder = new TimeLine.Holder();
+        TimelineHolder.t = timeline;
+
+        TimeLine.Holder newTimeLine = new TimeLine.Holder();
+        foreach(TimeLine.Item i in TimelineHolder.t){
+            // i.Action;
+            JObject x = JObject.Parse(JsonConvert.SerializeObject(i.Action)); // <- is either a film/serie/break/consumption
+            object? obj = null;
+
+            if(x.Property("Id") != null && x.Property("Genres") != null && x.Property("Original_language") != null && x.Property("Overview") != null && x.Property("Release_date") != null && x.Property("Runtime") != null && x.Property("Title") != null && x.Property("Vote_average") != null && x.Property("Certification") != null && x.Property("Directors") != null)
+            {
+                obj = (object)new Film(
+                    (int)(x.Property("Id").Value),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Genres").Value.ToString()),
+                    (string)(x.Property("Original_language").Value),
+                    (string)(x.Property("Overview").Value),
+                    (string)(x.Property("Release_date").Value),
+                    (int)(x.Property("Runtime").Value),
+                    (string)(x.Property("Title").Value),
+                    (double)(x.Property("Vote_average").Value),
+                    (string)(x.Property("Certification").Value),
+                    (List<Dictionary<string, string>>)JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(x.Property("Directors").Value.ToString())
+                );
+            }
+            else if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
+            {
+                obj = (object)new Episode(
+                    (int)(x.Property("Id").Value),
+                    (string)(x.Property("Title").Value),
+                    (int)(x.Property("Length").Value)
+                );
+            }
+            else if(x.Property("Id") != null && x.Property("Name") != null && x.Property("Price") != null && x.Property("StartTime") != null && x.Property("EndTime") != null)
+            {
+                obj = (object)new Consumption(
+                    (int)(x.Property("Id").Value),
+                    (string)(x.Property("Name").Value),
+                    (double)(x.Property("Price").Value),
+                    TimeOnly.Parse((string)(x.Property("StartTime").Value)),
+                    TimeOnly.Parse((string)(x.Property("EndTime").Value))
+                );
+            }
+            else if(x.Property("Title") != null)
+            {
+                obj = (object)new Break(
+                    (int)(x.Property("Time").Value)
+                );
+            }
+
+            if(obj != null){
+                newTimeLine.Add(new TimeLine.Item(
+                    obj,
+                    i.StartTime,
+                    i.EndTime
+                ));
+            }
+        }
+        return newTimeLine;
+    }
+
 }
