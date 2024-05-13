@@ -1,13 +1,23 @@
+using Newtonsoft.Json;
 
 public class Film : Media, IComparable
 {
     public string Title;
     public string Genre;
-    public double Rating;
+    public double Rating = 00.00;
     public int Id;
     public int Duration;
 
-    public Film(string title, string genre, int duration, int id = 0)
+    public Film(string title, string genre, int duration, int id = -1)
+    {
+        Id = id;
+        Genre = genre;
+        Title = title;
+        Duration = duration;
+    }
+
+    [JsonConstructor]
+    public Film(int id, string title, string genre, int duration)
     {
         Id = id;
         Genre = genre;

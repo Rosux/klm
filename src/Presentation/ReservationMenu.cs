@@ -372,15 +372,15 @@ public static class ReservationMenu
     /// <returns>a object of Reservations</returns>
     public static Reservation? GetSpecificReservationUser()
     {
-    List<Reservation> reservations = ReservationAccess.ReadReservationsUser();
-    if (reservations.Count == 0)
-    {
-        Console.WriteLine("You have no reservations.");
-        return null;
-    }
-    else
-    {
-        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
+        List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(Program.CurrentUser.Id);
+        if (reservations.Count == 0)
+        {
+            Console.WriteLine("You have no reservations.");
+            return null;
+        }
+        else
+        {
+            Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
