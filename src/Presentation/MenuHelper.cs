@@ -1235,6 +1235,7 @@ private static SearchAccess searchAccess = new SearchAccess();
                     foreach (var f in Action){
                         if(f.Length > longestline){
                             longestline = f.Length;
+                            // Console.WriteLine(longestline);
                         }
                     }
                 }
@@ -1267,7 +1268,9 @@ private static SearchAccess searchAccess = new SearchAccess();
                     foreach (var f in Action){
                         if(f.Length > longestline){
                             longestline = f.Length;
+                            // Console.WriteLine(longestline);
                         }
+                        Console.WriteLine(f.Length);
                     }
                 }
             }else if(x.Action is Break breaks){
@@ -1300,6 +1303,7 @@ private static SearchAccess searchAccess = new SearchAccess();
                     foreach (var f in Action){
                         if(f.Length > longestline){
                             longestline = f.Length;
+                            // Console.WriteLine(longestline);
                         }
                     }
                 }
@@ -1332,12 +1336,13 @@ private static SearchAccess searchAccess = new SearchAccess();
                     foreach (var f in Action){
                         if(f.Length > longestline){
                             longestline = f.Length;
+                            // Console.WriteLine(longestline);
                         }
                     }
                 }
             }
         }
-
+        
         Console.Write($"  ");
         for(int i = 0; i < Action.Count; i++){  
             Console.Write($"|{new string('─', Math.Max(longestline + 2, 0))}──");
@@ -1351,7 +1356,7 @@ private static SearchAccess searchAccess = new SearchAccess();
         Console.Write("\n");
         Console.Write($"  ");
         for(int i = 0; i < Action.Count; i++){  
-                Console.Write($"| {Action[i]}{new string(' ', Math.Max(longestline + 2 - Action[i].Length, 0))} ");
+            Console.Write($"| {Action[i]}{new string(' ', Math.Max(longestline + 2 - Action[i].Length, 0))} ");
         }
         Console.Write($"|");
         Console.ReadLine();
