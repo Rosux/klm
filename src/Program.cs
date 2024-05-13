@@ -6,9 +6,10 @@ class Program
     public static void Main(){
 
         // USE FOR NOT TESTING
-        Menu.Start();
+        // Menu.Start();
 
         // DO NOT USE UNLESS FOR TESTING
         // Menu.TestStart();
+        UserTable.EditUsers();
     }
 }
