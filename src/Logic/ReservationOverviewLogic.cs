@@ -33,17 +33,12 @@ public class ReservationOverviewLogic
         List<string> list_info_timeline = new List<string>();
         if (selected_res != null)
         {
-            ConsumptionAccess con_accesser = new ConsumptionAccess();
-            FilmAcesser film_accesser = new FilmAcesser();
-            SerieAcesser serie_acesser = new SerieAcesser();
             bool condition_con = false;
             bool condition_film = false;
             bool condition_episode = false;
-            Consumption cons_cor = new(-1,"",4, TimeOnly.Parse("12:00:00"), TimeOnly.Parse("23:00:00"));
-            Film film_cor = new("","",-1,-1);
-            Episode episode_cor = new("",-1,-1);
-            Season season_cor = new("",-1);
-            Serie serie_cor = new("","",-1);
+            Consumption cons_cor = null;
+            Film film_cor = null;
+            Episode episode_cor = null;
             Console.Clear();
             // matches every object in time line to either consumption, episode, film or break
             foreach(TimeLine.Item actie in selected_res.TimeLine.t)
@@ -51,55 +46,21 @@ public class ReservationOverviewLogic
                 condition_con = false;
                 condition_film = false;
                 condition_episode = false;
-                foreach(Consumption cons in con_accesser.ReadConsumption())
+
+                if (actie.Action is Film)
                 {
-                    TimeLine.Item timeline_item = new TimeLine.Item(cons, actie.StartTime, actie.EndTime);
-                    string string_movies = JsonConvert.SerializeObject(timeline_item);
-                    TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
-                    string timeline_str = timeline.Action.ToString();
-                    string actie_str = actie.Action.ToString();
-                    if(String.Compare(timeline_str, actie_str) == 0)
-                    {
-                        cons_cor = cons;
-                        condition_con = true;
-                        break;
-                    }
+                    condition_film = true;
+                    film_cor = (Film)actie.Action;
                 }
-                foreach(Serie serie in serie_acesser.Get_info())
+                else if(actie.Action is Episode)
                 {
-                    foreach(Season season in serie.Seasons)
-                    {
-                        foreach(Episode episode in season.Episodes)
-                        {
-                            TimeLine.Item timeline_item = new TimeLine.Item(episode, actie.StartTime, actie.EndTime);
-                            string string_movies = JsonConvert.SerializeObject(timeline_item);
-                            TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
-                            string timeline_str = timeline.Action.ToString();
-                            string actie_str = actie.Action.ToString();
-                            if(String.Compare(timeline_str, actie_str) == 0)
-                            {
-                                episode_cor = episode;
-                                season_cor = season;
-                                serie_cor = serie;
-                                condition_episode = true;
-                                break;
-                            }
-                        }
-                    }
+                    condition_episode = true;
+                    episode_cor = (Episode)actie.Action;
                 }
-                foreach(Film film in film_accesser.Get_info())
+                else if(actie.Action is Consumption)
                 {
-                    TimeLine.Item timeline_item = new TimeLine.Item(film, actie.StartTime, actie.EndTime);
-                    string string_movies = JsonConvert.SerializeObject(timeline_item);
-                    TimeLine.Item timeline = JsonConvert.DeserializeObject<TimeLine.Item>(string_movies);
-                    string timeline_str = timeline.Action.ToString();
-                    string actie_str = actie.Action.ToString();
-                    if(String.Compare(timeline_str, actie_str) == 0)
-                    {
-                        film_cor = film;
-                        condition_film = true;
-                        break;
-                    }
+                    condition_con = true;
+                    cons_cor = (Consumption)actie.Action;
                 }
                 // checks if current object from timeline is a consumption and makes a string format with the consumption info an adds it to list list_info_timeline
                 if(condition_con == true && condition_film == false && condition_episode == false)
@@ -116,7 +77,7 @@ public class ReservationOverviewLogic
                 // checks if current object from timeline is a episodde and makes a string format with the episode/sereie/season info an adds it to list list_info_timeline
                 else if(condition_con == false && condition_film == false && condition_episode == true)
                 {
-                    string episode_str = $"watching episode {episode_cor.Id}: {episode_cor.Title} from {serie_cor.Title} {season_cor.Title}, from {actie.StartTime} to {actie.EndTime}.";
+                    string episode_str = $"watching episode {episode_cor.Id}: {episode_cor.Title}, from {actie.StartTime} to {actie.EndTime}.";
                     list_info_timeline.Add(episode_str);
                 }
                 // checks if current object from timeline is a break and makes a string format with the break info an adds it to list list_info_timeline

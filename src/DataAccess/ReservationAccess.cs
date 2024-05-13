@@ -42,8 +42,11 @@ public class ReservationAccess : DatabaseHandler
         List<Reservation> reservations = new List<Reservation>();
         TimeSpan date_s = new TimeSpan(0, 23, 59, 59, 0, 0);
         DateTime date_e_cor = date.Subtract(date_s);
+        Console.WriteLine(date);
+        Console.WriteLine(date_e_cor);
+        Console.ReadKey(true);
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date OR StartDate >= @SDate AND EndDate <= @Date";
+        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date OR StartDate >= @SDate AND EndDate <= @Date OR EndDate <= @Date AND EndDate > @SDate";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
             Launch.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -76,7 +79,6 @@ public class ReservationAccess : DatabaseHandler
         TimeSpan date_s = new TimeSpan(7, 0, 0, 0, 0, 0);
         DateTime date_e = date.Add(date_s);
         DateTime date_e_cor = new DateTime(date_e.Year, date_e.Month, date_e.Day, 23, 59, 59);
-        _Conn.Open();
         string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @sDate AND StartDate <= @eDate OR EndDate <= @eDate AND EndDate >= @sDate";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
