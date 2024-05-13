@@ -25,13 +25,13 @@ public class Film : Media, IComparable
         Duration = duration;
     }
 
-    public Film(int id, string title, string genre, int duration)
-    {
-        Id = id;
-        Genre = genre;
-        Title = title;
-        Duration = duration;
-    }
+    // public Film(int id, string title, string genre, int duration)
+    // {
+    //     Id = id;
+    //     Genre = genre;
+    //     Title = title;
+    //     Duration = duration;
+    // }
 
     public int CompareTo(object obj)
     {
