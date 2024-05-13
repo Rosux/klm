@@ -19,12 +19,14 @@ public static class RoomLogic
             if((bool)choice)
             {
                 /// ads new room to database
+                Console.Clear();
                 int newRoomId = r.AddToRoomTable(newRoom);
                 Console.WriteLine($"New room created: \nID: {newRoomId}. \nCapacity: {GivenCapacity}.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine($"Room discarded.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
@@ -49,12 +51,14 @@ public static class RoomLogic
             if((bool)choice)
             {
                 /// removes given room from database
+                Console.Clear();
                 r.RemoveFromRoomTable(room.Id);
                 Console.WriteLine($"Room succesfully removed.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine($"Room not removed.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
@@ -81,12 +85,14 @@ public static class RoomLogic
             if((bool)choice)
             {
                 /// edits the given room
+                Console.Clear();
                 r.EditFromRoomTable(room.Id, capacity);
                 Console.WriteLine($"Changes saved succesfully.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
             else
             {
+                Console.Clear();
                 Console.WriteLine($"Changes not saved.\n\nPress any key to continue...");
                 Console.ReadKey(true);
             }
@@ -96,28 +102,7 @@ public static class RoomLogic
             RoomMenu.Action4(room);
         }
     }
-    /// <summary>
-    /// uses given roomid to show all info for a specific room
-    /// </summary>
-    /// <param name="roomid">takes Id of room user wants to see</param>
-    public static void FetchRoom(int roomid)
-    {
-        /// checks if room exists
-        if (r.GetRoom(roomid) != "")
-        {
-            /// shows all room info
-            Console.WriteLine("Room: ");
-            Console.WriteLine(r.GetRoom(roomid));
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
-        }
-        else
-        {
-            Console.WriteLine($"there is no room with ID {roomid}.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
-        }
-    }
+    
     /// <summary>
     /// returns a list of info from all rooms
     /// </summary>

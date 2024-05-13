@@ -19,7 +19,7 @@ public static class ReservationLogic
                     }
                     else
                     {
-                        Console.Write($"\n\n Press any key to continue...");
+                        Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey(true);
                     }
                     Console.Clear();

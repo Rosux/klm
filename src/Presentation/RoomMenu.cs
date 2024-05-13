@@ -21,10 +21,7 @@ public class RoomMenu
                 {"4. Edit a room", ()=>{
                     Action4();
                 }},
-                {"5. Show specified room", ()=>{
-                    Action5();
-                }},
-                {"6. Exit to main menu", ()=>{
+                {"5. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
@@ -129,36 +126,6 @@ public class RoomMenu
         else
         {
             Console.WriteLine("There are no rooms to edit.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
-        }
-    }
-    /// lets user view a specific room
-    private static void Action5()
-    {
-        Console.Clear();
-        List<Room> listroom = r.GetAllRooms();
-        /// checks if there even are rooms
-        if (listroom.Count != 0)
-        {
-            /// asks user for room id
-            int? roomid_p = MenuHelper.SelectInteger("Select room id: ", "", true, 0, 1, 2147483647);
-            if (roomid_p != null)
-            {
-                /// cals method FetchRoom with the given id
-                int roomid = (int) roomid_p;
-                RoomLogic.FetchRoom(roomid);
-            }
-            else
-            {
-                Console.WriteLine("Action cancelled.");
-                Console.Write($"\n\nPress any key to continue...");
-                Console.ReadKey(true);
-            }
-        }
-        else
-        {
-            Console.WriteLine("There are no rooms currently.");
             Console.Write($"\n\nPress any key to continue...");
             Console.ReadKey(true);
         }

@@ -131,7 +131,7 @@ public class ReservationOverviewLogic
             // sets the lengt of the tabel if there is a timeline
             foreach(string str in list_info_timeline)
             {
-                string string_cor = $"│o{i}: " + str;
+                string string_cor = $"│ {i}: " + str;
                 if(string_cor.Length > longest)
                 {
                     longest = string_cor.Length-2;
