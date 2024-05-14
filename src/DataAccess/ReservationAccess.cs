@@ -76,6 +76,7 @@ public class ReservationAccess : DatabaseHandler
         TimeSpan date_s = new TimeSpan(7, 0, 0, 0, 0, 0);
         DateTime date_e = date.Add(date_s);
         DateTime date_e_cor = new DateTime(date_e.Year, date_e.Month, date_e.Day, 23, 59, 59);
+        _Conn.Open();
         string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @sDate AND StartDate <= @eDate OR EndDate <= @eDate AND EndDate >= @sDate";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
