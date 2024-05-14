@@ -43,7 +43,7 @@ public class ReservationAccess : DatabaseHandler
         TimeSpan date_s = new TimeSpan(0, 23, 59, 59, 0, 0);
         DateTime date_e_cor = date.Subtract(date_s);
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date OR StartDate >= @SDate AND EndDate <= @Date";
+        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate <= @Date AND EndDate >= @Date OR StartDate >= @SDate AND EndDate <= @Date OR EndDate <= @Date AND EndDate > @SDate";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
             Launch.Parameters.AddWithValue("@Date", date.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -77,7 +77,7 @@ public class ReservationAccess : DatabaseHandler
         DateTime date_e = date.Add(date_s);
         DateTime date_e_cor = new DateTime(date_e.Year, date_e.Month, date_e.Day, 23, 59, 59);
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @sDate AND StartDate <= @eDate";
+        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @sDate AND StartDate <= @eDate OR EndDate <= @eDate AND EndDate >= @sDate";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
             Launch.Parameters.AddWithValue("@sDate", date.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -221,7 +221,7 @@ public class ReservationAccess : DatabaseHandler
                     TimeOnly.Parse((string)(x.Property("EndTime").Value))
                 );
             }
-            else if(x.Property("Title") != null)
+            else if(x.Property("Time") != null)
             {
                 obj = (object)new Break(
                     (int)(x.Property("Time").Value)
