@@ -783,7 +783,7 @@ private static SearchAccess searchAccess = new SearchAccess();
     }
     #endregion
 
-    #region Movie or Series/Episodes select
+    #region Movie or Series/Episodes select 
     /// <summary>
     /// Ask the user to select a movie or series episodes.
     /// </summary>

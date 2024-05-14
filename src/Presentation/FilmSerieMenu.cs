@@ -284,7 +284,7 @@ class FilmSerieMenu
         DateOnly x = MenuHelper.SelectDate("Select release date");
         string ReleaseDate = x.ToString("yyyy-MM-dd");
 
-        int runtime = getDuration();
+        int? runtime = getDuration();
 
         double vote_average = getVoteAverage();
 
@@ -300,31 +300,22 @@ class FilmSerieMenu
         List<Dictionary<string, string>> directorsList = new List<Dictionary<string, string>>();
         directorsList.Add(directorInfo);
         id = filmlogic_obj.CreateID();
-        Console.WriteLine(filmlogic_obj.Add_film(new Film(id, givengenres, OriginalLanguage, Overview, ReleaseDate, runtime, Title, vote_average, certification, directorsList)));
+        Console.WriteLine(filmlogic_obj.Add_film(new Film(id, givengenres, OriginalLanguage, Overview, ReleaseDate, (int)runtime, Title, vote_average, certification, directorsList)));
     }
 
     private static void movie_remove(FilmLogic filmlogic_obj)
     {
         if(filmlogic_obj.Check_films_exist())
         {
-            Console.WriteLine(filmlogic_obj.info());
-            Console.WriteLine("Id: ");
-            if (int.TryParse(Console.ReadLine(), out int film_id))
-            {
-                if(filmlogic_obj.Check_film(film_id))
-                {
-                    Console.WriteLine(filmlogic_obj.Remove_film(film_id));
-                }
-                else
-                {
-                    Console.WriteLine($"film with id: {film_id} does not exist, try again.");
-                }
+            Film ToRemove = MenuHelper.SelectMovie();
+            bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
+            if (a)
+            {   
+                filmlogic_obj.Remove_film(ToRemove.Id);
             }
             else
             {
-                Console.WriteLine("Id has to be an interger, try again.");
-                Console.WriteLine();
-                movie_remove(filmlogic_obj);
+                return;
             }
         }
         else
@@ -386,10 +377,18 @@ class FilmSerieMenu
                     Console.ReadKey();
                 }},
                 {"Runtime", ()=>{
-                    int i = getDuration();
-                    Console.WriteLine(filmlogic_obj.change_duration(film_id, i));
-                    Console.WriteLine("Press enter to continue... ");
-                    Console.ReadKey();
+                    int? i = getDuration();
+                    if (i == null)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine(filmlogic_obj.change_duration(film_id, (int)i));
+                        Console.WriteLine("Press enter to continue... ");
+                        Console.ReadKey();
+                    }
+
                 }},
                 {"Title", ()=>{
                     Console.WriteLine("New title: ");
@@ -461,17 +460,9 @@ class FilmSerieMenu
         return givenGenres;
     }
     // returns true if 
-    private static int getDuration()
+    private static int? getDuration()
     {
-        Console.WriteLine("Input Duration (min)");
-        string durationString = Console.ReadLine();
-        int duration;
-        if (!int.TryParse(durationString, out duration))
-        {
-            Console.WriteLine("Invalid input. Duration set to 0.");
-            duration = 0;
-        }
-        return duration;
+        return MenuHelper.SelectInteger("Select a duration ", "Minutes", true, 0, 0);
     }
     private static double getVoteAverage()
     {

@@ -28,7 +28,7 @@ public class FilmLogic
         List<Film> list_films = filmacesser.Get_info();
         foreach(Film film_2 in list_films)
         {
-            if (film_2.Title.ToUpper() != film.Title.ToUpper()){}
+            if (film_2.Id != film.Id ){}
             else
             {
                 duplicate = false;
