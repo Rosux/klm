@@ -246,7 +246,7 @@ class FilmSerieMenu
 // --------------------------------------------------------------------------------------------------------------
     private static void movie_info(FilmLogic filmlogic_obj)
     {
-        if(filmlogic_obj.Check_films_exist())
+        if(filmlogic_obj.Check_film())
         {
             Console.WriteLine(filmlogic_obj.info());
         }
@@ -258,44 +258,64 @@ class FilmSerieMenu
     private static void movie_add(FilmLogic filmlogic_obj)
     {
         int id = 0;
-        Console.WriteLine("Title: ");
-        string title = Console.ReadLine();
-        Console.WriteLine("Genre: ");
-        string genre = Console.ReadLine();
-        Console.WriteLine("Duration(min): ");
-        if (int.TryParse(Console.ReadLine(), out int duration))
+
+        Console.WriteLine("Input title: ");
+        string Title = Console.ReadLine();
+        if (string.IsNullOrEmpty(Title))
         {
-            Console.WriteLine(filmlogic_obj.Add_film(new Film(title, genre, duration)));
+            Title = "No title given";
         }
-        else
+
+        List<string> givengenres = GetGenres();
+
+        Console.WriteLine("Original language: ");
+        string OriginalLanguage = Console.ReadLine();
+        if(OriginalLanguage == "" || OriginalLanguage == null)
         {
-            Console.WriteLine("duration has to be an interger, try again.");
-            Console.WriteLine();
-            movie_add(filmlogic_obj);
+            OriginalLanguage = "English";
         }
+        
+        Console.WriteLine("Overview (movie plot)");
+        string Overview = Console.ReadLine();
+        if (Overview == "" || Overview == null)
+        {
+            Overview = "No movie plot";
+        }
+        DateOnly x = MenuHelper.SelectDate("Select release date");
+        string ReleaseDate = x.ToString("yyyy-MM-dd");
+
+        int? runtime = getDuration();
+
+        double vote_average = getVoteAverage();
+
+        Console.WriteLine("Certification (PG)");
+        string certification = Console.ReadLine();
+        
+        Console.WriteLine("Director");
+        string director = Console.ReadLine();
+        // Create a dictionary to store director information
+        Dictionary<string, string> directorInfo = new Dictionary<string, string>();
+        directorInfo.Add("-1", director);
+        // add dict to list
+        List<Dictionary<string, string>> directorsList = new List<Dictionary<string, string>>();
+        directorsList.Add(directorInfo);
+        id = filmlogic_obj.CreateID();
+        Console.WriteLine(filmlogic_obj.Add_film(new Film(id, givengenres, OriginalLanguage, Overview, ReleaseDate, (int)runtime, Title, vote_average, certification, directorsList)));
     }
+
     private static void movie_remove(FilmLogic filmlogic_obj)
     {
         if(filmlogic_obj.Check_films_exist())
         {
-            Console.WriteLine(filmlogic_obj.info());
-            Console.WriteLine("Id: ");
-            if (int.TryParse(Console.ReadLine(), out int film_id))
-            {
-                if(filmlogic_obj.Check_film(film_id))
-                {
-                    Console.WriteLine(filmlogic_obj.Remove_film(film_id));
-                }
-                else
-                {
-                    Console.WriteLine($"film with id: {film_id} does not exist, try again.");
-                }
+            Film ToRemove = MenuHelper.SelectMovie();
+            bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
+            if (a)
+            {   
+                filmlogic_obj.Remove_film(ToRemove.Id);
             }
             else
             {
-                Console.WriteLine("Id has to be an interger, try again.");
-                Console.WriteLine();
-                movie_remove(filmlogic_obj);
+                return;
             }
         }
         else
@@ -307,69 +327,157 @@ class FilmSerieMenu
     {
         if(filmlogic_obj.Check_films_exist())
         {
-            Console.WriteLine(filmlogic_obj.info());
-            Console.WriteLine("Id of movie you want to change: ");
-            if (int.TryParse(Console.ReadLine(), out int film_id))
+            Console.WriteLine("Search for a movie you want to change");
+            Film SelectedFilm = MenuHelper.SelectMovie();
+            int film_id = SelectedFilm.Id;
+            if (SelectedFilm != null)
             {
-                if(filmlogic_obj.Check_film(film_id))
-                {
-                    Console.WriteLine("What do you want to change:\n1. Title.\n2. Genre.\n3. Duration.\nchoice: ");
-                    if (int.TryParse(Console.ReadLine(), out int choice_2))
+                MenuHelper.SelectOptions("Choose what part you want to change", new Dictionary<string, Action>(){
+                {"Genres", ()=>{
+                    List<string> GivenGenres = GetGenres();
+                    Console.WriteLine(filmlogic_obj.change_genre(film_id, GivenGenres));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Original language", ()=>{
+                    Console.WriteLine("");
+                    Console.Write("Original Language: ");
+                    string givenlanguage = Console.ReadLine();
+                    if(givenlanguage == "" || givenlanguage == null)
                     {
-                        switch(choice_2)
-                        {
-                            case 1:
-                                Console.WriteLine("New title: ");
-                                string new_title = Console.ReadLine();
-                                Console.WriteLine(filmlogic_obj.change_title(film_id, new_title));
-                                break;
-                            case 2:
-                                Console.WriteLine("New genre: ");
-                                string new_genre = Console.ReadLine();
-                                Console.WriteLine(filmlogic_obj.change_genre(film_id, new_genre));
-                                break;
-                            case 3:
-                                Console.WriteLine("New duration: ");
-                                if (int.TryParse(Console.ReadLine(), out int new_duration))
-                                {
-                                    Console.WriteLine(filmlogic_obj.change_duration(film_id, new_duration));
-                                }
-                                else
-                                {
-                                    Console.WriteLine("please enter a valid interger, try again.");
-                                    Console.WriteLine();
-                                    movie_change(filmlogic_obj);
-                                }
-                                break;
-                            default:
-                                Console.WriteLine("please enter a valid interger, try again.");
-                                Console.WriteLine();
-                                movie_change(filmlogic_obj);
-                                break;
-                        }
+                        givenlanguage = "English";
+                        Console.WriteLine("Invalid input, language changed to: English ");
+                        string a = filmlogic_obj.change_language(film_id, givenlanguage);
+                        Console.WriteLine("Press enter to continue... ");
+                        Console.ReadKey();
                     }
                     else
                     {
-                        Console.WriteLine("please enter a valid interger, try again");
-                        Console.WriteLine();
-                        movie_change(filmlogic_obj);
+                        Console.WriteLine(filmlogic_obj.change_language(film_id, givenlanguage));
+                        Console.WriteLine("Press enter to continue... ");
+                        Console.ReadKey();
                     }
-                }
-                else
-                {
-                    Console.WriteLine($"film with id: {film_id} does not exist, please try again.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Id has to be an interger, try again.");
-                Console.WriteLine();
-                movie_change(filmlogic_obj); 
+                }},
+                {"Overview (plot)", ()=>{
+                    Console.WriteLine("New overview (plot): ");
+                    string Overview = Console.ReadLine();
+                    if (Overview == "" || Overview == null)
+                    {
+                        Overview = "No movie plot";
+                    }
+                    Console.WriteLine(filmlogic_obj.change_overview(film_id, Overview));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Release date", ()=>{
+                    DateOnly x = MenuHelper.SelectDate("Select new release date");
+                    string ReleaseDate = x.ToString("yyyy-MM-dd");
+                    Console.WriteLine(filmlogic_obj.change_releasedate(film_id, ReleaseDate));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Runtime", ()=>{
+                    int? i = getDuration();
+                    if (i == null)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine(filmlogic_obj.change_duration(film_id, (int)i));
+                        Console.WriteLine("Press enter to continue... ");
+                        Console.ReadKey();
+                    }
+
+                }},
+                {"Title", ()=>{
+                    Console.WriteLine("New title: ");
+                    string new_title = Console.ReadLine();
+                    Console.WriteLine(filmlogic_obj.change_title(film_id, new_title));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Vote average", ()=>{
+                    double d = getVoteAverage();
+                    Console.WriteLine(filmlogic_obj.change_vote(film_id, d));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Certification", ()=>{
+                    Console.WriteLine("Certification (PG)");
+                    string certification = Console.ReadLine();
+                    Console.WriteLine(filmlogic_obj.change_certification(film_id, certification));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Director", ()=>{
+                    Console.WriteLine("Director");
+                    string director = Console.ReadLine();
+                    // Create a dictionary to store director information
+                    Dictionary<string, string> directorInfo = new Dictionary<string, string>();
+                    directorInfo.Add("-1", director);
+                    // add dict to list
+                    List<Dictionary<string, string>> directorsList = new List<Dictionary<string, string>>();
+                    directorsList.Add(directorInfo);
+                    Console.WriteLine(filmlogic_obj.change_director(film_id, directorsList));
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+                {"Exit", ()=>{
+                    Console.WriteLine("Press enter to continue... ");
+                    Console.ReadKey();
+                }},
+            });
             }
         }
         else
         {
             Console.WriteLine("There are no films to change.");
         }
-    }   
+    }
+
+    private static List<string> GetGenres()
+    {
+        List<string> givenGenres = new List<string>();
+
+        Console.WriteLine("Enter genres (Enter to submit)");
+
+        while (true)
+        {
+            string givenGenre = Console.ReadLine();
+
+            if (givenGenre == "") // If the user presses Enter without typing anything
+                break;
+
+            givenGenres.Add(givenGenre);
+        }
+
+        if (givenGenres.Count == 0)
+        {
+            givenGenres.Add("No genre");
+        }
+
+        return givenGenres;
+    }
+    // returns true if 
+    private static int? getDuration()
+    {
+        return MenuHelper.SelectInteger("Select a duration ", "Minutes", true, 0, 0);
+    }
+    private static double getVoteAverage()
+    {
+        Console.WriteLine("Rating (/10)");
+        string voteAverageString = Console.ReadLine();
+        double voteAverage;
+        if (string.IsNullOrEmpty(voteAverageString))
+        {
+            return voteAverage = 0;
+        }
+        if (!double.TryParse(voteAverageString, out voteAverage))
+        {
+            Console.WriteLine("Invalid input. Vote average set to 0.");
+            voteAverage = 0;
+        }
+        return voteAverage;
+    }
 }

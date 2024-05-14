@@ -186,13 +186,19 @@ public class ReservationAccess : DatabaseHandler
             JObject x = JObject.Parse(JsonConvert.SerializeObject(i.Action)); // <- is either a film/serie/break/consumption
             object? obj = null;
 
-            if(x.Property("Title") != null && x.Property("Genre") != null && x.Property("Rating") != null && x.Property("Id") != null && x.Property("Duration") != null)
+            if(x.Property("Id") != null && x.Property("Genres") != null && x.Property("Original_language") != null && x.Property("Overview") != null && x.Property("Release_date") != null && x.Property("Runtime") != null && x.Property("Title") != null && x.Property("Vote_average") != null && x.Property("Certification") != null && x.Property("Directors") != null)
             {
                 obj = (object)new Film(
                     (int)(x.Property("Id").Value),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Genres").Value.ToString()),
+                    (string)(x.Property("Original_language").Value),
+                    (string)(x.Property("Overview").Value),
+                    (string)(x.Property("Release_date").Value),
+                    (int)(x.Property("Runtime").Value),
                     (string)(x.Property("Title").Value),
-                    (string)(x.Property("Genre").Value),
-                    (int)(x.Property("Duration").Value)
+                    (double)(x.Property("Vote_average").Value),
+                    (string)(x.Property("Certification").Value),
+                    (List<Dictionary<string, string>>)JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(x.Property("Directors").Value.ToString())
                 );
             }
             else if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
@@ -213,7 +219,7 @@ public class ReservationAccess : DatabaseHandler
                     TimeOnly.Parse((string)(x.Property("EndTime").Value))
                 );
             }
-            else if(x.Property("Title") != null)
+            else if(x.Property("Time") != null)
             {
                 obj = (object)new Break(
                     (int)(x.Property("Time").Value)

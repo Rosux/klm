@@ -194,7 +194,7 @@ public class ReservationTest
             DateTime.Parse("2024-04-24 02:00:00")
         );
         Timeline.Add(
-            (object)(new Film("Test Film #1", "Genre #1", 200)),
+            (object)(new Film(-1, new List<string>() , "Test language", "test plot", "11-07-2023", 193, "Test movie", 4.6, "Test Certification", new List<Dictionary<string, string>>())),
             DateTime.Parse("2024-04-24 02:00:00"),
             DateTime.Parse("2024-04-24 02:00:00")
         );

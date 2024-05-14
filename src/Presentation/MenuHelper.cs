@@ -786,7 +786,7 @@ private static SearchAccess searchAccess = new SearchAccess();
     }
     #endregion
 
-    #region Movie or Series/Episodes select
+    #region Movie or Series/Episodes select 
     /// <summary>
     /// Ask the user to select a movie or series episodes.
     /// </summary>
@@ -916,6 +916,119 @@ private static SearchAccess searchAccess = new SearchAccess();
         }while(true);
         Console.Clear();
         return selectedMedia;
+    }
+
+
+    /// <summary>
+    /// Ask the user to select only a movie.
+    /// </summary>
+    /// <returns>null if the user cancels the search. If a movie is selected it will return a Movie object.</returns>
+    public static Film? SelectMovie(){
+        Media selectedMedia;
+        int longestWord;
+        string searchString = "";
+        int cursorPosition = searchString.Length;
+        bool typing = true;
+        int selectedResult = 0;
+        ConsoleKey key;
+        ConsoleKeyInfo keyInfo;
+        do{
+            // calculate longest word
+            List<Media> results = searchAccess.SearchFilm(searchString);
+            longestWord = "Start typing to search".Length + 2;
+            foreach(Media m in results){
+                if (m is Film && ((Film)m).Title.Length+3 > longestWord){
+                    longestWord = ((Film)m).Title.Length + 3;
+                }
+            } 
+            if (searchString.Length + 2 > longestWord){
+                longestWord = searchString.Length + 2;
+            }
+
+            // print the search box thing
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"│ > ");
+            string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
+            for(int i = 0; i < printedText.Length; i++){
+                Console.BackgroundColor = (i == cursorPosition && typing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{printedText[i]}");
+            }
+            Console.BackgroundColor = (cursorPosition == printedText.Length && typing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+            Console.Write(" ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{new string(' ', Math.Max(0, longestWord-printedText.Length-2))}");
+            Console.Write($"│\n");
+
+            if(searchString == "" || results.Count() == 0){
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"└─{new string('─', Math.Max(0, longestWord))}─┘");
+            }else{
+                for(int i=0;i<Math.Min(results.Count(), 5);i++)
+                {
+                    if (i == 0) {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("└── ");
+                        string title = results[i] is Film ? ((Film)results[i]).Title : ((Serie)results[i]).Title;
+                        Console.BackgroundColor = (!typing && selectedResult == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                        Console.Write($"{title}{new string(' ', Math.Max(0, longestWord-title.Length-3))}");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($" ─┘\n");
+                    } else {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("    ");
+                        Console.BackgroundColor = (!typing && selectedResult == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                        string title = results[i] is Film ? ((Film)results[i]).Title : ((Serie)results[i]).Title;
+                        Console.Write($"{title}{new string(' ', Math.Max(0, longestWord-title.Length-3))}\n");
+                    }
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+            }
+
+            keyInfo = Console.ReadKey(true);
+            key = keyInfo.Key;
+
+            if(typing && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)) {
+                if (key == ConsoleKey.LeftArrow && cursorPosition > 0) {
+                    cursorPosition--; // Move cursor left if not at the beginning
+                } else if (key == ConsoleKey.RightArrow && cursorPosition < searchString.Length) {
+                    cursorPosition++; // Move cursor right if not at the end
+                }
+            }
+            if (typing && !char.IsControl(keyInfo.KeyChar)) {
+                searchString = searchString.Insert(cursorPosition, keyInfo.KeyChar.ToString());
+                cursorPosition++;
+            }
+            if (typing && cursorPosition > 0 && searchString.Length > 0 && key == ConsoleKey.Backspace) {
+                searchString = searchString.Remove(cursorPosition - 1, 1);
+                cursorPosition--;
+            }
+            if (!typing && (key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow)) {
+                // move selection up/down
+                if (key == ConsoleKey.UpArrow && selectedResult == 0) {
+                    typing = true;
+                    continue;
+                }
+                selectedResult += (key == ConsoleKey.DownArrow) ? 1 : -1;
+            }
+            if (typing && key == ConsoleKey.DownArrow && results.Count() > 0) {
+                typing = false;
+                continue;
+            }
+            if (!typing && key == ConsoleKey.Enter) {
+                selectedMedia = results[selectedResult];
+                break;
+            }
+            if(key == ConsoleKey.Escape){
+                Console.Clear();
+                return null;
+            }
+            selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
+            cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
+        }while(true);
+        Console.Clear();
+        return (Film)selectedMedia;
     }
 
     /// <summary>
