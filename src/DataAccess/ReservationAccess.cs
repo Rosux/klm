@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 
 public class ReservationAccess : DatabaseHandler
 {
-
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
     /// <summary>
     /// Get a list of all reservations.
