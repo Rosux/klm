@@ -336,6 +336,7 @@ public static class UserMenu{
     public static User? EditUser(User USR){
         User editedUser = USR;
         bool changing = true;
+        bool x = false;
         while (changing)
         {
             MenuHelper.SelectOptions("Select User property to edit", new Dictionary<string, Action>(){
@@ -373,10 +374,19 @@ public static class UserMenu{
                 }},
                 {"Save changes", ()=>{
                     changing = false;
+                    x = true;
+                }},
+                {"Discard changes", ()=>{
+                    changing = false;
+                    x = false;
                 }},
             });
         }
-        return editedUser;
+        if(x){
+            return editedUser;
+        }else{
+            return null;
+        }
     }
 
     public static void NoUsersToRemove(){

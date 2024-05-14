@@ -4,38 +4,30 @@ public class UserTable{
 
     public static void EditUsers()
         {
-            List<int> id = new List<int>();
-            foreach (User user in u.GetAllUsers()){
-                id.Add(user.Id);
-            }
-            List<string> firstname = new List<string>();
-            foreach (User user in u.GetAllUsers()){
-                firstname.Add(user.FirstName);
-            }
-            List<string> lastname = new List<string>();
-            foreach (User user in u.GetAllUsers()){
-                lastname.Add(user.LastName);
-            }
-            List<string> email = new List<string>();
-            foreach (User user in u.GetAllUsers()){
-                email.Add(user.Email);
-            }
-            List<string> password = new List<string>();
-            foreach (User user in u.GetAllUsers()){
-                password.Add(user.Password);
-            }
-            List<User> users = u.GetAllUsers();
-            List<List<User>> chunks = new List<List<User>>();
-            for(int i = 0;i < users.Count;i+=10)
-            {
-                chunks.Add(users.Skip(i).Take(10).ToList());
-            }
             int CurrentSelected = 0;
             ConsoleKey key;
-            int maxPage = chunks.Count;
             int currentPage = 0;
             do
             {
+                List<int> id = new List<int>();
+                List<string> firstname = new List<string>();
+                List<string> lastname = new List<string>();
+                List<string> email = new List<string>();
+                List<string> password = new List<string>();
+                List<User> users = u.GetAllUsers();
+                foreach (User user in u.GetAllUsers()){
+                    id.Add(user.Id);
+                    firstname.Add(user.FirstName);
+                    lastname.Add(user.LastName);
+                    email.Add(user.Email);
+                    password.Add(user.Password);
+                }
+                List<List<User>> chunks = new List<List<User>>();
+                for(int i = 0;i < users.Count;i+=10)
+                {
+                    chunks.Add(users.Skip(i).Take(10).ToList());
+                }
+                int maxPage = chunks.Count;
                 int maxLength = 0;
 
                 int idMax = 0;
@@ -153,7 +145,6 @@ public class UserTable{
                     Console.Write($" │ {chunks[currentPage][i].LastName}{new string(' ', Math.Max(0, lastMax - chunks[currentPage][i].LastName.Length))}");
                     Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
                     Console.BackgroundColor = ConsoleColor.Black;
-
                     Console.Write($" │\n");
                 }
                 Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
@@ -174,6 +165,14 @@ public class UserTable{
                 else if (key == ConsoleKey.LeftArrow)
                 {
                     currentPage -= 1;
+                }
+                else if (key == ConsoleKey.Enter)
+                {
+                    User? _editedUser = UserMenu.EditUser(chunks[currentPage][CurrentSelected]);
+                    if (_editedUser != null)
+                    {
+                        u.UpdateUser(_editedUser);
+                    }
                 }
                 currentPage = Math.Clamp(currentPage, 0, chunks.Count - 1);
                 CurrentSelected = Math.Clamp(CurrentSelected, -1, chunks[currentPage].Count - 1);
