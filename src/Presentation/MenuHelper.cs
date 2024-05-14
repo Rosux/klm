@@ -1258,9 +1258,11 @@ private static SearchAccess searchAccess = new SearchAccess();
                 }
             }
             if(watchables.Count == 0)
-                {   
+                {
                     Console.Write($"{prefix}\n\n");
-                    Console.WriteLine("No Consumptions/Movies/Series were added");
+                    Console.WriteLine("No Consumptions/Movies/Series were added\n\nPress any key to return");
+                    Console.ReadKey(true);
+
             }else{
                 string Line1 = "";
                 string Line2 = "";
@@ -1320,7 +1322,6 @@ private static SearchAccess searchAccess = new SearchAccess();
 
                 int scrollAmount = 0;
                 string[] Lines = {Line1, Line2, Line3, Line4};
-
                 ConsoleKey key;
                 do{
                     Console.Clear();
@@ -1339,7 +1340,7 @@ private static SearchAccess searchAccess = new SearchAccess();
                         scrollAmount += 5;
                     }
                     scrollAmount = Math.Clamp(scrollAmount, 0, Lines.Min(line => line.Length)-5);
-                }while(key != ConsoleKey.Enter);
+                }while(key != ConsoleKey.Escape);
             }
         }
     #endregion

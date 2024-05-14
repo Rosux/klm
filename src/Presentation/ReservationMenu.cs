@@ -214,15 +214,14 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {   //This while loop gets reservations and gives all the details in the prefix towards the timeline. 
-                    while (true)
-                    {
+                    // while (true)
+                    // {
                         Console.Clear();
-                        Console.WriteLine("\nPress escape to return to the main menu...");
-                        MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"", selectedReservation.TimeLine.t);  
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
+                        MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
+                        // ConsoleKeyInfo key = Console.ReadKey(true);
+                        // if (key.Key == ConsoleKey.Escape)
+                        //     break;
+                    // }
                 }
             } while (selectedReservation != null);
 
