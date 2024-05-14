@@ -3,8 +3,8 @@ using Newtonsoft.Json.Linq;
 
 public class ReservationAccess : DatabaseHandler
 {
-    public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
 
+    public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
     /// <summary>
     /// Get a list of all reservations.
     /// </summary>
@@ -33,10 +33,10 @@ public class ReservationAccess : DatabaseHandler
         return reservations;
     }
 
-    public Reservation? GetReservationById(int Id){
+    public Reservation? GetReservationByUser(int loggedUserId){
         Reservation? reservations = null;
         _Conn.Open();
-        string NewQuery = @"SELECT * FROM Reservations WHERE ID = " + Id;
+        string NewQuery = @"SELECT * FROM Reservations WHERE userid = @LoggedUserId";
         using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
         {
             SQLiteDataReader reader = Show.ExecuteReader();

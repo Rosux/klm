@@ -1202,7 +1202,12 @@ private static SearchAccess searchAccess = new SearchAccess();
     #endregion
 
     #region TimeLine
-    public static void PrintTimeLine(List<TimeLine.Item> t)
+    ///<summary>
+    ///Method sorts the data provided by the showreservation method on top of the timeline which is made underneath this.
+    /// </summary>
+    ///<param name="prefix">this contains all the data from the reservation like: Groupsize, StartDate, EndDate, Price. 
+
+    public static void PrintTimeLine(string prefix, string suffix, List<TimeLine.Item> t)
     {
         List<string> Dates = new List<string>();
         List<DateTime> Times = new List<DateTime>();
@@ -1314,11 +1319,13 @@ private static SearchAccess searchAccess = new SearchAccess();
         ConsoleKey key;
         do{
             Console.Clear();
+            Console.Write($"{prefix}\n\n");
             foreach(string Line in Lines){
                 string L = Line;
                 L = L.Substring(scrollAmount, Math.Min(Console.WindowWidth/2, L.Length - scrollAmount));
                 Console.WriteLine(L);
             }
+            Console.Write($"{suffix}\n\n");
             key = Console.ReadKey(true).Key;
             if(key == ConsoleKey.LeftArrow){
                 scrollAmount -= 5;

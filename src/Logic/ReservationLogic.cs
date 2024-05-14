@@ -39,16 +39,10 @@ public static class ReservationLogic
     }
     private static void ViewReservations()
     {
-        // get specific reservation
-        Dictionary<string, Reservation> reservationDict = new Dictionary<string, Reservation>();
-        int id = 1;
-        foreach(Reservation r in ReservationAccess.ReadReservationsUserId(Program.CurrentUser.Id)){
-            reservationDict.Add($"Reservation: {id} ({r.StartDate})", r);
-        }
-        Reservation? reservation = MenuHelper.SelectFromList("Select a reservation to view", reservationDict);
-        if(reservation == null){
+        Reservation? r = ReservationMenu.ShowReservation(Program.CurrentUser.Id);
+        if (r == null)
+        {
             return;
         }
-        MenuHelper.PrintTimeLine(reservation.TimeLine.t);
     }
 }

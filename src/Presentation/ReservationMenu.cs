@@ -189,9 +189,9 @@ public static class ReservationMenu
     /// uses menu helper to gives a list of all reservations to pick one to return
     /// </summary>
     /// <returns>a object of Reservation</returns>
-    public static Reservation? ShowReservation()
+    public static Reservation? ShowReservation(int loggedUserId)
     {
-        List<Reservation> reservations = ReservationAccess.ReadReservations();
+        List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
         if (reservations.Count == 0)
         {
             Console.WriteLine("There are no reservations available to show.");
@@ -213,12 +213,12 @@ public static class ReservationMenu
                 selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
 
                 if (selectedReservation != null)
-                {
-                    Console.Clear();
-                    return selectedReservation;
-
+                {   //This while loop gets reservations and gives all the details in the prefix towards the timeline. 
                     while (true)
                     {
+                        Console.Clear();
+                        Console.WriteLine("\nPress escape to return to the main menu...");
+                        MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"", selectedReservation.TimeLine.t);  
                         ConsoleKeyInfo key = Console.ReadKey(true);
                         if (key.Key == ConsoleKey.Escape)
                             break;
