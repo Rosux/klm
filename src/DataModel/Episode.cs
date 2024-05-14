@@ -21,4 +21,10 @@ public class Episode : Media
         Length = length;
         Title = title;
     }
+    // public Episode(int id, string title, int length)
+    // {
+    //     Id = id;
+    //     Length = length;
+    //     Title = title;
+    // }
 }

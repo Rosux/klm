@@ -57,6 +57,14 @@ public class Film : Media, IComparable
         Directors = directors;
     }
 
+    // public Film(int id, string title, string genre, int duration)
+    // {
+    //     Id = id;
+    //     Genre = genre;
+    //     Title = title;
+    //     Duration = duration;
+    // }
+
     public int CompareTo(object obj)
     {
         if (!(obj is Film) && !(obj is Serie))

@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
-
     /// <summary>
     /// Get a list of all reservations.
     /// </summary>
@@ -32,7 +31,6 @@ public class ReservationAccess : DatabaseHandler
         _Conn.Close();
         return reservations;
     }
-
     /// <summary>
     /// Get a list of all the reservations falling on a specific date.
     /// </summary>
