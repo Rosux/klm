@@ -247,7 +247,7 @@ public static class ReservationMenu
             Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
@@ -270,7 +270,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -284,7 +284,7 @@ public static class ReservationMenu
     List<Reservation> reservations = ReservationAccess.ReadReservationsDate(date);
     if (reservations.Count == 0)
     {
-        Console.WriteLine("There are no reservations during this time period.");
+        Console.WriteLine("\nThere are no reservations during this time period.");
         return null;
     }
     else
@@ -292,7 +292,7 @@ public static class ReservationMenu
         Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
@@ -315,7 +315,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -338,7 +338,7 @@ public static class ReservationMenu
         Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
             foreach (Reservation reservation in reservations)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
             reservationOptions.Add("Return to menu", null);
@@ -361,7 +361,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }
@@ -406,7 +406,7 @@ public static class ReservationMenu
                     }
                 }
             } while (selectedReservation != null);
-
+            Console.WriteLine("\n No reservation selected.");
             return null;
         }
     }

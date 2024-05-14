@@ -15,12 +15,12 @@ public static class ReservationLogic
                     {
                         Console.WriteLine(accesser.Overview(selected_res));
                         Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.ReadKey(true);
                     }
                     else
                     {
                         Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
+                        Console.ReadKey(true);
                     }
                     Console.Clear();
                 }},
