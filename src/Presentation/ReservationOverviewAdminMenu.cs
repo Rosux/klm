@@ -77,7 +77,7 @@ public static class ReservationOverviewAdminMenu
                 }},
                 {"3. Choose date",()=> {
                     // lets admin pick from a list of all reservations during the date that the admin can choose and shows all that reservations info.
-                    DateOnly? date_p = MenuHelper.SelectDate("Select at what date you want see all reservations:", "", true, null, DateOnly.FromDateTime(DateTime.Now), null);
+                    DateOnly? date_p = MenuHelper.SelectDate("Select at what date you want see all reservations:", "", true, null, null, null);
                     if (date_p == null)
                     {
                         Console.WriteLine("\nNo date selected.");
