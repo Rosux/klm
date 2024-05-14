@@ -213,15 +213,9 @@ public static class ReservationMenu
                 selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
 
                 if (selectedReservation != null)
-                {   //This while loop gets reservations and gives all the details in the prefix towards the timeline. 
-                    // while (true)
-                    // {
-                        Console.Clear();
-                        MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
-                        // ConsoleKeyInfo key = Console.ReadKey(true);
-                        // if (key.Key == ConsoleKey.Escape)
-                        //     break;
-                    // }
+                {   //This gets reservations and gives all the details in the prefix towards the timeline. 
+                    Console.Clear();
+                    MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
                 }
             } while (selectedReservation != null);
 
