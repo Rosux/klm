@@ -7,6 +7,7 @@ public class UserTable{
             int CurrentSelected = 0;
             ConsoleKey key;
             int currentPage = 0;
+            bool g = true;
             do
             {
                 List<int> id = new List<int>();
@@ -98,7 +99,7 @@ public class UserTable{
                 
                 maxLength += firstMax + lastMax + mailMax + 14;
                 Console.Clear();
-                Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength}");
+                Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength} chunks :{chunks[currentPage].Count}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"┌─{new string('─', Math.Max(0, maxLength + 4))}─┐\n");
                 if (CurrentSelected == -1)
@@ -130,22 +131,48 @@ public class UserTable{
                 Console.Write($"│ {time} │\n");
             
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┤\n");
-                Console.Write($"│ id{new string(' ', Math.Max(0, idMax - 1))}│ firstname{new string(' ', Math.Max(0, firstMax - 8))}│ lastname{new string(' ', Math.Max(0, lastMax - 7))}│ email{new string(' ', Math.Max(0, mailMax - 4))}│\n");
-                Console.Write($"├─{new string('─', Math.Max(0, idMax))}─┼─{new string('─', Math.Max(0, firstMax))}─┼─{new string('─', Math.Max(0, lastMax))}─┼─{new string('─', Math.Max(0, mailMax))}─┤\n");
-                for (int i = 0; i < chunks[currentPage].Count; i++)
+                Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┤    ");
+                if(true){
+                    Console.Write($"┌─editUser{new String('─', Math.Max(0, 12))}─┐\n");
+                }else{
+                    Console.Write("\n");
+                }
+                Console.Write($"│ id{new string(' ', Math.Max(0, idMax - 1))}│ firstname{new string(' ', Math.Max(0, firstMax - 8))}│ lastname{new string(' ', Math.Max(0, lastMax - 7))}│ email{new string(' ', Math.Max(0, mailMax - 4))}│    ");
+                if(true){
+                    Console.Write($"│   firstname{new String(' ', Math.Max(0, 10))}│\n");
+                }else{
+                    Console.Write("\n");
+                }
+                Console.Write($"├─{new string('─', Math.Max(0, idMax))}─┼─{new string('─', Math.Max(0, firstMax))}─┼─{new string('─', Math.Max(0, lastMax))}─┼─{new string('─', Math.Max(0, mailMax))}─┤    ");
+                if(true){
+                    Console.Write($"│   lastname{new String(' ', Math.Max(0, 11))}│\n");
+                }else{
+                    Console.Write("\n");
+                }
+                for (int i = 0; i < Math.Max(chunks[currentPage].Count, 8); i++)
                 {
                     Console.Write($"│ ");
                     if (CurrentSelected == i)
                     {
                         Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
-                    Console.Write($"{chunks[currentPage][i].Id}{new string(' ', Math.Max(0, idMax - chunks[currentPage][i].Id.ToString().Length))}");
-                    Console.Write($" │ {chunks[currentPage][i].FirstName}{new string(' ', Math.Max(0, firstMax - chunks[currentPage][i].FirstName.Length))}");
-                    Console.Write($" │ {chunks[currentPage][i].LastName}{new string(' ', Math.Max(0, lastMax - chunks[currentPage][i].LastName.Length))}");
-                    Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write($" │\n");
+                    if(i < chunks[currentPage].Count)
+                    {
+                        Console.Write($"{chunks[currentPage][i].Id}{new string(' ', Math.Max(0, idMax - chunks[currentPage][i].Id.ToString().Length))}");
+                        Console.Write($" │ {chunks[currentPage][i].FirstName}{new string(' ', Math.Max(0, firstMax - chunks[currentPage][i].FirstName.Length))}");
+                        Console.Write($" │ {chunks[currentPage][i].LastName}{new string(' ', Math.Max(0, lastMax - chunks[currentPage][i].LastName.Length))}");
+                        Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($" │    ");
+                    }else{
+
+                    }
+                    if(g && chunks[currentPage].Count >= 4){
+                        Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│\n");
+                    }else{
+                        Console.Write("\n");
+                    }
+                    g = false;
                 }
                 Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
                 Console.Write($"\n");
