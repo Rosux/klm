@@ -3,9 +3,9 @@ public class FilmAcesser
 {
     public List<Film> Get_info()
     {
-        string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Films.json"));
+        string path = Path.Combine(Environment.CurrentDirectory, "DataSource", "Films.json");
         string string_movies = File.ReadAllText(path);
-        List<Film> list_movies = JsonConvert.DeserializeObject<List<Film>>(string_movies)!;
+        List<Film> list_movies = JsonConvert.DeserializeObject<List<Film>>(string_movies);
         return list_movies;
     }
 
@@ -16,16 +16,20 @@ public class FilmAcesser
         writer.Write(string_movies);
         writer.Close();
     }
-    public List<Genre> Get_Genres()
+    
+    public List<string> Get_Genres()
     {
         string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Films.json"));
         string string_movies = File.ReadAllText(path);
         List<Film> list_movies = JsonConvert.DeserializeObject<List<Film>>(string_movies);
-        List<Genre> genres = list_movies
-            .Select(film => film.Genre)
-            .Distinct()
-            .Select(genreName => new Genre(genreName))
-            .ToList();
-        return genres;
+        List<string> allGenres = new List<string>();
+
+        foreach (Film film in list_movies)
+        {
+            allGenres.AddRange(film.Genres);
+        }
+        List<string> uniqueGenres = allGenres.Distinct().ToList();
+    
+        return uniqueGenres;
     }
 }

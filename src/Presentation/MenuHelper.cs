@@ -1,4 +1,8 @@
 using System;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 public static class MenuHelper{
 private static SearchAccess searchAccess = new SearchAccess();
@@ -144,6 +148,161 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// </returns>
     public static int SelectInteger(string prefix="", string suffix="", int defaultInt = 0, int min=int.MinValue, int max=int.MaxValue){
         return SelectInteger(prefix, suffix, false, defaultInt, min, max) ?? defaultInt;
+    }
+    #endregion
+
+    #region Text
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        string input = "";
+        string errorMessage = "";
+        string keybinds = "Press Enter to confirm";
+        if (canCancel){keybinds += "\nPress Escape to cancel";}
+        ConsoleKey key;
+        char keyChar;
+        do
+        {
+            errorMessage = "";
+            if (input.Length < minimumLength || input.Length > maximumLength)
+            {
+                errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
+            }
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"{errorMessage}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\n\n{keybinds}\n{suffix}");
+            ConsoleKeyInfo uwu = Console.ReadKey(true);
+            key = uwu.Key;
+            keyChar = uwu.KeyChar;
+
+            if(Regex.IsMatch(keyChar.ToString(), allowedRegexPattern)){
+                input += keyChar;
+            }
+            if (key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if (key == ConsoleKey.Enter)
+            {
+                if (input.Length >= minimumLength && input.Length <= maximumLength)
+                {
+                    break;
+                }
+            }
+            if (canCancel && key == ConsoleKey.Escape)
+            {
+                Console.Clear();
+                return null;
+            }
+        }while(true);
+        Console.Clear();
+        return input;
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", bool canCancel=false, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", canCancel, 0, int.MaxValue, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText("", "", canCancel, minimumLength, maximumLength, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false)
+    {
+        return SelectText(prefix, suffix, canCancel);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
+    public static string? SelectText(string prefix="", bool canCancel=false)
+    {
+        return SelectText(prefix, "", canCancel);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(string prefix="", string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", false, 0, int.MaxValue, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(string prefix="", int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText(prefix, "", false, minimumLength, maximumLength, allowedRegexPattern);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue)
+    {
+        return SelectText("", "", false, minimumLength, maximumLength);
+    }
+
+    /// <summary>
+    /// Asks the user to type in a string and returns that value.
+    /// </summary>
+    /// <param name="minimumLength">The minimum amount of characters required.</param>
+    /// <param name="maximumLength">The maximum amount of characters required.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <returns>A string chosen by the user.</returns>
+    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    {
+        return SelectText("", "", false, minimumLength, maximumLength, allowedRegexPattern);
     }
     #endregion
 
@@ -368,9 +527,12 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="CanCancel">A boolean indicating if the user can stop the select process.</param>
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
-    /// <returns>A TimeOnly object containing the user selected time.</returns>
-    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+    /// <param name="minTime">The minimum allowed selected time.</param>
+    /// <param name="maxTime">The maximum allowed selected time.</param>
+    /// <returns>A TimeOnly object containing the user selected time or null if the user cances the process.</returns>
+    public static TimeOnly? SelectTime(string prefix = "", string suffix = "", bool CanCancel=false, TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
         TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
         TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
         if(defaultTime <= MinTime){
@@ -392,6 +554,11 @@ private static SearchAccess searchAccess = new SearchAccess();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"\n\n{suffix}");
             key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.Escape && CanCancel)
+            {
+                Console.Clear();
+                return null;
+            }
             if (key == ConsoleKey.LeftArrow)
             {
                 hour = true;
@@ -424,10 +591,32 @@ private static SearchAccess searchAccess = new SearchAccess();
     /// <summary>
     /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
     /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
+    /// <param name="minTime">The minimum allowed selected time.</param>
+    /// <param name="maxTime">The maximum allowed selected time.</param>
+    /// <returns>A TimeOnly object containing the user selected time.</returns>
+    public static TimeOnly SelectTime(string prefix = "", string suffix = "", TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+        return SelectTime(prefix, suffix, false, defaultTime, minTime, maxTime) ?? TimeOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <returns>A TimeOnly object containing the user selected time.</returns>
+    public static TimeOnly SelectTime(string prefix = ""){
+        return SelectTime(prefix, "", false, TimeOnly.MinValue, null, null) ?? TimeOnly.MinValue;
+    }
+
+    /// <summary>
+    /// Shows a select time to user as: 00:00 and lets the user select a specific time in HH:MM format.
+    /// </summary>
     /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
     /// <returns>A TimeOnly object containing the user selected time.</returns>
     public static TimeOnly SelectTime(TimeOnly defaultTime = new TimeOnly()){
-        return SelectTime("", "", defaultTime, null, null);
+        return SelectTime("", "", false, defaultTime, null, null) ?? TimeOnly.MinValue;
     }
     #endregion
 
@@ -597,8 +786,7 @@ private static SearchAccess searchAccess = new SearchAccess();
     }
     #endregion
 
-
-    #region Movie or Series/Episodes select
+    #region Movie or Series/Episodes select 
     /// <summary>
     /// Ask the user to select a movie or series episodes.
     /// </summary>
@@ -728,6 +916,119 @@ private static SearchAccess searchAccess = new SearchAccess();
         }while(true);
         Console.Clear();
         return selectedMedia;
+    }
+
+
+    /// <summary>
+    /// Ask the user to select only a movie.
+    /// </summary>
+    /// <returns>null if the user cancels the search. If a movie is selected it will return a Movie object.</returns>
+    public static Film? SelectMovie(){
+        Media selectedMedia;
+        int longestWord;
+        string searchString = "";
+        int cursorPosition = searchString.Length;
+        bool typing = true;
+        int selectedResult = 0;
+        ConsoleKey key;
+        ConsoleKeyInfo keyInfo;
+        do{
+            // calculate longest word
+            List<Media> results = searchAccess.SearchFilm(searchString);
+            longestWord = "Start typing to search".Length + 2;
+            foreach(Media m in results){
+                if (m is Film && ((Film)m).Title.Length+3 > longestWord){
+                    longestWord = ((Film)m).Title.Length + 3;
+                }
+            } 
+            if (searchString.Length + 2 > longestWord){
+                longestWord = searchString.Length + 2;
+            }
+
+            // print the search box thing
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"│ > ");
+            string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
+            for(int i = 0; i < printedText.Length; i++){
+                Console.BackgroundColor = (i == cursorPosition && typing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{printedText[i]}");
+            }
+            Console.BackgroundColor = (cursorPosition == printedText.Length && typing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+            Console.Write(" ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{new string(' ', Math.Max(0, longestWord-printedText.Length-2))}");
+            Console.Write($"│\n");
+
+            if(searchString == "" || results.Count() == 0){
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"└─{new string('─', Math.Max(0, longestWord))}─┘");
+            }else{
+                for(int i=0;i<Math.Min(results.Count(), 5);i++)
+                {
+                    if (i == 0) {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("└── ");
+                        string title = results[i] is Film ? ((Film)results[i]).Title : ((Serie)results[i]).Title;
+                        Console.BackgroundColor = (!typing && selectedResult == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                        Console.Write($"{title}{new string(' ', Math.Max(0, longestWord-title.Length-3))}");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($" ─┘\n");
+                    } else {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write("    ");
+                        Console.BackgroundColor = (!typing && selectedResult == i) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                        string title = results[i] is Film ? ((Film)results[i]).Title : ((Serie)results[i]).Title;
+                        Console.Write($"{title}{new string(' ', Math.Max(0, longestWord-title.Length-3))}\n");
+                    }
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+            }
+
+            keyInfo = Console.ReadKey(true);
+            key = keyInfo.Key;
+
+            if(typing && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)) {
+                if (key == ConsoleKey.LeftArrow && cursorPosition > 0) {
+                    cursorPosition--; // Move cursor left if not at the beginning
+                } else if (key == ConsoleKey.RightArrow && cursorPosition < searchString.Length) {
+                    cursorPosition++; // Move cursor right if not at the end
+                }
+            }
+            if (typing && !char.IsControl(keyInfo.KeyChar)) {
+                searchString = searchString.Insert(cursorPosition, keyInfo.KeyChar.ToString());
+                cursorPosition++;
+            }
+            if (typing && cursorPosition > 0 && searchString.Length > 0 && key == ConsoleKey.Backspace) {
+                searchString = searchString.Remove(cursorPosition - 1, 1);
+                cursorPosition--;
+            }
+            if (!typing && (key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow)) {
+                // move selection up/down
+                if (key == ConsoleKey.UpArrow && selectedResult == 0) {
+                    typing = true;
+                    continue;
+                }
+                selectedResult += (key == ConsoleKey.DownArrow) ? 1 : -1;
+            }
+            if (typing && key == ConsoleKey.DownArrow && results.Count() > 0) {
+                typing = false;
+                continue;
+            }
+            if (!typing && key == ConsoleKey.Enter) {
+                selectedMedia = results[selectedResult];
+                break;
+            }
+            if(key == ConsoleKey.Escape){
+                Console.Clear();
+                return null;
+            }
+            selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
+            cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
+        }while(true);
+        Console.Clear();
+        return (Film)selectedMedia;
     }
 
     /// <summary>
@@ -923,4 +1224,242 @@ private static SearchAccess searchAccess = new SearchAccess();
         }
     }
     #endregion
+
+    #region Price
+    /// <summary>
+    /// Ask the user to select a price and return the chosen price.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
+    /// <returns>A double containing the user chosen price or null if the user chose to cancel the process.</returns>
+    public static double? SelectPrice(string prefix="", string suffix="", bool canCancel=false)
+    {
+        string input = "";
+        double price;
+        string keybinds = "Press Enter to confirm";
+        if(canCancel){keybinds += "\nPress Escape to cancel";}
+
+        ConsoleKey key;
+        ConsoleKeyInfo RawKey;
+        do
+        {
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n\n{keybinds}\n{suffix}");
+            RawKey = Console.ReadKey(true);
+            key = RawKey.Key;
+
+            if(key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if(key == ConsoleKey.Escape && canCancel){
+                Console.Clear();
+                return null;
+            }
+            if(key == ConsoleKey.Enter && double.TryParse(input, out price)){
+                break;
+            }
+            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
+                if(input.Length == 0){
+                    input += "0,";
+                }else{
+                    input += ",";
+                }
+            }
+            if(char.IsDigit(RawKey.KeyChar)){
+                if(input.Contains(',') && input.Length >= 3 && input[input.Length-3] == ','){
+                    continue;
+                }
+                input += RawKey.KeyChar.ToString();
+            }
+
+        }while(true);
+        Console.Clear();
+        return price;
+    }
+    #endregion
+
+    #region Confirmation
+    /// <summary>
+    /// Gives the user 2 options (true and false) and makes them choose one of these options.
+    /// </summary>
+    /// <param name="prompt">A string containing the question to confirm.</param>
+    /// <returns>A boolean indicating if the user confirms or not.</returns>
+    public static bool Confirm(string prompt=""){
+        bool selection = false;
+        ConsoleKey key;
+        do
+        {
+            Console.Clear();
+            Console.Write($"{prompt}\n\n");
+            Console.BackgroundColor = selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
+            Console.Write($">No");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"     ");
+            Console.BackgroundColor = !selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
+            Console.Write($">Yes");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\n\nPress Enter to confirm");
+            key = Console.ReadKey(true).Key;
+            if(key == ConsoleKey.Enter){
+                return selection;
+            }
+            if(key == ConsoleKey.RightArrow){
+                selection = true;
+            }
+            if(key == ConsoleKey.LeftArrow){
+                selection = false;
+            }
+        }while(true);
+    }
+    #endregion
+
+    #region TimeLine
+    ///<summary>
+    ///Method sorts the data provided by the showreservation method on top of the timeline which is made underneath this.
+    /// </summary>
+    ///<param name="prefix">this contains all the data from the reservation like: Groupsize, StartDate, EndDate, Price. 
+
+    public static void PrintTimeLine(string prefix, string suffix, List<TimeLine.Item> t)
+    {
+        List<string> Dates = new List<string>();
+        List<DateTime> Times = new List<DateTime>();
+        List<string> Action = new List<string>();
+        t = t.OrderBy(o=>o.StartTime).ToList();
+        List<TimeLine.Item> watchables = new List<TimeLine.Item>();
+            foreach(var x in t){
+                if(x.Action is Episode || x.Action is Film){
+                    watchables.Add(x);
+                }
+            }
+            // Foreach loop to check what the action is in the timeline and prints that out.
+            for(int i = 0; i < watchables.Count; i++)
+            {
+                TimeLine.Item item = watchables[i];
+                if(item.Action is Episode || item.Action is Film){
+                    DateTime StartTimeString = item.StartTime;
+                    DateTime EndTimeString = item.EndTime;
+                    if (i > 0)
+                    {
+                        if(watchables[i-1].EndTime != watchables[i].StartTime)
+                        {
+                            Times.Add(StartTimeString);
+                        }
+                    }else
+                    {
+                        Times.Add(StartTimeString);
+                    }
+                    Times.Add(EndTimeString);
+                    if (i > 0)
+                    {
+                        if (watchables[i - 1].EndTime < item.StartTime)
+                        {
+                            Action.Add("");
+                            Dates.Add("");
+                        }
+                    }
+                    if(item.Action is Film)
+                    {
+                        Action.Add(((Film)item.Action).Title);
+                        Dates.Add(item.StartTime.Date.ToString("yyyy-MM-dd"));
+                    }
+                    else if(item.Action is Episode)
+                    {
+                        Action.Add(((Episode)item.Action).Title);
+                        Dates.Add(item.StartTime.Date.ToString("yyyy-MM-dd"));
+                    }
+                }
+            }
+            if(watchables.Count == 0)
+                {
+                    Console.Write($"{prefix}\n\n");
+                    Console.WriteLine("No Consumptions/Movies/Series were added\n\nPress any key to return");
+                    Console.ReadKey(true);
+
+            }else{
+                string Line1 = "";
+                string Line2 = "";
+                string Line3 = "";
+                string Line4 = "";
+
+                Console.Clear();
+                Line1 += ($"  ");
+                for(int i=0;i<Dates.Count;i++){
+                    if(i == 0){
+                        Line1 += ($"{Dates[i]}{new string(' ', Math.Max(0, 3+Math.Max(10, Action[i].Length)-Dates[i].Length))}");
+                    }else if(Dates[i] == "" || Action[i] == ""){
+                        Line1 += ($"{new string(' ', 6)}");
+                    }else if(Dates[i-1] == Dates[i]){
+                        Line1 += ($"{new string(' ', Math.Max(10, Action[i].Length)+3)}");
+                    }else{
+                        Line1 += ($"{Dates[i]}{new string(' ', Math.Max(0, 3+Math.Max(10, Action[i].Length)-Dates[i].Length))}");
+                    }
+                }
+                Line2 += ("  ├");
+                for(int i=0;i<Action.Count;i++)
+                {
+                    if(Action[i] == "")
+                    {
+                        Line2 += ($"{new string('─', 5)}┼");
+                    }
+                    else
+                    {
+                        Line2 += ($"{new string('─', Math.Max(12, 2 + Action[i].Length))}");
+                        Line2 += (i == Action.Count - 1 ? "┤" : "┼");
+                    }
+                }
+                int actionId = 0;
+                for(int i=0;i<Times.Count;i++)
+                {
+                    if(Action[actionId] == ""){
+                        Line3 += ($"{Times[i].ToString("HH:mm")}{new string(' ', 1)}");
+                    }else{
+                        Line3 += ($"{Times[i].ToString("HH:mm")}{new string(' ', Math.Max(0, Math.Max(10, Action[actionId].Length))-2)}");
+                    }
+                    actionId++;
+                    actionId = Math.Clamp(actionId, 0, Action.Count-1);
+                }
+                Line4 += ("  |");
+                for(int i=0;i<Action.Count;i++)
+                {
+                    if(Action[i] == "")
+                    {
+                        Line4 += ($" {new string(' ', 3)} |");
+                    }
+                    else
+                    {
+                        Line4 += ($" {Action[i]}{new string(' ', Math.Max(0, 10-Action[i].Length))} |");
+                    }
+                }
+
+
+                int scrollAmount = 0;
+                string[] Lines = {Line1, Line2, Line3, Line4};
+                ConsoleKey key;
+                do{
+                    Console.Clear();
+                    Console.Write($"{prefix}\n\n");
+                    foreach(string Line in Lines){
+                        string L = Line;
+                        L = L.Substring(scrollAmount, Math.Min(Console.WindowWidth/2, L.Length - scrollAmount));
+                        Console.WriteLine(L);
+                    }
+                    Console.Write($"{suffix}\n\n");
+                    key = Console.ReadKey(true).Key;
+                    if(key == ConsoleKey.LeftArrow){
+                        scrollAmount -= 5;
+                    }
+                    if(key == ConsoleKey.RightArrow){
+                        scrollAmount += 5;
+                    }
+                    scrollAmount = Math.Clamp(scrollAmount, 0, Lines.Min(line => line.Length)-5);
+                }while(key != ConsoleKey.Escape);
+            }
+        }
+    #endregion
 }
+
+// ┌─┬┐
+// │ ││
+// ├─┼┤
+// └─┴┘

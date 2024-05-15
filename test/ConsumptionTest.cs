@@ -155,4 +155,33 @@ public class ConsumptionTest
 
         Assert.Fail("Inserted Consumption not found in the list.");
     }
+
+    [Test]
+    public void ExistsTest(){
+        var x = new Consumption(
+            Id: 1,
+            Name: "BIG LONG TEST NAME",
+            Price: 2.50,
+            StartTime: new TimeOnly(11,20),
+            EndTime: new TimeOnly(12,20)
+        );
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
+        VALUES (@Name, @Price, @StartTime, @EndTime)";
+        int rowsAffected;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@Name", x.Name);
+            Launch.Parameters.AddWithValue("@Price", x.Price);
+            Launch.Parameters.AddWithValue("@StartTime", x.StartTime.Hour.ToString("00") + ":" + x.StartTime.Minute.ToString("00"));
+            Launch.Parameters.AddWithValue("@EndTime", x.EndTime.Hour.ToString("00") + ":" + x.EndTime.Minute.ToString("00"));
+            rowsAffected = Launch.ExecuteNonQuery();
+        }
+        _Conn.Close();
+
+        bool shouldBeTrue = c.ConsumptionExists("BIG LONG TEST NAME");
+        bool shouldBefalse = c.ConsumptionExists("this item doesn't even exist");
+        Assert.IsTrue(shouldBeTrue);
+        Assert.IsFalse(shouldBefalse);
+    }
 }

@@ -151,30 +151,62 @@ public class UserTable{
                 }
                 for (int i = 0; i < Math.Max(chunks[currentPage].Count, 8); i++)
                 {
-                    Console.Write($"│ ");
                     if (CurrentSelected == i)
                     {
                         Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
                     if(i < chunks[currentPage].Count)
                     {
+                        Console.Write($"│ ");
                         Console.Write($"{chunks[currentPage][i].Id}{new string(' ', Math.Max(0, idMax - chunks[currentPage][i].Id.ToString().Length))}");
                         Console.Write($" │ {chunks[currentPage][i].FirstName}{new string(' ', Math.Max(0, firstMax - chunks[currentPage][i].FirstName.Length))}");
                         Console.Write($" │ {chunks[currentPage][i].LastName}{new string(' ', Math.Max(0, lastMax - chunks[currentPage][i].LastName.Length))}");
                         Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write($" │    ");
+                        if( i == 0)
+                        {
+                            Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
+                        }else if(i == 1)
+                        {
+                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
+                        }
+                        else if(i == 2)
+                        {
+                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
+                        }
+                            Console.Write($"\n");    
+                        
                     }else{
-
+                        if(i == chunks[currentPage].Count)
+                        {
+                            Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
+                        }
+                        if( i == 0)
+                        {
+                            Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
+                        }
+                        if(i == 1)
+                        {
+                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
+                        }
+                        if(i == 2)
+                        {
+                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
+                        }
+                        g = false;
+                        Console.Write($"{new string(' ', Math.Max(0, idMax + 5))}");
+                        Console.Write($"{new string(' ', Math.Max(0, firstMax + 4))}");
+                        Console.Write($"{new string(' ', Math.Max(0, lastMax + 4))}");
+                        Console.Write($"{new string(' ', Math.Max(0, mailMax + 4))}");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write($"\n");   
                     }
-                    if(g && chunks[currentPage].Count >= 4){
-                        Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│\n");
-                    }else{
-                        Console.Write("\n");
-                    }
-                    g = false;
                 }
-                Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
+                if(chunks[currentPage].Count == 10)
+                {
+                    Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
+                }
                 Console.Write($"\n");
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.UpArrow)

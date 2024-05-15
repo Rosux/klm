@@ -2,44 +2,46 @@
 public static class ConsumptionMenu
 {
     private static ConsumptionAccess c = new ConsumptionAccess();
-    public static Consumption AddConsumptionMenu(){
-        string Name, StartTime, EndTime;
-        double Price;
-        TimeOnly StartTimer, EndTimer;
-        do {
-            //Check Name of product and check if the field inst empty.
-            Console.WriteLine("Please type the name of the product:");
-            Name = Console.ReadLine().Trim();
-            if (string.IsNullOrWhiteSpace(Name)) {
-                Console.WriteLine("Name cannot be empty. Please try again.");
-                continue;
-            }
-            //Check Price of product and check if the field inst empty.
-            Console.WriteLine("Please provide the price of the product:");
-            if (!double.TryParse(Console.ReadLine(), out Price)) {
-                Console.WriteLine("Invalid price format. Please try again.");
-                continue;
-            }
-            //Check StartTime of product and check if the field inst empty.
-            Console.WriteLine("Please enter the starttime of when the product can be ordered (HH-MM):");
-            StartTime = Console.ReadLine().Trim();
-            if (!TimeOnly.TryParse(StartTime, out StartTimer)) {
-                Console.WriteLine("Invalid start time format. Please try again.");
-                continue;
-            }
-            //Check EndTime of product and check if the field inst empty.
-            Console.WriteLine("Please enter the endtime of when the product can be ordered (HH-MM):");
-            EndTime = Console.ReadLine().Trim();
-            if (!TimeOnly.TryParse(EndTime, out EndTimer)) {
-                Console.WriteLine("Invalid end time format. Please try again.");
-                continue;
-            }
-            break;
+    public static Consumption? AddConsumptionMenu(){
+        string prompt = "Name: \nPrice: \nStartTime: \nEndTime: \n";
 
-        } while (true);
-        Consumption consumption = new Consumption(Name, Price, StartTimer, EndTimer);
+        string Name;
+        while(true){
+            string? name = MenuHelper.SelectText(prompt+"\nType the name of the product:", "", true, 2, 30);
+            if(name == null){
+                return null;
+            }
+            if(!c.ConsumptionExists(name)){
+                Name = name;
+                break;
+            }else{
+                Console.Write($"Name must be unique!\n\nName: '{name}' already exists.\n\nPress any key to continue.");
+                Console.ReadKey(true);
+            }
+        }
+        prompt = $"Name: {Name}\nPrice: \nStartTime: \nEndTime: \n";
+        double? Price = MenuHelper.SelectPrice(prompt+"\nPlease provide the price of the product:", "", true);
+        if(Price == null){
+            return null;
+        }
+        prompt = $"Name: {Name}\nPrice: {Price}\nStartTime: \nEndTime: \n";
+        TimeOnly? StartTime = MenuHelper.SelectTime(prompt+"\nPlease enter the start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        if(StartTime == null){
+            return null;
+        }
+        prompt = $"Name: {Name}\nPrice: {Price}\nStartTime: {StartTime}\nEndTime: \n";
+        TimeOnly? EndTime = MenuHelper.SelectTime(prompt+"\nPlease enter the endtime of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        if(EndTime == null){
+            return null;
+        }
+        prompt = $"Are you sure you want to save the following data:\nName: {Name}\nPrice: {Price}\nStartTime: {StartTime}\nEndTime: {EndTime}";
+        if(!MenuHelper.Confirm(prompt)){
+            return null;
+        }
+        Consumption consumption = new Consumption(Name, (double)Price, (TimeOnly)StartTime, (TimeOnly)EndTime);
         return consumption;
     }
+
     public static Consumption RemoveConsumptionMenu(){
         List<Consumption> consumptions = c.ReadConsumption();
         if (consumptions.Count == 0) {

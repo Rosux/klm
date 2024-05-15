@@ -1,3 +1,7 @@
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 public static class ReservationLogic
 {
     private static ReservationAccess ReservationAccess = new ReservationAccess();
@@ -8,22 +12,7 @@ public static class ReservationLogic
         {
             MenuHelper.SelectOptions("Reservations", new Dictionary<string, Action>(){
                 {"1. Book a Reservation", BookReservation},
-                {"2. View Reservation", ()=>{
-                    // lets the user choose a reservation from a list of all his reservations to seethe info
-                    Reservation selected_res = ReservationMenu.GetSpecificReservationUser();
-                    if (selected_res != null)
-                    {
-                        Console.WriteLine(accesser.Overview(selected_res));
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
-                    }
-                    else
-                    {
-                        Console.Write($"\n\nPress any key to continue...");
-                        Console.ReadKey();
-                    }
-                    Console.Clear();
-                }},
+                {"2. View Reservation", ()=> ViewReservations()},
                 {"3. Exit to main menu", ()=>{
                     running = false;
                 }},
@@ -48,8 +37,12 @@ public static class ReservationLogic
             }
         }
     }
-
-    public static void ViewReservation(){
-
+    private static void ViewReservations()
+    {
+        Reservation? r = ReservationMenu.ShowReservation(Program.CurrentUser.Id);
+        if (r == null)
+        {
+            return;
+        }
     }
 }

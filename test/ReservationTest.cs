@@ -1,5 +1,6 @@
 using System.Data.SQLite;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 [TestFixture]
 public class ReservationTest
@@ -181,5 +182,88 @@ public class ReservationTest
         }
 
         Assert.Fail("Inserted Consumption not found in the list.");
+    }
+
+    [Test]
+    public void TimeLineTest(){
+        // sorry but this test assumes the insert methods in ReservationAccess.cs work
+        TimeLine.Holder Timeline = new TimeLine.Holder();
+        Timeline.Add(
+            (object)(new Break(15)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+        Timeline.Add(
+            (object)(new Film(-1, new List<string>() , "Test language", "test plot", "11-07-2023", 193, "Test movie", 4.6, "Test Certification", new List<Dictionary<string, string>>())),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+        Timeline.Add(
+            (object)(new Episode("Test Episode #1", 45)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+        Timeline.Add(
+            (object)(new Consumption("Test Consumption #1", 40.20, TimeOnly.MinValue, TimeOnly.MinValue)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+        var x = new Reservation(
+            Id: 1,
+            RoomId: 1,
+            UserId: 2,
+            GroupSize: 10,
+            StartDate: DateTime.Parse("2024-04-24 02:00:00"),
+            EndDate: DateTime.Parse("2024-04-27 02:00:00"),
+            Price: 99.99,
+            TimeLine: Timeline
+        );
+        r.CreateReservation(x);
+
+        // tests start here
+        List<Reservation> a = r.ReadReservationsUserId(2);
+        if(a.Count == 1){
+            Assert.Pass("Reservation exists in list");
+            Assert.AreEqual(TestTimeLine(a[0].TimeLine), 4);
+        }
+
+        List<Reservation> b = r.ReadReservationsWeek(DateTime.Parse("2024-04-23 00:00:00"));
+        if(b.Count == 1){
+            Assert.Pass("Reservation exists in list");
+            Assert.AreEqual(TestTimeLine(b[0].TimeLine), 4);
+        }
+
+        List<Reservation> c = r.ReadReservationsDate(DateTime.Parse("2024-04-23 00:00:00"));
+        if(c.Count == 1){
+            Assert.Pass("Reservation exists in list");
+            Assert.AreEqual(TestTimeLine(c[0].TimeLine), 4);
+        }
+
+        List<Reservation> d = r.ReadReservations();
+        if(d.Count == 1){
+            Assert.Pass("Reservation exists in list");
+            Assert.AreEqual(TestTimeLine(d[0].TimeLine), 4);
+        }
+    }
+
+    private int TestTimeLine(TimeLine.Holder t){
+        int u = 0;
+        List<TimeLine.Item> timelineItems = t.t;
+        if(timelineItems.Count == 4){
+            Assert.Pass("Reservation timeline holds all the objects in the list");
+            if(timelineItems[0].Action is Break && (Break)(timelineItems[0].Action) != null){
+                u++;
+            }
+            if(timelineItems[1].Action is Film && (Film)(timelineItems[1].Action) != null){
+                u++;
+            }
+            if(timelineItems[2].Action is Episode && (Episode)(timelineItems[2].Action) != null){
+                u++;
+            }
+            if(timelineItems[3].Action is Consumption && (Consumption)(timelineItems[3].Action) != null){
+                u++;
+            }
+        }
+        return u;
     }
 }
