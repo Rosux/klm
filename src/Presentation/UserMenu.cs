@@ -60,7 +60,7 @@ public static class UserMenu{
     /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
     /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
     /// <returns>Return the user given string.</returns>
-    private static string? GetValidInput(string prompt, int minLength, int maxLength)
+    public static string? GetValidInput(string prompt, int minLength, int maxLength)
     {
         string input = "";
         string error= "";
@@ -106,7 +106,7 @@ public static class UserMenu{
         return input;
     }
 
-    private static string GetValideEmail(string prompt, int minLength, int maxLength)
+    public static string GetValideEmail(string prompt, int minLength, int maxLength)
     {
         string input = "";
         string error= "";
@@ -367,6 +367,7 @@ public static class UserMenu{
     public static User? EditUser(User USR){
         User editedUser = USR;
         bool changing = true;
+        bool x = false;
         while (changing)
         {
             MenuHelper.SelectOptions("Select User property to edit", new Dictionary<string, Action>(){
@@ -404,10 +405,19 @@ public static class UserMenu{
                 }},
                 {"Save changes", ()=>{
                     changing = false;
+                    x = true;
+                }},
+                {"Discard changes", ()=>{
+                    changing = false;
+                    x = false;
                 }},
             });
         }
-        return editedUser;
+        if(x){
+            return editedUser;
+        }else{
+            return null;
+        }
     }
 
     public static void NoUsersToRemove(){

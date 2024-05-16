@@ -47,6 +47,10 @@ class Menu
                             // takes admin to his reservation menu
                             ReservationOverviewAdminMenu.ReservationAdminOverview();
                         }},
+                        {"Edit Users", ()=>{
+                            // takes admin to his reservation menu
+                            UserTable.EditUsers();;
+                        }},
                         {"Logout", ()=>{
                             // goto login screen
                             uwu = false;
