@@ -103,7 +103,6 @@ public class UserTable{
                 
                 maxLength += firstMax + lastMax + mailMax + roleMax + 17;
                 Console.Clear();
-                Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength} chunks :{chunks[currentPage].Count}, {g}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"┌─{new string('─', Math.Max(0, maxLength + 4))}─┐\n");
                 if (CurrentSelected == -1)

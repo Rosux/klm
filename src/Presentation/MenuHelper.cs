@@ -1,11 +1,8 @@
 using System;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 
 public static class MenuHelper{
-private static SearchAccess searchAccess = new SearchAccess();
+    private static SearchAccess searchAccess = new SearchAccess();
 
     #region Integer
     /// <summary>
@@ -46,7 +43,7 @@ private static SearchAccess searchAccess = new SearchAccess();
             key = RawKey.Key;
 
             // add number to string
-            if (char.IsDigit(RawKey.KeyChar))
+            if (char.IsDigit(RawKey.KeyChar) && int.TryParse(inputNum+RawKey.KeyChar, out int x))
             {
                 inputNum += RawKey.KeyChar;
             }
@@ -698,13 +695,14 @@ private static SearchAccess searchAccess = new SearchAccess();
 
     #region Options from a Dict
     /// <summary>
-    /// Shows a list of options to the user and return the value of the chosen option.
+    /// Shows a list of options to the user and return the value of the chosen option unless the user cancels the selection.
     /// </summary>
     /// <typeparam name="T">The type you want returned.</typeparam>
     /// <param name="Header">A string of what comes at the top. (Like "Select an option")</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
     /// <param name="Options">A Dictionary of options and any typed values that will be returned if that item is selected.</param>
-    /// <returns>The value of the chosen option by the user.</returns>
-    public static T SelectFromList<T>(string Header, Dictionary<string, T> Options){
+    /// <returns>NULL if the user cancels the selection otherwise the value of the chosen option by the user.</returns>
+    public static T? SelectFromList<T>(string Header, bool canCancel, Dictionary<string, T> Options){
         if (Options.Count == 0){
             return default(T);
         }
@@ -713,6 +711,11 @@ private static SearchAccess searchAccess = new SearchAccess();
         for (int i=0;i<Options.Count;i+=10)
         {
             chunks.Add(Options.Skip(i).Take(10).ToDictionary(kv => kv.Key, kv => kv.Value));
+        }
+
+        string keybinds = "Press Enter to select\nUse the Up/Down arrows to select a row\nUse the Left/Right arrow to browse pages";
+        if(canCancel){
+            keybinds += "\nPress Escape to cancel";
         }
 
         // get longest option
@@ -724,7 +727,7 @@ private static SearchAccess searchAccess = new SearchAccess();
         // selection variables
         int currentSelection = 0;
         int currentPage = 0;
-        
+
         // draw loop
         ConsoleKey key;
         do{
@@ -737,13 +740,13 @@ private static SearchAccess searchAccess = new SearchAccess();
             }
             // add arrows on the correct sides of the page number
             pageArrows = (currentPage > 0 ? "<-" : "  ") + pageArrows + (currentPage < chunks.Count-1 ? "->" : "  ");
-            
+
             // print menu with options
             Console.Clear();
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"┌─{Header}{new String('─', Math.Max(0, longestWord-Header.Length))}─┐\n");
-            
+
             // loop over options and print them
             for (int i = 0; i < chunks[currentPage].Keys.Count; i++){
                 string word = chunks[currentPage].Keys.ElementAt(i);
@@ -764,6 +767,7 @@ private static SearchAccess searchAccess = new SearchAccess();
 
             // write closing border
             Console.Write($"└─{new String('─', Math.Max(0, longestWord))}─┘");
+            Console.Write($"\n\n{keybinds}");
 
             // get user input and call the callback if an option is selected
             key = Console.ReadKey(true).Key;
@@ -776,6 +780,9 @@ private static SearchAccess searchAccess = new SearchAccess();
                currentPage += (key == ConsoleKey.RightArrow) ? 1 : -1;
                currentSelection = 0;
             }
+            if(key == ConsoleKey.Escape && canCancel){
+                return default;
+            }
 
             // limit the current choice so it doesnt cause out of range errors
             currentPage = Math.Clamp(currentPage, 0, chunks.Count-1);
@@ -784,9 +791,20 @@ private static SearchAccess searchAccess = new SearchAccess();
         } while (key != ConsoleKey.Enter);
         return chunks[currentPage].Values.ElementAt(currentSelection);
     }
+
+    /// <summary>
+    /// Shows a list of options to the user and return the value of the chosen option.
+    /// </summary>
+    /// <typeparam name="T">The type you want returned.</typeparam>
+    /// <param name="Header">A string of what comes at the top. (Like "Select an option")</param>
+    /// <param name="Options">A Dictionary of options and any typed values that will be returned if that item is selected.</param>
+    /// <returns>The value of the chosen option by the user.</returns>
+    public static T SelectFromList<T>(string Header, Dictionary<string, T> Options){
+        return SelectFromList(Header, false, Options) ?? default;
+    }
     #endregion
 
-    #region Movie or Series/Episodes select 
+    #region Movie or Series/Episodes select
     /// <summary>
     /// Ask the user to select a movie or series episodes.
     /// </summary>
@@ -810,7 +828,7 @@ private static SearchAccess searchAccess = new SearchAccess();
                 }else if(m is Serie && ((Serie)m).Title.Length+3 > longestWord){
                     longestWord = ((Serie)m).Title.Length + 3;
                 }
-            } 
+            }
             if (searchString.Length + 2 > longestWord){
                 longestWord = searchString.Length + 2;
             }
@@ -917,7 +935,6 @@ private static SearchAccess searchAccess = new SearchAccess();
         Console.Clear();
         return selectedMedia;
     }
-
 
     /// <summary>
     /// Ask the user to select only a movie.
@@ -1315,11 +1332,12 @@ private static SearchAccess searchAccess = new SearchAccess();
     #endregion
 
     #region TimeLine
-    ///<summary>
-    ///Method sorts the data provided by the showreservation method on top of the timeline which is made underneath this.
+    /// <summary>
+    /// Prints the timeline movies/episodes given.
     /// </summary>
-    ///<param name="prefix">this contains all the data from the reservation like: Groupsize, StartDate, EndDate, Price. 
-
+    /// <param name="prefix">A string of text printed before the timeline.</param>
+    /// <param name="suffix">A string of text printed after the timeline.</param>
+    /// <param name="t">A List of timeline items to display.</param>
     public static void PrintTimeLine(string prefix, string suffix, List<TimeLine.Item> t)
     {
         List<string> Dates = new List<string>();
