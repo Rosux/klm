@@ -1,6 +1,23 @@
 public class UserTable{
 
     private static UserAccess u = new UserAccess();
+    /// <summary>
+    /// Display a table with all users. Where u can edit the users by pressing enter and then selected what to edit. Like Firstname lastname Email or Role.
+    ///    ┌──────────────────────────────────────────────────────────────┐
+    ///    │ <-                           1/1                          -> │
+    ///    │───────────┬──────────────┬──────────┬────────────────┬───────┤
+    ///    │ Id        │ Firstname    │ Lastname │ Email          │ Role  │
+    ///    ├───────────┼──────────────┼──────────┼────────────────┼───────┤
+    ///    │ 1         │ fff          │ email    │ sdfsd          │ USER  │
+    ///    │ 2         │ bbbsdfgsdgsd │ sdf      │ sdfdsf         │ USER  │
+    ///    │ 3         │ sdf          │ sdf      │ sdf@sdf        │ USER  │
+    ///    │ 4         │ gsdgsd       │ Fra      │ sdfsdfs@sdf    │ ADMIN │
+    ///    │ 5         │ sdfsf        │ dddddddd │ d@d.d          │ USER  │
+    ///    │ 6         │ admin        │ admin    │ admin@mail.com │ ADMIN │
+    ///    │ 58        │ muhammed     │ aktas    │ aktas@mail.com │ ADMIN │
+    ///    └───────────┴──────────────┴──────────┴────────────────┴───────┘
+    /// 
+    /// </summary>
     public static void EditUsers()
         {
             int CurrentSelected = 0;
@@ -14,6 +31,7 @@ public class UserTable{
             User? editedUser = null;
             do
             {
+                
                 List<int> id = new List<int>();
                 List<string> firstname = new List<string>();
                 List<string> lastname = new List<string>();
@@ -103,6 +121,7 @@ public class UserTable{
                 
                 maxLength += firstMax + lastMax + mailMax + roleMax + 17;
                 Console.Clear();
+                Console.WriteLine("Press escape to go back");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"┌─{new string('─', Math.Max(0, maxLength + 4))}─┐\n");
                 if (CurrentSelected == -1)
@@ -451,16 +470,28 @@ public class UserTable{
                     if (currentEditSelected == 1)
                     {
                         Console.Clear();
-                        editedUser.FirstName = UserMenu.GetValidInput("Enter your Firstname:", 3, 20);
+                        first = UserMenu.GetValidInput("Enter your Firstname:", 3, 20);
+                        if (first != null)
+                        {
+                            editedUser.FirstName = first;
+                        }
                     }else if(currentEditSelected == 2)
                     {
                         Console.Clear();
-                        editedUser.LastName = UserMenu.GetValidInput("Enter your Lastname:", 3, 20);
+                        last = UserMenu.GetValidInput("Enter your Lastname:", 3, 20);
+                        if (last != null)
+                        {
+                            editedUser.LastName = last;
+                        }
                     }
                     else if(currentEditSelected == 3)
                     {
                         Console.Clear();
-                        editedUser.Email = UserMenu.GetValideEmail("Enter your email:", 3, 20);
+                        mail = UserMenu.GetValideEmail("Enter your email:", 3, 20);
+                        if (mail != null)
+                        {
+                            editedUser.Email = mail;
+                        }
                     }
                     else if(currentEditSelected == 4)
                     {
