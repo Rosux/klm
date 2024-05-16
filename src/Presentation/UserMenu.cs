@@ -60,7 +60,7 @@ public static class UserMenu{
     /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
     /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
     /// <returns>Return the user given string.</returns>
-    private static string? GetValidInput(string prompt, int minLength, int maxLength)
+    public static string? GetValidInput(string prompt, int minLength, int maxLength)
     {
         string input = "";
         string error= "";
@@ -106,7 +106,7 @@ public static class UserMenu{
         return input;
     }
 
-    private static string GetValideEmail(string prompt, int minLength, int maxLength)
+    public static string GetValideEmail(string prompt, int minLength, int maxLength)
     {
         string input = "";
         string error= "";

@@ -1,28 +1,31 @@
 public class UserTable{
 
     private static UserAccess u = new UserAccess();
-
     public static void EditUsers()
         {
             int CurrentSelected = 0;
             ConsoleKey key;
             int currentPage = 0;
             bool g = false;
-            int currentEditSelected = 0;
+            int currentEditSelected = 1;
+            string? first = "";
+            string? last  = "";
+            string? mail = "";
+            User? editedUser = null;
             do
             {
                 List<int> id = new List<int>();
                 List<string> firstname = new List<string>();
                 List<string> lastname = new List<string>();
                 List<string> email = new List<string>();
-                List<string> password = new List<string>();
+                List<string> role = new List<string>();
                 List<User> users = u.GetAllUsers();
                 foreach (User user in u.GetAllUsers()){
                     id.Add(user.Id);
                     firstname.Add(user.FirstName);
                     lastname.Add(user.LastName);
                     email.Add(user.Email);
-                    password.Add(user.Password);
+                    role.Add(user.Role.ToString());
                 }
                 List<List<User>> chunks = new List<List<User>>();
                 for(int i = 0;i < users.Count;i+=10)
@@ -79,26 +82,26 @@ public class UserTable{
                         mailMax = list.Length;
                     }
                 }
-                if (mailMax < 5)
+                if (mailMax < 4)
                 {
-                    mailMax = 5;
+                    mailMax = 4;
                 }
 
-                int passMax = 0;
-                foreach (var list in password)
+                int roleMax = 0;
+                foreach (var list in role)
                 {
-                        if (list.Length > passMax)
+                        if (list.Length > roleMax)
                         {
-                            passMax = list.Length;
+                            roleMax = list.Length;
                         }
                         
                 }
-                if (passMax < 8)
+                if (roleMax < 5)
                 {
-                    passMax = 8;
+                    roleMax = 5;
                 }
                 
-                maxLength += firstMax + lastMax + mailMax + 14;
+                maxLength += firstMax + lastMax + mailMax + roleMax + 17;
                 Console.Clear();
                 Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength} chunks :{chunks[currentPage].Count}, {g}");
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -132,94 +135,270 @@ public class UserTable{
                 Console.Write($"│ {time} │\n");
             
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┤    ");
-                if(true && g == true){
-                    Console.Write($"┌─editUser{new String('─', Math.Max(0, 12))}─┐\n");
-                }else{
-                    Console.Write("\n");
-                }
-                Console.Write($"│ id{new string(' ', Math.Max(0, idMax - 1))}│ firstname{new string(' ', Math.Max(0, firstMax - 8))}│ lastname{new string(' ', Math.Max(0, lastMax - 7))}│ email{new string(' ', Math.Max(0, mailMax - 4))}│    ");
-                if(true && g == true){
-                    Console.Write($"│   firstname{new String(' ', Math.Max(0, 10))}│\n");
-                }else{
-                    Console.Write("\n");
-                }
-                Console.Write($"├─{new string('─', Math.Max(0, idMax))}─┼─{new string('─', Math.Max(0, firstMax))}─┼─{new string('─', Math.Max(0, lastMax))}─┼─{new string('─', Math.Max(0, mailMax))}─┤    ");
-                if(true && g == true){
-                    Console.Write($"│   lastname{new String(' ', Math.Max(0, 11))}│\n");
-                }else{
-                    Console.Write("\n");
-                }
-                for (int i = 0; i < Math.Max(chunks[currentPage].Count, 8); i++)
+                Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┬─{new string('─', Math.Max(0, roleMax))}─┤\n");
+                Console.Write($"│ Id{new string(' ', Math.Max(0, idMax - 1))}│ Firstname{new string(' ', Math.Max(0, firstMax - 8))}│ Lastname{new string(' ', Math.Max(0, lastMax - 7))}│ Email{new string(' ', Math.Max(0, mailMax - 4))}│ Role{new string(' ', Math.Max(0, roleMax - 3))}│\n");
+                Console.Write($"├─{new string('─', Math.Max(0, idMax))}─┼─{new string('─', Math.Max(0, firstMax))}─┼─{new string('─', Math.Max(0, lastMax))}─┼─{new string('─', Math.Max(0, mailMax))}─┼─{new string('─', Math.Max(0, roleMax))}─┤\n");
+                for (int i = 0; i < Math.Max(chunks[currentPage].Count, 9); i++)
                 {
-                    if (CurrentSelected == i && !g)
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                    }
                     if(i < chunks[currentPage].Count)
                     {
                         Console.Write($"│ ");
+                        if (CurrentSelected == i && !g)
+                        {
+                            Console.BackgroundColor = ConsoleColor.DarkGray;
+                        }
                         Console.Write($"{chunks[currentPage][i].Id}{new string(' ', Math.Max(0, idMax - chunks[currentPage][i].Id.ToString().Length))}");
                         Console.Write($" │ {chunks[currentPage][i].FirstName}{new string(' ', Math.Max(0, firstMax - chunks[currentPage][i].FirstName.Length))}");
                         Console.Write($" │ {chunks[currentPage][i].LastName}{new string(' ', Math.Max(0, lastMax - chunks[currentPage][i].LastName.Length))}");
                         Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
+                        Console.Write($" │ {chunks[currentPage][i].Role}{new string(' ', Math.Max(0, roleMax - chunks[currentPage][i].Role.ToString().Length))}");
+
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write($" │    ");
-                        if (currentEditSelected == i && g)
-                        {
-                            Console.BackgroundColor = ConsoleColor.DarkGray;
-                        }
                         if( i == 0 && g == true)
                         {
-                            Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
+                            Console.Write($"┌─editUser{new String('─', Math.Max(0, 5))}─┐");
                         }else if(i == 1 && g == true)
                         {
-                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Firstname{new String(' ', Math.Max(0, 4))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
                         }
                         else if(i == 2 && g == true)
                         {
-                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if (i == 3 && g == true)
+                        {
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if (i == 4 && g == true)
+                        {
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if (i == 5 && g == true)
+                        {
+                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                        }else if (i == 6 && g == true)
+                        {
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
                         }
+                        else if (i == 7 && g == true)
+                        {
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if (i == 8 && g == true)
+                        {
+                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                        }
+                        
                             Console.Write($"\n");    
                         
                     }else{
                         if(i == chunks[currentPage].Count)
                         {
-                            Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
+                            Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┴─{new string('─', Math.Max(0, roleMax ))}─┘");
                         }
-                        
-                        if( i == 0 && g == true)
-                        {
-                            Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
-                        }
-                        if(i == 1 && chunks[currentPage].Count <= 1 && g == true)
+                        if( i == 1 && g == true && chunks[currentPage].Count <= 1 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0, 4))}");
-                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
-                        }else if(i == 1 && chunks[currentPage].Count > 1 && g == true)
-                        {
-                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Firstname{new String(' ', Math.Max(0, 4))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
                         }
+
+
                         if(i == 2 && chunks[currentPage].Count <= 1 && g == true)
                         {
-                            Console.Write($"{new string(' ', Math.Max(0, 83))}");
-                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
-                        }else if(i == 2 && chunks[currentPage].Count <= 2 && g == true)
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if(i == 2 && chunks[currentPage].Count > 1 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0, 4))}");
-                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
                         }
-                        Console.Write($"{new string(' ', Math.Max(0, idMax + 5))}");
-                        Console.Write($"{new string(' ', Math.Max(0, firstMax + 4))}");
-                        Console.Write($"{new string(' ', Math.Max(0, lastMax + 4))}");
-                        Console.Write($"{new string(' ', Math.Max(0, mailMax + 4))}");
+
+
+                        if(i == 3 && chunks[currentPage].Count >= 3  && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if(i == 3 && chunks[currentPage].Count <= 2 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }
+
+
+                        if(i == 4 && chunks[currentPage].Count <= 3 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0,  maxLength + 12))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if(i == 4 && chunks[currentPage].Count >= 4 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }
+
+                        if(i == 5 && chunks[currentPage].Count <= 4 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
+                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                        }else if(i == 5 && chunks[currentPage].Count >= 4 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0,  4))}");
+                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                        }
+
+                        if(i == 6 && chunks[currentPage].Count < 6 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12 ))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if(i == 6 && chunks[currentPage].Count >= 6 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }
+
+                        if(i == 7 && chunks[currentPage].Count <= 6 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12 ))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }else if(i == 7 && chunks[currentPage].Count >= 7 && g == true)
+                        {
+                            
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write("│ ");
+                            if (currentEditSelected == i && g)
+                            {
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            }
+                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.Write(" │");
+                        }
+
+                        
+                        if(i == 8 && chunks[currentPage].Count >= 8 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                        }else if(i == 8 && chunks[currentPage].Count <= 7 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
+                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                        }
                         Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write($"\n");   
                     }
                 }
-                if(chunks[currentPage].Count == 10)
+                if(chunks[currentPage].Count >= 9)
                 {
-                    Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
+                    Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┴─{new string('─', Math.Max(0, roleMax ))}─┘");
                 }
                 Console.Write($"\n");
                 key = Console.ReadKey(true).Key;
@@ -241,14 +420,87 @@ public class UserTable{
                 }
                 else if (key == ConsoleKey.Enter && !g)
                 {
+                    editedUser = chunks[currentPage][CurrentSelected];
                     g = true;
                 }
                 else if (key == ConsoleKey.Escape && g)
                 {
                     g = false;
                 }
+                else if (key == ConsoleKey.UpArrow  && g)
+                {
+                    if (currentEditSelected == 6)
+                    {
+                        currentEditSelected  -= 2;
+                    }else
+                    {
+                        currentEditSelected  -= 1;
+                    }
+                }
+                else if (key == ConsoleKey.DownArrow  && g)
+                {
+                    if (currentEditSelected == 4)
+                    {
+                        currentEditSelected  += 2;
+                    }else
+                    {
+                        currentEditSelected  += 1;
+                    }
+                }
+                else if (key == ConsoleKey.Enter && g)
+                {
+                    if (currentEditSelected == 1)
+                    {
+                        Console.Clear();
+                        editedUser.FirstName = UserMenu.GetValidInput("Enter your Firstname:", 3, 20);
+                    }else if(currentEditSelected == 2)
+                    {
+                        Console.Clear();
+                        editedUser.LastName = UserMenu.GetValidInput("Enter your Lastname:", 3, 20);
+                    }
+                    else if(currentEditSelected == 3)
+                    {
+                        Console.Clear();
+                        editedUser.Email = UserMenu.GetValideEmail("Enter your email:", 3, 20);
+                    }
+                    else if(currentEditSelected == 4)
+                    {
+                        Console.Clear();
+                        MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
+                            {"1. User", ()=>{
+                                editedUser.Role = UserRole.USER;
+                            }},
+                            {"2. Admin", ()=>{
+                                editedUser.Role = UserRole.ADMIN;
+                            }},
+                        });
+                    }
+                    else if(currentEditSelected == 6)
+                    {
+                        Console.Clear();
+                        bool answers = u.UpdateUser(editedUser);
+                        if (answers)
+                        {
+                            Console.WriteLine("updated");
+                            Console.ReadLine();
+                            g = false;
+                        }else
+                        {
+                            Console.WriteLine("nope");
+                            Console.ReadLine();
+                            g = false;
+                        }
+                    }
+                    else if(currentEditSelected == 7)
+                    {
+                        Console.WriteLine("Discard");
+                        g = false;
+                    }
+                }
                 currentPage = Math.Clamp(currentPage, 0, chunks.Count - 1);
-                CurrentSelected = Math.Clamp(CurrentSelected, -1, chunks[currentPage].Count - 1);
+                CurrentSelected = Math.Clamp(CurrentSelected, - 0, chunks[currentPage].Count - 1);
+                currentEditSelected = Math.Clamp(currentEditSelected, + 1, 8 - 1);
+
 
             } while (key != ConsoleKey.Escape);
 
