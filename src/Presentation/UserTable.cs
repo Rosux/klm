@@ -28,6 +28,7 @@ public class UserTable{
             string? first = "";
             string? last  = "";
             string? mail = "";
+            int j = 0;
             User? editedUser = null;
             do
             {
@@ -149,6 +150,18 @@ public class UserTable{
                 {
                     time = time + "->" ;
                 }
+                if (currentPage > 0  && currentPage  < chunks.Count - 1)
+                {
+                    if(maxLength%2 !=0)
+                    {
+                        j = 2;
+                    }
+                    else
+                    {
+                        j = 1;
+                    }
+                    time = "<-" +$"{new string(' ', Math.Max(0, maxLength/2-x.Length+2))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}"+"->" ;
+                } 
                 
                 Console.Write($"│ {time} │\n");
             
