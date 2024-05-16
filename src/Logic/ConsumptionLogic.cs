@@ -16,20 +16,23 @@ public static class ConsumptionLogic
                 }},
                 {"2. Remove Consumption", ()=>{
                     //Check if there is a item to remove and if there is it send a message to get it removed.
-                    Consumption consumption =  ConsumptionMenu.RemoveConsumptionMenu();
+                    Consumption? consumption = ConsumptionMenu.RemoveConsumptionMenu();
                     if (consumption == null)
                     {
-                        ConsumptionMenu.NoItemsToRemove();
                         return;
                     }
                     bool removed = c.DeleteConsumption(consumption);
+                    if (removed){
+                        ConsumptionMenu.Deleted();
+                    }else{
+                        ConsumptionMenu.Error();
+                    }
                 }},
                 {"3. Edit Consumption", ()=>{
                     // retrieve the changed product
-                    Consumption editedConsumption = ConsumptionMenu.EditConsumption();
+                    Consumption? editedConsumption = ConsumptionMenu.EditConsumption();
                     // if there are no products show error and return to the menu
                     if (editedConsumption == null){
-                        ConsumptionMenu.NoItems();
                         return;
                     }
                     // send updated Consumption to DataAccess layer

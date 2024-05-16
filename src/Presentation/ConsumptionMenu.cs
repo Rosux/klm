@@ -42,17 +42,17 @@ public static class ConsumptionMenu
         return consumption;
     }
 
-    public static Consumption RemoveConsumptionMenu(){
+    public static Consumption? RemoveConsumptionMenu(){
         List<Consumption> consumptions = c.ReadConsumption();
         if (consumptions.Count == 0) {
-            Console.WriteLine("There are no consumptions available to remove.");
+            NoItemsToRemove();
             return null;
         }else {
-        Dictionary<string, Consumption> d = new Dictionary<string, Consumption>();
-        foreach (Consumption consumption in c.ReadConsumption()){
-            d.Add(consumption.Name, consumption);
-        }
-        return MenuHelper.SelectFromList("Select id to delete", d);
+            Dictionary<string, Consumption> d = new Dictionary<string, Consumption>();
+            foreach (Consumption consumption in c.ReadConsumption()){
+                d.Add(consumption.Name, consumption);
+            }
+            return MenuHelper.SelectFromList("Select product to delete", true, d);
         }
     }
 
@@ -64,43 +64,82 @@ public static class ConsumptionMenu
         }
         if (cons.Count == 0)
         {
+            ConsumptionMenu.NoItems();
             return null;
         }
         // let the user select 1 item from the dict
-        Consumption editedConsumption = MenuHelper.SelectFromList("Select product to edit", cons);
+        Consumption? editedConsumption = MenuHelper.SelectFromList("Select product to edit", true, cons);
+        if(editedConsumption == null){
+            return null;
+        }
         // keep asking what the user wants to change
+        bool saving = false;
         bool changing = true;
         while (changing)
         {
             MenuHelper.SelectOptions("Select product property to edit", new Dictionary<string, Action>(){
                 // change the name of the Consumption
                 {"Name", ()=>{
-                    Console.WriteLine("Enter the new name of the product:");
-                    editedConsumption.Name = Console.ReadLine();
+                    string prompt = $"Current Name: {editedConsumption.Name}\nCurrent Price: {editedConsumption.Price}\nCurrent StartTime: {editedConsumption.StartTime}\nCurrent EndTime: {editedConsumption.EndTime}\n";
+                    string NewName;
+                    while(true){
+                        string? name = MenuHelper.SelectText(prompt+"\nType the new name of the product:", "", true, 2, 30);
+                        if(name == null){
+                            return;
+                        }
+                        if(!c.ConsumptionExists(name)){
+                            NewName = name;
+                            break;
+                        }else{
+                            Console.Write($"Name must be unique!\n\nName: '{name}' already exists.\n\nPress any key to continue.");
+                            Console.ReadKey(true);
+                        }
+                    }
+                    editedConsumption.Name = NewName;
                 }},
                 // change the price of the Consumption
                 {"Price", ()=>{
-                    Console.WriteLine("Enter the new price of the product:");
-                    editedConsumption.Price = Convert.ToDouble(Console.ReadLine());
+                    string prompt = $"Current Name: {editedConsumption.Name}\nCurrent Price: {editedConsumption.Price}\nCurrent StartTime: {editedConsumption.StartTime}\nCurrent EndTime: {editedConsumption.EndTime}\n";
+                    double? Price = MenuHelper.SelectPrice(prompt+"\nPlease provide the new price of the product:", "", true);
+                    if(Price == null){
+                        return;
+                    }
+                    editedConsumption.Price = (double)Price;
                 }},
                 // change the start time of the Consumption
                 {"Start time", ()=>{
-                    Console.WriteLine("Enter the new opening time of the product:");
-                    editedConsumption.StartTime = MenuHelper.SelectTime(editedConsumption.StartTime);
+                    string prompt = $"Current Name: {editedConsumption.Name}\nCurrent Price: {editedConsumption.Price}\nCurrent StartTime: {editedConsumption.StartTime}\nCurrent EndTime: {editedConsumption.EndTime}\n";
+                    TimeOnly? StartTime = MenuHelper.SelectTime(prompt+"\nPlease enter the new start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+                    if(StartTime == null){
+                        return;
+                    }
+                    editedConsumption.StartTime = (TimeOnly)StartTime;
                 }},
                 // change the end time of the Consumption
                 {"End time", ()=>{
-                    Console.WriteLine("Enter the new closing time of the product:");
-                    editedConsumption.EndTime = MenuHelper.SelectTime(editedConsumption.EndTime);
+                    string prompt = $"Current Name: {editedConsumption.Name}\nCurrent Price: {editedConsumption.Price}\nCurrent StartTime: {editedConsumption.StartTime}\nCurrent EndTime: {editedConsumption.EndTime}\n";
+                    TimeOnly? EndTime = MenuHelper.SelectTime(prompt+"\nPlease enter the new end time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+                    if(EndTime == null){
+                        return;
+                    }
+                    editedConsumption.EndTime = (TimeOnly)EndTime;
+                }},
+                {"Cancel edit", ()=>{
+                    changing = false;
+                    saving = false;
                 }},
                 // return the changed consumption item to the logic layer
                 {"Save changes", ()=>{
                     changing = false;
+                    saving = true;
                 }},
             });
         }
-        
-        return editedConsumption;
+        if(saving){
+            return editedConsumption;
+        }else{
+            return null;
+        }
     }
 
     public static void Error(){
@@ -111,6 +150,11 @@ public static class ConsumptionMenu
     public static void Saved(){
         Console.Clear();
         Console.WriteLine("Your changes are saved succesfully.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+    public static void Deleted(){
+        Console.Clear();
+        Console.WriteLine("Items are removed succesfully.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void NoItems(){

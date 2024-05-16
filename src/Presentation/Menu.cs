@@ -80,7 +80,17 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
-        ReservationLogic.Reservation();
+        // UserMenu.RemoveUser();
+        // Dictionary<string, Break> dict = new Dictionary<string, Break>();
+        // dict.Add("Break for 1 minutes", new Break(1));
+        // dict.Add("Break for 2 minutes", new Break(2));
+        // dict.Add("Break for 3 minutes", new Break(3));
+        // dict.Add("Break for 4 minutes", new Break(4));
+        // dict.Add("Break for 5 minutes", new Break(5));
+        // Break? y = MenuHelper.SelectFromList("Select a break", true, dict);
+
+
+        // ReservationLogic.Reservation();
         // while(true)
         // {
         //     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){

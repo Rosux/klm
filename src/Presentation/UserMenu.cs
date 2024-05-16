@@ -350,17 +350,17 @@ public static class UserMenu{
         return user;
     }
 
-    public static User RemoveUser(){
+    public static User? RemoveUser(){
         List<User> users = u.GetAllUsers();
         if (users.Count == 0) {
             Console.WriteLine("There are no Users available to remove.");
             return null;
         }else {
-        Dictionary<string, User> d = new Dictionary<string, User>();
-        foreach (User user in u.GetAllUsers()){
-            d.Add(user.FirstName, user);
-        }
-        return MenuHelper.SelectFromList("Select id to delete", d);
+            Dictionary<string, User> d = new Dictionary<string, User>();
+            foreach (User user in u.GetAllUsers()){
+                d.Add(user.FirstName, user);
+            }
+            return MenuHelper.SelectFromList("Select user to delete", true, d);
         }
     }
 
