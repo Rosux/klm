@@ -7,7 +7,8 @@ public class UserTable{
             int CurrentSelected = 0;
             ConsoleKey key;
             int currentPage = 0;
-            bool g = true;
+            bool g = false;
+            int currentEditSelected = 0;
             do
             {
                 List<int> id = new List<int>();
@@ -99,7 +100,7 @@ public class UserTable{
                 
                 maxLength += firstMax + lastMax + mailMax + 14;
                 Console.Clear();
-                Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength} chunks :{chunks[currentPage].Count}");
+                Console.WriteLine($"first: {firstMax} last: {lastMax} mail: {mailMax}, max: {maxLength} chunks :{chunks[currentPage].Count}, {g}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"┌─{new string('─', Math.Max(0, maxLength + 4))}─┐\n");
                 if (CurrentSelected == -1)
@@ -132,26 +133,26 @@ public class UserTable{
             
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┤    ");
-                if(true){
+                if(true && g == true){
                     Console.Write($"┌─editUser{new String('─', Math.Max(0, 12))}─┐\n");
                 }else{
                     Console.Write("\n");
                 }
                 Console.Write($"│ id{new string(' ', Math.Max(0, idMax - 1))}│ firstname{new string(' ', Math.Max(0, firstMax - 8))}│ lastname{new string(' ', Math.Max(0, lastMax - 7))}│ email{new string(' ', Math.Max(0, mailMax - 4))}│    ");
-                if(true){
+                if(true && g == true){
                     Console.Write($"│   firstname{new String(' ', Math.Max(0, 10))}│\n");
                 }else{
                     Console.Write("\n");
                 }
                 Console.Write($"├─{new string('─', Math.Max(0, idMax))}─┼─{new string('─', Math.Max(0, firstMax))}─┼─{new string('─', Math.Max(0, lastMax))}─┼─{new string('─', Math.Max(0, mailMax))}─┤    ");
-                if(true){
+                if(true && g == true){
                     Console.Write($"│   lastname{new String(' ', Math.Max(0, 11))}│\n");
                 }else{
                     Console.Write("\n");
                 }
                 for (int i = 0; i < Math.Max(chunks[currentPage].Count, 8); i++)
                 {
-                    if (CurrentSelected == i)
+                    if (CurrentSelected == i && !g)
                     {
                         Console.BackgroundColor = ConsoleColor.DarkGray;
                     }
@@ -164,14 +165,18 @@ public class UserTable{
                         Console.Write($" │ {chunks[currentPage][i].Email}{new string(' ', Math.Max(0, mailMax - chunks[currentPage][i].Email.Length))}");
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write($" │    ");
-                        if( i == 0)
+                        if (currentEditSelected == i && g)
+                        {
+                            Console.BackgroundColor = ConsoleColor.DarkGray;
+                        }
+                        if( i == 0 && g == true)
                         {
                             Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
-                        }else if(i == 1)
+                        }else if(i == 1 && g == true)
                         {
                             Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
                         }
-                        else if(i == 2)
+                        else if(i == 2 && g == true)
                         {
                             Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
                         }
@@ -182,19 +187,28 @@ public class UserTable{
                         {
                             Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┘");
                         }
-                        if( i == 0)
+                        
+                        if( i == 0 && g == true)
                         {
                             Console.Write($"│   email{new String(' ', Math.Max(0, 14))}│");
                         }
-                        if(i == 1)
+                        if(i == 1 && chunks[currentPage].Count <= 1 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
+                            Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
+                        }else if(i == 1 && chunks[currentPage].Count > 1 && g == true)
                         {
                             Console.Write($"│   Role{new String(' ', Math.Max(0, 15))}│");
                         }
-                        if(i == 2)
+                        if(i == 2 && chunks[currentPage].Count <= 1 && g == true)
                         {
+                            Console.Write($"{new string(' ', Math.Max(0, 83))}");
+                            Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
+                        }else if(i == 2 && chunks[currentPage].Count <= 2 && g == true)
+                        {
+                            Console.Write($"{new string(' ', Math.Max(0, 4))}");
                             Console.Write($"└─{new String('─', Math.Max(0, 20))}─┘");
                         }
-                        g = false;
                         Console.Write($"{new string(' ', Math.Max(0, idMax + 5))}");
                         Console.Write($"{new string(' ', Math.Max(0, firstMax + 4))}");
                         Console.Write($"{new string(' ', Math.Max(0, lastMax + 4))}");
@@ -209,29 +223,29 @@ public class UserTable{
                 }
                 Console.Write($"\n");
                 key = Console.ReadKey(true).Key;
-                if (key == ConsoleKey.UpArrow)
+                if (key == ConsoleKey.UpArrow && !g)
                 {
                     CurrentSelected--;
                 }
-                else if (key == ConsoleKey.DownArrow)
+                else if (key == ConsoleKey.DownArrow && !g)
                 {
                     CurrentSelected++;
                 }
-                else if (key == ConsoleKey.RightArrow)
+                else if (key == ConsoleKey.RightArrow && !g)
                 {
                     currentPage += 1;
                 }
-                else if (key == ConsoleKey.LeftArrow)
+                else if (key == ConsoleKey.LeftArrow && !g)
                 {
                     currentPage -= 1;
                 }
-                else if (key == ConsoleKey.Enter)
+                else if (key == ConsoleKey.Enter && !g)
                 {
-                    User? _editedUser = UserMenu.EditUser(chunks[currentPage][CurrentSelected]);
-                    if (_editedUser != null)
-                    {
-                        u.UpdateUser(_editedUser);
-                    }
+                    g = true;
+                }
+                else if (key == ConsoleKey.Escape && g)
+                {
+                    g = false;
                 }
                 currentPage = Math.Clamp(currentPage, 0, chunks.Count - 1);
                 CurrentSelected = Math.Clamp(CurrentSelected, -1, chunks[currentPage].Count - 1);
