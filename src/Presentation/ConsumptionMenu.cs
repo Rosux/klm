@@ -52,7 +52,7 @@ public static class ConsumptionMenu
             foreach (Consumption consumption in c.ReadConsumption()){
                 d.Add(consumption.Name, consumption);
             }
-            return MenuHelper.SelectFromList("Select id to delete", true, d);
+            return MenuHelper.SelectFromList("Select product to delete", true, d);
         }
     }
 
