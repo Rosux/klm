@@ -48,7 +48,7 @@ class Menu
                             ReservationOverviewAdminMenu.ReservationAdminOverview();
                         }},
                         {"Edit Users", ()=>{
-                            // takes admin to his reservation menu
+                            // takes admin to table for editing user
                             UserTable.EditUsers();;
                         }},
                         {"Logout", ()=>{
