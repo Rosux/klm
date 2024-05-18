@@ -1,5 +1,25 @@
 public static class UserLogic
 {
+
+    /// <summary>
+    /// Asks the user to select an option among Edit user and Exit to main menu.
+    /// </summary>
+    public static void User(){
+        bool running = true;
+        while(running)
+        {
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. Edit user", ()=>{
+                    // when choosing to edit a user ask which user to edit etc
+                    UserTable.EditUsers();
+                }},
+                {"2. Exit to main menu", ()=>{
+                    running = false;
+                }},
+            });
+        }
+    }
+
     public static void Login()
     {
         UserAccess u = new UserAccess();
