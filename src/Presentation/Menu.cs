@@ -86,25 +86,28 @@ class Menu
         Console.CursorVisible = false;
 
         // seats is basically a layout of the seats in the room, in this case this room has this layout:
-        // a 4x3 area with 8 seats and 1 empty space
-        // [ seat ] [ seat ] [ seat ]
-        // [ seat ] [ empty] [ seat ] [ seat ]
-        // [ seat ] [ seat ] [ seat ]
+        // a 4x4 area with 8 seats and 1 empty space
+        // [ seat ] [ seat ] [ seat ] [ seat ]
+        // [ seat ] [ seat ] [ seat ] [ seat ]
+        // [ seat ] [ seat ] [ empty] [ empty]
+        // [ seat ] [ seat ] [ seat ] [ seat ]
 
         bool[][] seats = new bool[][]{
-            new bool[] {true, true, true},
-            new bool[] {true, false, true, true},
-            new bool[] {true, true, true},
+            new bool[] {true, true, true, true},
+            new bool[] {true, true, true, true},
+            new bool[] {true, true, false, false},
+            new bool[] {true, true, true, true},
         };
 
-        Room r = new Room(seats); // r.Capacity is 9 (it automatically counts all the chairs and assigns it to the Capacity)
+        Room r = new Room(seats); // r.Capacity is 14 (it automatically counts all the chairs and assigns it to the Capacity)
         List<Entertainment> entertainments = new List<Entertainment>() {
-            new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 2, 1)
+            new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 2, 1),
+            new Entertainment(new DateTime(2024, 5, 20, 4, 59, 0), "Corner Seat Experience", 0, 3)
             //  ^ at 04:20 AM we ordered a lap dance in seat 2, 1
-            // 2,1 in this case is the bottom center chair as in
-            // [        ], [        ], [        ],
-            // [        ], [        ], [        ], [        ]
-            // [        ], [THIS ONE], [        ]
+            // [ x0 y0 ], [ x1 y0 ], [ x2 y0 ], [ x3 y0 ]
+            // [ x0 y1 ], [ x1 y1 ], [ x2 y1 ], [ x3 y1 ]
+            // [ x0 y2 ], [ THIS  ], [ x2 y2 ], [ x3 y2 ]
+            // [ x0 y3 ], [ x1 y3 ], [ x2 y3 ], [ x3 y3 ]
         };
 
         int x = 0;
@@ -112,31 +115,7 @@ class Menu
         ConsoleKey key;
         do{
             Console.Clear();
-            Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
-            for(int i=0;i<r.Seats.Length;i++)
-            {
-                for(int j=0;j<r.Seats[i].Length;j++)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    if(r.Seats[i][j]){
-                        Console.BackgroundColor = y == i && x == j ? ConsoleColor.DarkGray : ConsoleColor.Black;
-                        Console.ForegroundColor = ConsoleColor.White;
-                        foreach(Entertainment e in entertainments){
-                            if(e.SeatRow == i && e.SeatColumn == j){
-                                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            }
-                        }
-                        Console.Write("[x]");
-                    }else{
-                        Console.BackgroundColor = y == i && x == j ? ConsoleColor.DarkGray : ConsoleColor.Black;
-                        Console.Write("   ");
-                    }
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write(" ");
-                }
-                Console.Write("\n");
-            }
+            PrintSeats(r, entertainments, x, y);
             key = Console.ReadKey(true).Key;
 
             // handle selecting seat column and row (X=column and Y=row)
@@ -175,5 +154,47 @@ class Menu
         }while(true);
 
 
+    }
+
+    private static void PrintSeats(Room r, List<Entertainment> entertainments, int x, int y)
+    {
+        // calculate the longest row of seats
+        int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
+        Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
+        // create the top surounding bar with the word Screen centered
+        string header = "Screen";
+        for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
+        {
+            header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
+            // header
+        }
+        Console.Write($"┌{header}┐\n");
+        for(int i=0;i<r.Seats.Length;i++)
+        {
+            for(int line=0;line<2;line++)
+            {
+                Console.Write("│ ");
+                for(int j=0;j<Math.Max(widestSeats, r.Seats[i].Length);j++)
+                {
+                    foreach(Entertainment e in entertainments){
+                        // if an entertainment takes place at this seat make it "gold"
+                        if(e.SeatRow == i && e.SeatColumn == j){
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        }
+                    }
+                    // if x and y are the selected seat make the background color light gray
+                    Console.BackgroundColor = (i == y && j == x) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    // print box (based on line print the top or bottom)
+                    Console.Write(j < r.Seats[i].Length && r.Seats[i][j] ? (line==0 ? "╔═╗" : "╚═╝") : "   ");
+                    // reset colors
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(" ");
+                }
+                Console.Write($"│\n");
+            }
+        }
+        // print bottom surounding line
+        Console.Write($"└{new string('─', (widestSeats*4)+1)}┘\n\n");
     }
 }
