@@ -159,7 +159,7 @@ public class UserTable{
                 {
                     if(maxLength%2 !=0)
                         {
-                            j = 2;
+                            j = 4;
                         }
                         else
                         {
