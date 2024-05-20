@@ -86,23 +86,26 @@ class Menu
         Console.CursorVisible = false;
 
         // seats is basically a layout of the seats in the room, in this case this room has this layout:
-        // a 2x2 area with 3 seats and 1 empty space
-        // [seat] [empty space]
-        // [seat] [seat]
+        // a 4x3 area with 8 seats and 1 empty space
+        // [ seat ] [ seat ] [ seat ]
+        // [ seat ] [ empty] [ seat ] [ seat ]
+        // [ seat ] [ seat ] [ seat ]
 
         bool[][] seats = new bool[][]{
-            new bool[] {true, false},
-            new bool[] {true, true},
+            new bool[] {true, true, true},
+            new bool[] {true, false, true, true},
+            new bool[] {true, true, true},
         };
 
-        Room r = new Room(seats);
+        Room r = new Room(seats); // r.Capacity is 9 (it automatically counts all the chairs and assigns it to the Capacity)
         List<Entertainment> entertainments = new List<Entertainment>() {
-            new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 1, 1)
+            new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 2, 1)
+            //  ^ at 04:20 AM we ordered a lap dance in seat 2, 1
+            // 2,1 in this case is the bottom center chair as in
+            // [        ], [        ], [        ],
+            // [        ], [        ], [        ], [        ]
+            // [        ], [THIS ONE], [        ]
         };
-        // at 04:20 AM we ordered a lap dance in seat 1, 1
-        // 1,1 in this case is the bottom right chair as in
-        // [], []
-        // [], [THIS ONE]
 
         int x = 0;
         int y = 0;

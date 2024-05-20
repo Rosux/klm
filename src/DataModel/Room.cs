@@ -39,7 +39,7 @@ public class Room
         int capacity = 0;
         for(int i=0;i<Seats.Length;i++)
         {
-            for(int j=0;j<Seats.Length;j++)
+            for(int j=0;j<Seats[i].Length;j++)
             {
                 if(Seats[i][j]){
                     capacity++;
