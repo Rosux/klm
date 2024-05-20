@@ -95,7 +95,7 @@ class Menu
             new bool[] {true, true},
         };
 
-        Room r = new Room(2, seats);
+        Room r = new Room(seats);
         List<Entertainment> entertainments = new List<Entertainment>() {
             new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 1, 1)
         };
