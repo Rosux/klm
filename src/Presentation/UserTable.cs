@@ -123,36 +123,50 @@ public class UserTable{
                 }
                 string x = $"{currentPage + 1}/{maxPage}";
                 string time = $"{x}";
-                for(int i = 1; i <= Math.Max(2, maxLength - x.Length); i++)
+                if(maxPage != 1)
                 {
-                    time = ((i % 2 == 1) ? " " : "") + time + ((i % 2 == 0) ? " " : "");
-                }
-                if (currentPage  < chunks.Count - 1)
-                {
-                    time = "  " + time;
+                    for(int i = 1; i <= Math.Max(2, maxLength - x.Length); i++)
+                    {
+                        time = ((i % 2 == 1) ? " " : "") + time + ((i % 2 == 0) ? " " : "");
+                    }
+                    if (currentPage  < chunks.Count - 1)
+                    {
+                        time = "  " + time;
+                    }else
+                    {
+                        time = "<-" + time;
+                    }
+                    if (currentPage > 0 )
+                    {
+                        time = time + "  " ;
+                    }else
+                    {
+                        time = time + "->" ;
+                    }
+                    if (currentPage > 0  && currentPage  < chunks.Count - 1)
+                    {
+                        if(maxLength%2 !=0)
+                        {
+                            j = 2;
+                        }
+                        else
+                        {
+                            j = 1;
+                        }
+                        time = "<-" +$"{new string(' ', Math.Max(0, maxLength/2-x.Length+2))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}"+"->" ;
+                    } 
                 }else
-                {
-                    time = "<-" + time;
-                }
-                if (currentPage > 0 )
-                {
-                    time = time + "  " ;
-                }else
-                {
-                    time = time + "->" ;
-                }
-                if (currentPage > 0  && currentPage  < chunks.Count - 1)
                 {
                     if(maxLength%2 !=0)
-                    {
-                        j = 2;
-                    }
-                    else
-                    {
-                        j = 1;
-                    }
-                    time = "<-" +$"{new string(' ', Math.Max(0, maxLength/2-x.Length+2))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}"+"->" ;
-                } 
+                        {
+                            j = 4;
+                        }
+                        else
+                        {
+                            j = 3;
+                        }
+                    time =$"{new string(' ', Math.Max(0, maxLength/2-x.Length+4))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}" ;
+                }
                 Console.Write($"│ {time} │\n");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┬─{new string('─', Math.Max(0, roleMax))}─┤\n");
