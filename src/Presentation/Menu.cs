@@ -41,7 +41,7 @@ class Menu
                         }},
                         {"Rooms", ()=>{
                             // room editor
-                            RoomMenu.AdminOverView();
+                            RoomLogic.Menu();
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
@@ -84,6 +84,8 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
+
+        RoomLogic.Menu();
 
         // seats is basically a layout of the seats in the room, in this case this room has this layout:
         // a 4x4 area with 8 seats and 1 empty space

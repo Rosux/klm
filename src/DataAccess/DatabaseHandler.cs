@@ -30,9 +30,10 @@ public class DatabaseHandler
     private static readonly string _CreateRoomsString = @"
         CREATE TABLE IF NOT EXISTS Rooms(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Capacity INTEGER NOT NULL
+            Capacity INTEGER NOT NULL,
+            Seats TEXT NOT NULL
         )
-    ";
+    "; // Seats is a bool[][] array indicating the seat layout
 
     private static readonly string _CreateReservations =  @"
         CREATE TABLE IF NOT EXISTS Reservations(
@@ -44,10 +45,11 @@ public class DatabaseHandler
             EndDate TEXT NOT NULL,
             Price REAL NOT NULL,
             TimeLine TEXT NOT NULL,
+            Entertainments TEXT NOT NULL,
             FOREIGN KEY (RoomId) REFERENCES Rooms(ID),
             FOREIGN KEY (UserId) REFERENCES Users(ID)
         )
-    ";
+    "; // Entertainments is a List<Entertainment> containg all the special entertainments of the reservation
 
     protected SQLiteConnection _Conn = new SQLiteConnection();
     private string DatabasePath;
