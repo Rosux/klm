@@ -23,19 +23,10 @@ public static class UserLogic
                     UserAccess u = new UserAccess();
                     List<User> users = u.GetAllUsers();
                     Dictionary<string, User> userDict = users.ToDictionary(user => user.Email);
-                    User selectedUser = MenuHelper.SelectFromList("select user to delete", true, userDict);
+                    User? selectedUser = MenuHelper.SelectFromList("select user to delete", true, userDict);
                     if (selectedUser != null)
                     {
-                        bool delete = false;
-                        Console.Clear();
-                        MenuHelper.SelectOptions("Are u sure?", new Dictionary<string, Action>(){
-                            {"1. yes", ()=>{
-                                delete = true;
-                            }},
-                            {"2. no", ()=>{
-                                delete = false;
-                            }},
-                        });
+                        bool delete = MenuHelper.Confirm("Are u sure?");
                         if (delete)
                         {
                             u.DeleteUser(selectedUser);

@@ -407,7 +407,7 @@ public static class UserMenu{
     }
     public static void NotSure(){
         Console.Clear();
-        Console.WriteLine("user not removed\n\nPress any key to continue");
+        Console.WriteLine("User not removed\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void UserRemoved(){

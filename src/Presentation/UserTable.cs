@@ -451,6 +451,8 @@ public class UserTable{
                     Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┴─{new string('─', Math.Max(0, roleMax ))}─┘");
                 }
                 Console.Write($"\n");
+                Console.WriteLine("Press Enter to select");
+                Console.WriteLine("Use the Up/Down arrows to select a row");
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.UpArrow && !g)
                 {
