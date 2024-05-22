@@ -145,10 +145,6 @@ public class UserTable{
                 maxLength += firstMax + lastMax + mailMax + roleMax + 17;
                 Console.Clear();
                 Console.WriteLine("Press escape to go back");
-                if (editedUser != null)
-                {
-                    Console.WriteLine($"max:{maxedited}  firstlenght: {editedUser.Email.Length}");
-                }
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"┌─{new string('─', Math.Max(0, maxLength + 4))}─┐\n");
                 if (CurrentSelected == -1)
