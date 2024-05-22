@@ -9,11 +9,21 @@ public static class UserLogic
         while(running)
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"1. Edit user", ()=>{
+                {"1. Add user", ()=>{
+                    UserAccess u = new UserAccess();
+                    User? cred = UserMenu.AddNewUser();
+                    if (cred == null)
+                    {
+                        return;
+                    }
+                    bool added = u.AddUser(cred);
+                    UserMenu.NotifyAddUser(added);
+                }},
+                {"2. Edit user", ()=>{
                     // when choosing to edit a user ask which user to edit etc
                     UserTable.EditUsers();
                 }},
-                {"2. Exit to main menu", ()=>{
+                {"3. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
