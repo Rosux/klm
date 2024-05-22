@@ -405,6 +405,11 @@ public static class UserMenu{
         Console.WriteLine("There are no Users stored to remove.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
+    public static void NotSure(){
+        Console.Clear();
+        Console.WriteLine("user not removed\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
     public static void UserRemoved(){
         Console.Clear();
         Console.WriteLine("The user has been removed.\n\nPress any key to continue");

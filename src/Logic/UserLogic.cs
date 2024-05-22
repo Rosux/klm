@@ -19,11 +19,38 @@ public static class UserLogic
                     bool added = u.AddUser(cred);
                     UserMenu.NotifyAddUser(added);
                 }},
-                {"2. Edit user", ()=>{
+                {"2. Delete user", ()=>{
+                    UserAccess u = new UserAccess();
+                    List<User> users = u.GetAllUsers();
+                    Dictionary<string, User> userDict = users.ToDictionary(user => user.Email);
+                    User selectedUser = MenuHelper.SelectFromList("select user to delete", true, userDict);
+                    if (selectedUser != null)
+                    {
+                        bool delete = false;
+                        Console.Clear();
+                        MenuHelper.SelectOptions("Are u sure?", new Dictionary<string, Action>(){
+                            {"1. yes", ()=>{
+                                delete = true;
+                            }},
+                            {"2. no", ()=>{
+                                delete = false;
+                            }},
+                        });
+                        if (delete)
+                        {
+                            u.DeleteUser(selectedUser);
+                            UserMenu.UserRemoved();
+                        }else
+                        {
+                            UserMenu.NotSure();
+                        }
+                    }
+                }},
+                {"3. Edit user", ()=>{
                     // when choosing to edit a user ask which user to edit etc
                     UserTable.EditUsers();
                 }},
-                {"3. Exit to main menu", ()=>{
+                {"4. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
