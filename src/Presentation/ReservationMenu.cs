@@ -176,7 +176,8 @@ public static class ReservationMenu
                 new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0),
                 new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0),
                 (double)(GroupSize * 12.0) + totalPrice,
-                timeline
+                timeline,
+                new List<Entertainment>()
             );
             return r;
         }else if(!save){

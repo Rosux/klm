@@ -43,7 +43,8 @@ public class ReservationTest
             StartDate: DateTime.Parse("2024-04-24 02:00:00"),
             EndDate: DateTime.Parse("2024-04-27 02:00:00"),
             Price: 100.50,
-            TimeLine: Timeline
+            TimeLine: Timeline,
+            Entertainments: new List<Entertainment>()
         );
         bool insertResult = r.CreateReservation(x);
         Assert.IsTrue(insertResult, "Failed to insert Consumption.");
@@ -67,7 +68,8 @@ public class ReservationTest
                 List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
                 TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
                 TimelineHolder.t = timeline;
-                readResult.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder));
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                readResult.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder, entertainments));
             }
         }
         _Conn.Close();
@@ -76,7 +78,7 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
             {
                 Assert.Pass("Inserted Consumption found in the list.");
             }
@@ -96,11 +98,12 @@ public class ReservationTest
             StartDate: DateTime.Parse("2024-04-24 02:00:00"),
             EndDate: DateTime.Parse("2024-04-27 02:00:00"),
             Price: 100.50,
-            TimeLine: Timeline
+            TimeLine: Timeline,
+            Entertainments: new List<Entertainment>()
         );
         _Conn.Open();
-        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
-        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine, Entertainments)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine, @Entertainments)";
         int rowsAffected;
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
@@ -111,6 +114,7 @@ public class ReservationTest
             Launch.Parameters.AddWithValue("@EndDate", x.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
             Launch.Parameters.AddWithValue("@Price", x.Price);
             Launch.Parameters.AddWithValue("@TimeLine", x.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(x.Entertainments));
             rowsAffected = Launch.ExecuteNonQuery();
         }
         _Conn.Close();
@@ -129,16 +133,16 @@ public class ReservationTest
             {
             if (isDatabaseEmpty)
             {
-                Assert.Pass("Consumption successfully removed and database is empty.");
+                Assert.Pass("reservation successfully removed and database is empty.");
             }
             else
             {
-                Assert.Pass("Consumption successfully removed.");
+                Assert.Pass("reservation successfully removed.");
             }
         }
         else
         {
-            Assert.Fail("Failed to remove Consumption.");
+            Assert.Fail("Failed to remove reservation.");
         }
     }
 
@@ -153,11 +157,12 @@ public class ReservationTest
             StartDate: DateTime.Parse("2024-04-24 02:00:00"),
             EndDate: DateTime.Parse("2024-04-27 02:00:00"),
             Price: 100.50,
-            TimeLine: Timeline
+            TimeLine: Timeline,
+            Entertainments: new List<Entertainment>()
         );
         _Conn.Open();
-        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
-        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine, Entertainments)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine, @Entertainments)";
         int rowsAffected;
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
@@ -168,6 +173,7 @@ public class ReservationTest
             Launch.Parameters.AddWithValue("@EndDate", x.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
             Launch.Parameters.AddWithValue("@Price", x.Price);
             Launch.Parameters.AddWithValue("@TimeLine", x.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(x.Entertainments));
             rowsAffected = Launch.ExecuteNonQuery();
         }
         _Conn.Close();
@@ -175,13 +181,13 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
             {
-                Assert.Pass("Inserted Consumption found in the list.");
+                Assert.Pass("Inserted reservation found in the list.");
             }
         }
 
-        Assert.Fail("Inserted Consumption not found in the list.");
+        Assert.Fail("Inserted reservation not found in the list.");
     }
 
     [Test]
@@ -216,7 +222,8 @@ public class ReservationTest
             StartDate: DateTime.Parse("2024-04-24 02:00:00"),
             EndDate: DateTime.Parse("2024-04-27 02:00:00"),
             Price: 99.99,
-            TimeLine: Timeline
+            TimeLine: Timeline,
+            Entertainments: new List<Entertainment>()
         );
         r.CreateReservation(x);
 
