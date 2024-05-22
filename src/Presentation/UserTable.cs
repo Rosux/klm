@@ -30,6 +30,7 @@ public class UserTable{
             string? mail = "";
             int j = 0;
             User? editedUser = null;
+            User? currentSelectedUser = null;
             do
             {
                 List<int> id = new List<int>();
@@ -505,10 +506,47 @@ public class UserTable{
                     }else if(currentEditSelected == 6)
                     {
                         Console.Clear();
+                        currentSelectedUser = chunks[currentPage][CurrentSelected];
                         bool answers = u.UpdateUser(editedUser);
+                        List<string> longestEdited = new List<string>();
+                        List<string> longestUnedited = new List<string>();
+                        longestEdited.Add(editedUser.FirstName);
+                        longestEdited.Add(editedUser.LastName);
+                        longestEdited.Add(editedUser.Email);
+                        longestEdited.Add(editedUser.Role.ToString());
+                        longestUnedited.Add(currentSelectedUser.FirstName);
+                        longestUnedited.Add(currentSelectedUser.LastName);
+                        longestUnedited.Add(currentSelectedUser.Email);
+                        longestUnedited.Add(currentSelectedUser.Role.ToString());
+                        int editedMax = 0;
+                        foreach (var list in longestEdited)
+                        {
+                            if (list.ToString().Length > editedMax )
+                            {
+                                editedMax = list.ToString().Length;
+                            }
+                        }
+                        int uneditedMax = 0;
+                        foreach (var list in longestUnedited)
+                        {
+                            if (list.ToString().Length > uneditedMax )
+                            {
+                                uneditedMax = list.ToString().Length;
+                            }
+                        }
+                        int total = editedMax + uneditedMax;
+                        Console.WriteLine($"total : {total}. editedMax: {editedMax}. uneditedMax: {uneditedMax}");
                         if (answers)
                         {
-                            Console.WriteLine("updated");
+                            Console.WriteLine($"updated");
+                            Console.Write($" ┌─{new string('─', Math.Max(0, total + 14))}─┐\n");
+                            Console.Write($" │ data      │ old data = updated data{new string(' ', Math.Max(0, total - 
+                            currentSelectedUser.FirstName.Length - editedUser.FirstName.Length))}│\n");
+                            Console.Write($" │ Firstname │ {currentSelectedUser.FirstName} = {editedUser.FirstName}{new string(' ', Math.Max(0, total - currentSelectedUser.FirstName.Length - editedUser.FirstName.Length))}│\n");
+                            Console.Write($" │ Lastname  │ {currentSelectedUser.LastName} = {editedUser.LastName}{new string(' ', Math.Max(0, total - currentSelectedUser.LastName.Length - editedUser.LastName.Length))}│\n");
+                            Console.Write($" │ Email     │ {currentSelectedUser.Email} = {editedUser.Email}{new string(' ', Math.Max(0, total - currentSelectedUser.Email.Length - editedUser.Email.Length))}│\n");
+                            Console.Write($" │ Role      │ {currentSelectedUser.Role} = {editedUser.Role}{new string(' ', Math.Max(0, total - currentSelectedUser.Role.ToString().Length - editedUser.Role.ToString().Length))}│\n");
+                            Console.Write($" └─{new string('─', Math.Max(0, total + 14))}─┘\n");
                             Console.ReadLine();
                             g = false;
                         }else
