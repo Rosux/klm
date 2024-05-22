@@ -205,12 +205,10 @@ public static class ReservationMenu
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
             }
 
-            reservationOptions.Add("Return to menu", null);
-
             Reservation selectedReservation = null;
             do
             {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
+                selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
 
                 if (selectedReservation != null)
                 {   //This gets reservations and gives all the details in the prefix towards the timeline. 

@@ -836,7 +836,7 @@ public static class MenuHelper{
             // print the search box thing
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"Search by Titles, Genres or Directors seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
             Console.Write($"│ > ");
             string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
             for(int i = 0; i < printedText.Length; i++){

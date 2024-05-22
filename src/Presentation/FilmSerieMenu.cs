@@ -328,7 +328,10 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine("Search for a movie you want to change");
-            Film SelectedFilm = MenuHelper.SelectMovie();
+            Film? SelectedFilm = MenuHelper.SelectMovie();
+            if(SelectedFilm == null){
+                return;
+            }
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
             {

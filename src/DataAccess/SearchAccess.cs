@@ -28,13 +28,27 @@ public class SearchAccess
                     films.Add(f);
                     break;
                 }else{
+                    bool stop = false;
+                    foreach(Dictionary<string, string> director in f.Directors){
+                        foreach(KeyValuePair<string, string> kvp in director){
+                            string directorName = kvp.Value;
+                            if(directorName.ToLower().Contains(token.ToLower())){
+                                films.Add(f);
+                                stop = true;
+                                break;
+                            }
+                            if(stop){break;}
+                        }
+                        if(stop){break;}
+                    }
+                    if(stop){break;}
                     foreach(string genre in f.Genres){
                         if(genre.ToLower().Contains(token.ToLower())){
                             films.Add(f);
                             break;
                         }
                     }
-                } 
+                }
             }
         }
         foreach (Serie f in AllSerie){
