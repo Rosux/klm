@@ -41,7 +41,7 @@ class Menu
                         }},
                         {"Rooms", ()=>{
                             // room editor
-                            RoomLogic.Menu();
+                            RoomLogic.Menus();
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
@@ -85,7 +85,7 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        RoomLogic.Menu();
+        RoomLogic.Menus();
 
         // seats is basically a layout of the seats in the room, in this case this room has this layout:
         // a 4x4 area with 8 seats and 1 empty space
@@ -158,7 +158,7 @@ class Menu
 
     }
 
-    private static void PrintSeats(Room r, List<Entertainment> entertainments, int x, int y)
+    public static void PrintSeats(Room r, List<Entertainment> entertainments, int x, int y)
     {
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
