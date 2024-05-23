@@ -84,44 +84,34 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
-        // UserMenu.RemoveUser();
-        // Dictionary<string, Break> dict = new Dictionary<string, Break>();
-        // dict.Add("Break for 1 minutes", new Break(1));
-        // dict.Add("Break for 2 minutes", new Break(2));
-        // dict.Add("Break for 3 minutes", new Break(3));
-        // dict.Add("Break for 4 minutes", new Break(4));
-        // dict.Add("Break for 5 minutes", new Break(5));
-        // Break? y = MenuHelper.SelectFromList("Select a break", true, dict);
 
+        // UserAccess u = new UserAccess();
+        // List<User> baka = u.GetAllUsers();
+        // Dictionary<string, string> headers = new Dictionary<string, string>();
+        // headers.Add("Email :)", "Email");
+        // headers.Add("User's name", "LastName");
+        // headers.Add("User's pass", "Password");
+        // // headers.Add("User's Roles (maybe not)", "Role");
+        // MenuHelper.Table(baka, headers);
 
-        // ReservationLogic.Reservation();
-        // while(true)
+        // ConsumptionAccess c = new ConsumptionAccess();
+        // List<Consumption> cs = c.ReadConsumption();
+        // Dictionary<string, string> cheaders = new Dictionary<string, string>
         // {
-        //     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-        //         {"Test", ()=>{
-        //             // How to use MenuHelper.SelectMovieOrEpisode();
-        //             object a = MenuHelper.SelectMovieOrEpisode();
-        //             if(a is Film){
-        //                 Console.WriteLine(((Film)a).Title);
-        //             }else if(a is Dictionary<Serie, List<Episode>>){
-        //                 List<Episode> ruru = ((Dictionary<Serie, List<Episode>>)a).First().Value;
-        //                 foreach(Episode ep in ruru)
-        //                 {
+        //     { "Consumption name???????????", "Name" },
+        //     { "pr (euros)", "Price" }
+        // };
+        // MenuHelper.Table(cs, cheaders);
 
-        //                 }
-        //                 Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Key.Title);
-        //                 Console.WriteLine(((Dictionary<Serie, List<Episode>>)a).First().Value.Count);
-        //                 Console.ReadKey(true);
-        //             }else if(a == null){
-        //                 Console.WriteLine("nothing selected");
-        //             }
-        //             Console.ReadKey(true);
-        //         }},
-        //         {"Exit", ()=>{
-        //             // close application
-        //             Environment.Exit(1);
-        //         }},
-        //     });
-        // }
+
+        FilmAcesser f = new FilmAcesser();
+        List<Film> fs = f.Get_info();
+        Dictionary<string, string> fheaders = new Dictionary<string, string>
+        {
+            { "Film Name", "Title" },
+            { "hoe lang duurt deze kanker film?", "Runtime" }
+        };
+        MenuHelper.Table(fs, fheaders);
+
     }
 }

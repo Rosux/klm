@@ -1,5 +1,7 @@
 using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using TimeLine;
 
 public static class MenuHelper{
     private static SearchAccess searchAccess = new SearchAccess();
@@ -1474,6 +1476,179 @@ public static class MenuHelper{
                 }while(key != ConsoleKey.Escape);
             }
         }
+    #endregion
+
+    #region Table
+    /// <summary>
+    /// Convert a generic list of items to a dictionary holding columns of the original generic list.
+    /// </summary>
+    /// <typeparam name="T">The type of what the list holds.</typeparam>
+    /// <param name="items">A generic list of items that gets converted to a column structured dictionary.</param>
+    /// <returns>A dictionary that has a key for each column and the data saved as strings.</returns>
+    private static Dictionary<string, List<string>> CreateColumns<T>(List<T> items)
+    {
+        // dict holds basically a structure like this
+        /*
+            "Name": ["Bob", "Peter", "Tony"],
+            "Email": ["Bob@mail.com", "Peter@mail.com", "Tony@mail.com"],
+        */
+        Dictionary<string, List<string>> columns = new Dictionary<string, List<string>>();
+
+        MemberInfo[] defaultMembers = typeof(T).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+        foreach(MemberInfo defaultMemberInfo in defaultMembers)
+        {
+            columns.Add(defaultMemberInfo.Name.ToString(), new List<string>());
+        }
+
+        foreach(T item in items)
+        {
+            if(item == null)
+            {
+                continue;
+            }
+            MemberInfo[] itemMembers = item.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+            foreach(MemberInfo member in itemMembers)
+            {
+                 // member here is the name of the field/property (for a User this would be Id, FirstName, LastName, Email, Password, Role)
+                if(columns.ContainsKey(member.Name))
+                {
+                    string memberDataString = "N/A";
+                    if(member.MemberType == MemberTypes.Property)
+                    {
+                        PropertyInfo memberProperty = (PropertyInfo)member;
+                        if(memberProperty.GetValue(item) != null)
+                        {
+                            memberDataString = memberProperty.GetValue(item).ToString();
+                        }
+                    }
+                    else if(member.MemberType == MemberTypes.Field)
+                    {
+                        FieldInfo memberField = (FieldInfo)member;
+                        if(memberField.GetValue(item) != null)
+                        {
+                            memberDataString = memberField.GetValue(item).ToString();
+                        }
+                    }
+                    columns[member.Name].Add(memberDataString);
+                }
+            }
+        }
+        return columns;
+    }
+
+    /// <summary>
+    /// Calculate the width of each column based on the longest value or header of that column.
+    /// </summary>
+    /// <param name="columns">A dictionary holding the data for each column. Each key represents a property/field name, and the corresponding value is a list of data values in that column.</param>
+    /// <param name="headers">A dictionary representing the headers of the table. Each key represents a column name, and the corresponding value is the property/field for that the columns data.</param>
+    /// <returns>A list of integers representing the maximum width for each column in characters.</returns>
+    private static List<int> GetMaxColumnWidths(Dictionary<string, List<string>> columns, Dictionary<string, string> headers){
+        List<int> columnWidths = new List<int>();
+        // loop over all headers (being for example {ColumnName, FieldName/PropertyName})
+        for(int i=0;i<headers.Count;i++){
+            KeyValuePair<string, string> kvp = headers.ElementAt(i);
+            string itemPropertyName = kvp.Value;
+            columnWidths.Add(kvp.Key.ToString().Length); // add the length of the header
+            foreach(string d in columns[itemPropertyName]){
+                if(d.Length >= columnWidths[i]){
+                    columnWidths[i] = d.Length;
+                }
+            }
+        }
+        return columnWidths;
+    }
+
+    public static void Table<T>(List<T> items, Dictionary<string, string> headers)
+    {
+        Dictionary<string, List<string>> columns = CreateColumns(items);
+        List<List<T>> chunks = new List<List<T>>();
+        for (int i=0;i<items.Count;i+=10)
+        {
+            chunks.Add(items.Skip(i).Take(10).ToList());
+        }
+
+        // get the width of each column
+        List<int> columnWidths = GetMaxColumnWidths(columns, headers);
+
+        // get the total table width (for alignment purposes and ease of use)
+        // │ Firstname │ LongestName │ LongestEmail │\n
+        // ^^=2       ^^^=3         ^^^ = 3        ^^=2
+        // ............--------------...............=
+        int totalWidth = 1; // 1 since the end of the line has a vertical bar
+        foreach(int textLength in columnWidths){
+            totalWidth += 2 + textLength + 1; // 2 is the 2 spaces before the text (being "| ") and then the max text length (columnWidths) and then 1 for the space after the text (in "| text |" it would be " |"<- this one)
+        }
+
+
+        int currentPage = 0;
+        int maxPage = chunks.Count-1;
+        ConsoleKey key;
+        do
+        {
+            // create the page arrows
+            string pageArrows = $"{currentPage+1}/{maxPage+1}";
+            // 8 in the next line stands for "| <-" and "-> |" totaling to 8 characters
+            for(int i=Math.Max(0, (totalWidth-pageArrows.Length) - 8);i>0;i--){
+                pageArrows = ((i % 2 == 1) ? " " : "") + pageArrows + ((i % 2 == 0) ? " " : "");
+            }
+            pageArrows = (currentPage > 0 ? "│ <-" : "│   ") + pageArrows + (currentPage < maxPage ? "-> │" : "   │");
+
+            // clear the screen and print the table
+            Console.Clear();
+
+            // prints the top line
+            Console.Write($"┌{new string('─', totalWidth-2)}┐\n");
+
+            // prints the <- pagenumber ->
+            Console.Write($"{pageArrows}\n");
+
+            // prints the seperator between page number and headers
+            for(int i=0;i<headers.Keys.ToList().Count;i++){
+                // the +2 is for a space at both sides
+                Console.Write($"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┬')}");
+            }
+
+            // prints the headers
+            Console.Write("\n");
+            for(int i=0;i<headers.Keys.ToList().Count;i++){
+                string headerText = headers.Keys.ToList()[i];
+                Console.Write($"{(i==0 ? '│' : "")} {headerText}{new string(' ', Math.Max(0, columnWidths[i] - headerText.Length))} │");
+            }
+
+            // prints the seperator between headers and data
+            Console.Write("\n");
+            for(int i=0;i<headers.Keys.ToList().Count;i++){
+                // the +2 is for a space at both sides
+                Console.Write($"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┼')}");
+            }
+
+            // prints the data
+            Console.Write("\n");
+            for(int i=0;i<chunks[currentPage].Count;i++){ // loop over all items (like all Users)
+                Console.Write("│");
+                int j = 0;
+                foreach(string header in headers.Values){
+                    string itemText = columns[header].ElementAt((currentPage*10)+i);
+                    Console.Write($" {itemText}{new string(' ', Math.Max(0, columnWidths[j]-itemText.Length))} │");
+                    j++;
+                }
+                Console.Write("\n");
+            }
+
+            // print the bottom line
+            for(int i=0;i<headers.Keys.ToList().Count;i++){
+                // the +2 is for a space at both sides
+                Console.Write($"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '┴')}");
+            }
+
+            key = Console.ReadKey(true).Key;
+
+            if(key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
+                currentPage += (key == ConsoleKey.LeftArrow) ? -1 : 1;
+            }
+            currentPage = Math.Clamp(currentPage, 0, chunks.Count-1);
+        }while(true);
+    }
     #endregion
 }
 
