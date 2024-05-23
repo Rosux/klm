@@ -9,11 +9,39 @@ public static class UserLogic
         while(running)
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"1. Edit user", ()=>{
+                {"1. Add user", ()=>{
+                    UserAccess u = new UserAccess();
+                    User? cred = UserMenu.AddNewUser();
+                    if (cred == null)
+                    {
+                        return;
+                    }
+                    bool added = u.AddUser(cred);
+                    UserMenu.NotifyAddUser(added);
+                }},
+                {"2. Delete user", ()=>{
+                    UserAccess u = new UserAccess();
+                    List<User> users = u.GetAllUsers();
+                    Dictionary<string, User> userDict = users.ToDictionary(user => user.Email);
+                    User? selectedUser = MenuHelper.SelectFromList("select user to delete", true, userDict);
+                    if (selectedUser != null)
+                    {
+                        bool delete = MenuHelper.Confirm("Are u sure?");
+                        if (delete)
+                        {
+                            u.DeleteUser(selectedUser);
+                            UserMenu.UserRemoved();
+                        }else
+                        {
+                            UserMenu.NotSure();
+                        }
+                    }
+                }},
+                {"3. Edit user", ()=>{
                     // when choosing to edit a user ask which user to edit etc
                     UserTable.EditUsers();
                 }},
-                {"2. Exit to main menu", ()=>{
+                {"4. Exit to main menu", ()=>{
                     running = false;
                 }},
             });

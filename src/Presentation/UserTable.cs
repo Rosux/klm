@@ -32,12 +32,16 @@ public class UserTable{
             User? editedUser = null;
             do
             {
+                int maxedited = 0;
+                int maxorg = 0;
                 List<int> id = new List<int>();
                 List<string> firstname = new List<string>();
                 List<string> lastname = new List<string>();
                 List<string> email = new List<string>();
                 List<string> role = new List<string>();
                 List<User> users = u.GetAllUsers();
+                List<string> maxEdited = new List<string>();
+                List<string> maxOrg = new List<string>();
                 foreach (User user in u.GetAllUsers()){
                     id.Add(user.Id);
                     firstname.Add(user.FirstName);
@@ -53,6 +57,32 @@ public class UserTable{
                 int maxPage = chunks.Count;
                 int maxLength = 0;
                 int idMax = 0;
+                if (editedUser != null)
+                {
+                    maxEdited.Add(editedUser.FirstName);
+                    maxEdited.Add(editedUser.LastName);
+                    maxEdited.Add(editedUser.Email);
+                    maxEdited.Add(editedUser.Role.ToString());
+                    maxOrg.Add(chunks[currentPage][CurrentSelected].FirstName);
+                    maxOrg.Add(chunks[currentPage][CurrentSelected].LastName);
+                    maxOrg.Add(chunks[currentPage][CurrentSelected].Email);
+                    maxOrg.Add(chunks[currentPage][CurrentSelected].Role.ToString());
+                    foreach(var list in maxEdited)
+                    {
+                        if (list.ToString().Length > maxedited )
+                        {
+                            maxedited = list.ToString().Length;
+                        }
+                    }
+                    foreach(var list in maxOrg)
+                    {
+                        if (list.ToString().Length > maxorg )
+                        {
+                            maxorg = list.ToString().Length;
+                        }
+                    }
+                }
+                maxedited += maxorg;
                 foreach (var list in id)
                 {
                     if (list.ToString().Length > idMax )
@@ -123,36 +153,50 @@ public class UserTable{
                 }
                 string x = $"{currentPage + 1}/{maxPage}";
                 string time = $"{x}";
-                for(int i = 1; i <= Math.Max(2, maxLength - x.Length); i++)
+                if(maxPage != 1)
                 {
-                    time = ((i % 2 == 1) ? " " : "") + time + ((i % 2 == 0) ? " " : "");
-                }
-                if (currentPage  < chunks.Count - 1)
-                {
-                    time = "  " + time;
+                    for(int i = 1; i <= Math.Max(2, maxLength - x.Length); i++)
+                    {
+                        time = ((i % 2 == 1) ? " " : "") + time + ((i % 2 == 0) ? " " : "");
+                    }
+                    if (currentPage  < chunks.Count - 1)
+                    {
+                        time = "  " + time;
+                    }else
+                    {
+                        time = "<-" + time;
+                    }
+                    if (currentPage > 0 )
+                    {
+                        time = time + "  " ;
+                    }else
+                    {
+                        time = time + "->" ;
+                    }
+                    if (currentPage > 0  && currentPage  < chunks.Count - 1)
+                    {
+                        if(maxLength%2 !=0)
+                        {
+                            j = 2;
+                        }
+                        else
+                        {
+                            j = 1;
+                        }
+                        time = "<-" +$"{new string(' ', Math.Max(0, maxLength/2-x.Length+2))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}"+"->" ;
+                    } 
                 }else
-                {
-                    time = "<-" + time;
-                }
-                if (currentPage > 0 )
-                {
-                    time = time + "  " ;
-                }else
-                {
-                    time = time + "->" ;
-                }
-                if (currentPage > 0  && currentPage  < chunks.Count - 1)
                 {
                     if(maxLength%2 !=0)
-                    {
-                        j = 2;
-                    }
-                    else
-                    {
-                        j = 1;
-                    }
-                    time = "<-" +$"{new string(' ', Math.Max(0, maxLength/2-x.Length+2))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}"+"->" ;
-                } 
+                        {
+                            j = 4;
+                        }
+                        else
+                        {
+                            j = 3;
+                        }
+                    time =$"{new string(' ', Math.Max(0, maxLength/2-x.Length+4))}"+$"{x}"+$"{new string(' ', Math.Max(0, maxLength/2-x.Length+j))}" ;
+                }
                 Console.Write($"│ {time} │\n");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"│─{new string('─', Math.Max(0, idMax))}─┬─{new string('─', Math.Max(0, firstMax))}─┬─{new string('─', Math.Max(0, lastMax))}─┬─{new string('─', Math.Max(0, mailMax))}─┬─{new string('─', Math.Max(0, roleMax))}─┤\n");
@@ -176,7 +220,7 @@ public class UserTable{
                         Console.Write($" │    ");
                         if( i == 0 && g == true)
                         {
-                            Console.Write($"┌─editUser{new String('─', Math.Max(0, 5))}─┐");
+                            Console.Write($"┌─editUser{new String('─', Math.Max(0, maxedited + 7))}─┐");
                         }else if(i == 1 && g == true)
                         {
                             Console.Write("│ ");
@@ -184,7 +228,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Firstname{new String(' ', Math.Max(0, 4))}");
+                            Console.Write($"Firstname: {chunks[currentPage][CurrentSelected].FirstName} -> {editedUser.FirstName}{new String(' ', Math.Max(0, maxedited - editedUser.FirstName.Length - chunks[currentPage][CurrentSelected].FirstName.Length))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 2 && g == true)
@@ -194,7 +238,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.Write($"Lastname : {chunks[currentPage][CurrentSelected].LastName} -> {editedUser.LastName}{new String(' ', Math.Max(0, maxedited - editedUser.LastName.Length - chunks[currentPage][CurrentSelected].LastName.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if (i == 3 && g == true)
@@ -204,7 +248,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.Write($"Email    : {chunks[currentPage][CurrentSelected].Email} -> {editedUser.Email}{new String(' ', Math.Max(0, maxedited - editedUser.Email.Length - chunks[currentPage][CurrentSelected].Email.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if (i == 4 && g == true)
@@ -214,12 +258,12 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Role     : {chunks[currentPage][CurrentSelected].Role} -> {editedUser.Role}{new String(' ', Math.Max(0, maxedited - editedUser.Role.ToString().Length - chunks[currentPage][CurrentSelected].Role.ToString().Length))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if (i == 5 && g == true)
                         {
-                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                            Console.Write($"│─{new String('─', Math.Max(0, maxedited + 15))}─│");
                         }else if (i == 6 && g == true)
                         {
                             Console.Write("│ ");
@@ -227,7 +271,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Save changes{new String(' ', Math.Max(0, maxedited + 3))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if (i == 7 && g == true)
@@ -237,12 +281,12 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.Write($"Discard changes{new String(' ', Math.Max(0, maxedited ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if (i == 8 && g == true)
                         {
-                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                            Console.Write($"└─{new String('─', Math.Max(0, maxedited + 15))}─┘");
                         }
                         
                             Console.Write($"\n");    
@@ -260,7 +304,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Firstname{new String(' ', Math.Max(0, 4))}");
+                            Console.Write($"Firstname: {chunks[currentPage][CurrentSelected].FirstName} -> {editedUser.FirstName}{new String(' ', Math.Max(0, maxedited - editedUser.FirstName.Length - chunks[currentPage][CurrentSelected].FirstName.Length))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
@@ -272,7 +316,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.Write($"Lastname : {chunks[currentPage][CurrentSelected].LastName} -> {editedUser.LastName}{new String(' ', Math.Max(0, maxedited - editedUser.LastName.Length - chunks[currentPage][CurrentSelected].LastName.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 2 && chunks[currentPage].Count > 1 && g == true)
@@ -283,7 +327,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Lastname{new String(' ', Math.Max(0, 5))}");
+                            Console.Write($"Lastname : {chunks[currentPage][CurrentSelected].LastName} -> {editedUser.LastName}{new String(' ', Math.Max(0, maxedited - editedUser.LastName.Length - chunks[currentPage][CurrentSelected].LastName.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
@@ -295,7 +339,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.Write($"Email    : {chunks[currentPage][CurrentSelected].Email} -> {editedUser.Email}{new String(' ', Math.Max(0, maxedited - editedUser.Email.Length - chunks[currentPage][CurrentSelected].Email.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 3 && chunks[currentPage].Count <= 2 && g == true)
@@ -306,7 +350,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Email{new String(' ', Math.Max(0, 8))}");
+                            Console.Write($"Email    : {chunks[currentPage][CurrentSelected].Email} -> {editedUser.Email}{new String(' ', Math.Max(0, maxedited - editedUser.Email.Length - chunks[currentPage][CurrentSelected].Email.Length ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
@@ -318,7 +362,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Role     : {chunks[currentPage][CurrentSelected].Role} -> {editedUser.Role}{new String(' ', Math.Max(0, maxedited - editedUser.Role.ToString().Length - chunks[currentPage][CurrentSelected].Role.ToString().Length))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 4 && chunks[currentPage].Count >= 4 && g == true)
@@ -329,18 +373,18 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Role{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Role     : {chunks[currentPage][CurrentSelected].Role} -> {editedUser.Role}{new String(' ', Math.Max(0, maxedited - editedUser.Role.ToString().Length - chunks[currentPage][CurrentSelected].Role.ToString().Length))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
                         if(i == 5 && chunks[currentPage].Count <= 4 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
-                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                            Console.Write($"│─{new String('─', Math.Max(0, maxedited + 15))}─│");
                         }else if(i == 5 && chunks[currentPage].Count >= 4 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0,  4))}");
-                            Console.Write($"│─{new String('─', Math.Max(0, 13))}─│");
+                            Console.Write($"│─{new String('─', Math.Max(0, maxedited + 15))}─│");
                         }
                         if(i == 6 && chunks[currentPage].Count < 6 && g == true)
                         {
@@ -350,7 +394,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Save changes{new String(' ', Math.Max(0, maxedited + 3))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 6 && chunks[currentPage].Count >= 6 && g == true)
@@ -361,7 +405,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Save{new String(' ', Math.Max(0, 9))}");
+                            Console.Write($"Save changes{new String(' ', Math.Max(0, maxedited + 3))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
@@ -373,7 +417,7 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.Write($"Discard changes{new String(' ', Math.Max(0, maxedited  ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }else if(i == 7 && chunks[currentPage].Count >= 7 && g == true)
@@ -384,21 +428,22 @@ public class UserTable{
                             {
                                 Console.BackgroundColor = ConsoleColor.DarkGray;
                             }
-                            Console.Write($"Discard{new String(' ', Math.Max(0, 6))}");
+                            Console.Write($"Discard changes{new String(' ', Math.Max(0, maxedited ))}");
                             Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write(" │");
                         }
                         if(i == 8 && chunks[currentPage].Count >= 8 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0, 4))}");
-                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                            Console.Write($"└─{new String('─', Math.Max(0, maxedited + 15))}─┘");
                         }else if(i == 8 && chunks[currentPage].Count <= 7 && g == true)
                         {
                             Console.Write($"{new string(' ', Math.Max(0, maxLength + 12))}");
-                            Console.Write($"└─{new String('─', Math.Max(0, 13))}─┘");
+                            Console.Write($"└─{new String('─', Math.Max(0, maxedited + 15))}─┘");
                         }
                         Console.BackgroundColor = ConsoleColor.Black;
                             Console.Write($"\n");   
+
                     }
                 }
                 if(chunks[currentPage].Count >= 9)
@@ -406,6 +451,8 @@ public class UserTable{
                     Console.Write($"└─{new string('─', Math.Max(0, idMax ))}─┴─{new string('─', Math.Max(0, firstMax ))}─┴─{new string('─', Math.Max(0, lastMax ))}─┴─{new string('─', Math.Max(0, mailMax ))}─┴─{new string('─', Math.Max(0, roleMax ))}─┘");
                 }
                 Console.Write($"\n");
+                Console.WriteLine("Press Enter to select");
+                Console.WriteLine("Use the Up/Down arrows to select a row");
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.UpArrow && !g)
                 {
@@ -494,7 +541,7 @@ public class UserTable{
                         bool answers = u.UpdateUser(editedUser);
                         if (answers)
                         {
-                            Console.WriteLine("updated");
+                            Console.WriteLine($"Updated. click any button to continue");
                             Console.ReadLine();
                             g = false;
                         }else
@@ -514,6 +561,7 @@ public class UserTable{
                 currentEditSelected = Math.Clamp(currentEditSelected, + 1, 8 - 1);
             } while (key != ConsoleKey.Escape);
         }
+        
 }
 
 // ┌ ─ ┬  ┐ 
