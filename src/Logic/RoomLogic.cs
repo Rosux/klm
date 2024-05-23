@@ -43,7 +43,7 @@ public static class RoomLogic
         if(r.GetAllRooms().Count == 0){
             RoomMenu.NoRoomsFoundNotification();
         }else{
-            Room? chosenroom = ChooseRoom();
+            Room? chosenroom = ChooseRoom("choose a room to see");
             if(chosenroom != null){
                 Console.Clear();
                 List<Entertainment> entertainments = new List<Entertainment>(){};
@@ -92,16 +92,16 @@ public static class RoomLogic
     /// </summary>
     public static void AddRoom()
     {
-        int? GivenCapacity_p = MenuHelper.SelectInteger("Select capacity for new room: ", "", true, 0, 1, 2147483647);
-        if (GivenCapacity_p  != null)
+        int? GivenRows_p = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 2147483647);
+        if (GivenRows_p  != null)
         {
-            int capacity = (int)GivenCapacity_p;
-            int? GivenRows_p = MenuHelper.SelectInteger($"Current capcity: {capacity}\nSelect the amount of rows you wat for the new room: ", "", true, 0, 1, capacity);
-            if (GivenRows_p  != null)
+            int rows = (int)GivenRows_p;
+            int? GivenSeats_p = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 2147483647);
+            if (GivenSeats_p  != null)
             {
-                int rows = (int)GivenRows_p;
                 int seats_per_rows = 0;
                 int extra_seats = 0;
+                int capacity = rows * (int) GivenSeats_p;
                 if(capacity%rows == 0)
                 {
                     seats_per_rows = capacity/rows;
@@ -144,68 +144,92 @@ public static class RoomLogic
                 }
                 Room room = new(seats);
                 r.AddRoom(room);
-                
-                // List<List<string>> all_row_top = new List<List<string>>();
-                // List<List<string>> all_row_bottom = new List<List<string>>();
-                // foreach(bool[] row in seats)
-                // {
-                //     List<string> row_top = new List<string>();
-                //     List<string> row_bottom = new List<string>();
-                //     foreach(bool seatss in row)
-                //     {         
-                //         row_top.Add("╔═╗");
-                //         row_bottom.Add("╚═╝");
-                //     }
-                //     all_row_top.Add(row_top);
-                //     all_row_bottom.Add(row_bottom);
-                // }
-                
-                // ConsoleKey key;
-                // int choice_seat = 0;
-                // int choice_row = 0;
-                // int ii = 0;
-                // int iii = 0;
-                // do
-                // {
-                //     key = Console.ReadKey(true).Key;
-                //     if(key == ConsoleKey.Escape)
-                //     {
-                //         break;
-                //     }
-                //     else if(key == ConsoleKey.RightArrow && choice_seat < ii - 1)
-                //     {
-                //         choice_seat++;
-                //     }
-                //     else if(key == ConsoleKey.LeftArrow && choice_seat != 0)
-                //     {
-                //         choice_seat--;
-                //     }
 
-                //     var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
-                //     Console.Clear();
-                //     Console.Write("-----------------------------------\n");
-                //     ii = 0;
-                //     iii = 0;
-                //     foreach(var (row_top, row_bottom) in zip)
-                //     {
-                //         foreach(string seat_top in row_top)
-                //         {
-                //             if (ii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                //             Console.Write(seat_top);
-                //             Console.BackgroundColor = ConsoleColor.Black;
-                //             ii++;
-                //         }
-                //         Console.WriteLine();
-                //         foreach(string seat_bottom in row_bottom)
-                //         {
-                //             if (iii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                //             Console.Write(seat_bottom);
-                //             Console.BackgroundColor = ConsoleColor.Black;
-                //             iii++;
-                //         }
-                //         Console.WriteLine();
-                //     }
-                // }while(key != ConsoleKey.Escape);
+                // List<Entertainment> entertainments = new List<Entertainment>() {
+                // new Entertainment(new DateTime(2024, 5, 20, 4, 20, 0), "Lap dance", 2, 1),
+                // new Entertainment(new DateTime(2024, 5, 20, 4, 59, 0), "Corner Seat Experience", 0, 3)
+                // //  ^ at 04:20 AM we ordered a lap dance in seat 2, 1
+                // // [ x0 y0 ], [ x1 y0 ], [ x2 y0 ], [ x3 y0 ]
+                // // [ x0 y1 ], [ x1 y1 ], [ x2 y1 ], [ x3 y1 ]
+                // // [ x0 y2 ], [ THIS  ], [ x2 y2 ], [ x3 y2 ]
+                // // [ x0 y3 ], [ x1 y3 ], [ x2 y3 ], [ x3 y3 ]
+                // };
+                // Menu.PrintSeats(room, entertainments, 0, 0);
+                // Console.ReadKey(true);
+                
+                ConsoleKey key;
+                int choice_seat = 0;
+                int choice_row = 0;
+                int ii = 0;
+                int iii = 0;
+                do
+                {
+                    List<List<string>> all_row_top = new List<List<string>>();
+                    List<List<string>> all_row_bottom = new List<List<string>>();
+                    foreach(bool[] row in seats)
+                    {
+                        List<string> row_top = new List<string>();
+                        List<string> row_bottom = new List<string>();
+                        foreach(bool seatss in row)
+                        {         
+                            if (seatss)
+                            {
+                                row_top.Add("╔═╗");
+                                row_bottom.Add("╚═╝");
+                            }
+                            else
+                            {
+                                row_top.Add("   ");
+                                row_bottom.Add("   ");
+                            }
+                            
+                        }
+                        all_row_top.Add(row_top);
+                        all_row_bottom.Add(row_bottom);
+                    }
+
+                    var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
+                    Console.Clear();
+                    Console.Write("-----------------------------------\n");
+                    ii = 0;
+                    iii = 0;
+                    foreach(var (row_top, row_bottom) in zip)
+                    {
+                        foreach(string seat_top in row_top)
+                        {
+                            if (ii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                            Console.Write(seat_top);
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            ii++;
+                        }
+                        Console.WriteLine();
+                        foreach(string seat_bottom in row_bottom)
+                        {
+                            if (iii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                            Console.Write(seat_bottom);
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            iii++;
+                        }
+                        Console.WriteLine();
+
+                        
+                    }
+
+                    key = Console.ReadKey(true).Key;
+                    if(key == ConsoleKey.Escape)
+                    {
+                        break;
+                    }
+                    else if(key == ConsoleKey.RightArrow && choice_seat < ii - 1)
+                    {
+                        choice_seat++;
+                    }
+                    else if(key == ConsoleKey.LeftArrow && choice_seat != 0)
+                    {
+                        choice_seat--;
+                    }
+
+                }while(key != ConsoleKey.Escape);
 
             }
             else
