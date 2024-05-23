@@ -16,7 +16,7 @@ public static class ReservationMenu
             rooms.Add($"Room {RoomCounter} (Maximum size: {room.Capacity})", room);
             RoomCounter++;
         }
-        Room SelectedRoom = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
+        Room SelectedRoom  = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
         DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
         TimeOnly startTime = MenuHelper.SelectTime("Select at what time you want to start your reservation:", "", new TimeOnly(), null, null);
         DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", startDate, startDate, null);
@@ -156,6 +156,16 @@ public static class ReservationMenu
                         new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
                         new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(breakTime)
                     );
+                }},
+                {"Add Entertainment", ()=>{
+                    //Ask the user to provide the date they want a entertainment to take place
+                    DateOnly EntertainmentDate = MenuHelper.SelectDate("Select Entertainment date and time", startDate, startDate, endDate);
+                    //Ask the user to provide the time they want a entertainment to take place
+                    TimeOnly EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime);
+                    //Convert the provided date and time to a DateTime format
+                    DateTime Time = new DateTime(EntertainmentDate.Day, EntertainmentDate.Month, EntertainmentDate.Year, EntertainmentStartTime.Hour, EntertainmentStartTime.Minute, 0);
+                    MenuHelper.PrintSeats(SelectedRoom);
+
                 }},
                 {"Save", ()=>{
                     save = true;

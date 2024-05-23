@@ -1475,6 +1475,51 @@ public static class MenuHelper{
             }
         }
     #endregion
+
+    #region PrintSeats
+    public static void PrintSeats(Room r)
+    {   
+        // calculate the longest row of seats
+        int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
+        Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
+        // create the top surounding bar with the word Screen centered
+        string header = "Screen";
+        for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
+        {
+            header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
+            // header
+        }
+        Console.Write($"┌{header}┐\n");
+        for(int i=0;i<r.Seats.Length;i++)
+        {
+            for(int line=0;line<2;line++)
+            {
+                Console.Write("│ ");
+                for(int j=0;j<Math.Max(widestSeats, r.Seats[i].Length);j++)
+                {
+                    // foreach(Entertainment e in entertainments){
+                    //     // if an entertainment takes place at this seat make it "gold"
+                    //     if(e.SeatRow == i && e.SeatColumn == j){
+                    //         Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    //     }
+                    // }
+                    // if x and y are the selected seat make the background color light gray
+                    // Console.BackgroundColor = (i == y && j == x) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    // print box (based on line print the top or bottom)
+                    Console.Write(j < r.Seats[i].Length && r.Seats[i][j] ? (line==0 ? "╔═╗" : "╚═╝") : "   ");
+                    // reset colors
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write(" ");
+                }
+                Console.Write($"│\n");
+            }
+        }
+        // print bottom surounding line
+        Console.Write($"└{new string('─', (widestSeats*4)+1)}┘\n\n");
+    }
+    
+    #endregion
 }
 
 // ┌─┬┐
