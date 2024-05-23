@@ -187,14 +187,15 @@ public static class RoomLogic
                         all_row_top.Add(row_top);
                         all_row_bottom.Add(row_bottom);
                     }
-
                     var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
                     Console.Clear();
+                    Console.WriteLine("This is the current room layout:\nSelect any seat to remove.\n");
                     Console.Write("-----------------------------------\n");
                     ii = 0;
                     iii = 0;
                     foreach(var (row_top, row_bottom) in zip)
                     {
+                        Console.Write("| ");
                         foreach(string seat_top in row_top)
                         {
                             if (ii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
@@ -202,7 +203,9 @@ public static class RoomLogic
                             Console.BackgroundColor = ConsoleColor.Black;
                             ii++;
                         }
+                        Console.Write(" |");
                         Console.WriteLine();
+                        Console.Write("| ");
                         foreach(string seat_bottom in row_bottom)
                         {
                             if (iii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
@@ -210,10 +213,10 @@ public static class RoomLogic
                             Console.BackgroundColor = ConsoleColor.Black;
                             iii++;
                         }
-                        Console.WriteLine();
-
-                        
+                        Console.Write(" |");
+                        Console.WriteLine();         
                     }
+                    Console.Write("-----------------------------------\n");
 
                     key = Console.ReadKey(true).Key;
                     if(key == ConsoleKey.Escape)
@@ -227,6 +230,14 @@ public static class RoomLogic
                     else if(key == ConsoleKey.LeftArrow && choice_seat != 0)
                     {
                         choice_seat--;
+                    }
+                    else if(key == ConsoleKey.UpArrow && choice_seat >= (int) GivenSeats_p)
+                    {
+                        choice_seat = choice_seat - (int) GivenSeats_p;
+                    }
+                    else if(key == ConsoleKey.DownArrow&& choice_seat >= (int) GivenSeats_p)
+                    {
+                        choice_seat = choice_seat + (int) GivenSeats_p;
                     }
 
                 }while(key != ConsoleKey.Escape);
