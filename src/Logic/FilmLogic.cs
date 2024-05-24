@@ -13,8 +13,8 @@ public class FilmLogic
         {
             foreach(Film film in list_films)
             {
-                all_info = all_info + $"film Id: {film.Id}\ntitle: {film.Title}\ngenres: {string.Join(", ", film.Genres)}\nduration: {film.Runtime}\n";
-                all_info = all_info + $"_________________________________________\n";
+                all_info = all_info + $"film Id: {film.Id}\ntitle: {film.Title}";
+                all_info = all_info + $"\n_______________________________________\n";
             }
             return all_info;
         }
@@ -234,7 +234,7 @@ public class FilmLogic
         filmacesser.Return_info(list_films);
         return info;
     }
-    public string change_director(int id, List<Dictionary<string, string>> directorsList)
+    public string change_director(int id, List<string> directorsList)
     {
         string info = "";
         FilmAcesser filmacesser = new();

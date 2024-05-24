@@ -1,42 +1,33 @@
 using Newtonsoft.Json;
 public class Film : Media, IComparable
 {
-    [JsonProperty("Id")]
     public int Id { get; set; }
     private List<string> _genres;
 
-    [JsonProperty("Genres")]
+    [JsonProperty("genres")]
     [JsonConverter(typeof(MovieConverter<string>))]
     public List<string> Genres
     {
         get => _genres ?? new List<string>();
         set => _genres = value;
     }
-    [JsonProperty("Original_language")]
     public string Original_language { get; set; } // original language of movies
 
-    [JsonProperty("Overview")]
     public string Overview { get; set; } // string with plot of movie
 
-    [JsonProperty("Release_date")]
     public string Release_date { get; set; }
 
-    [JsonProperty("Runtime")]
     public int Runtime { get; set; } // length of movie in minutes
 
-    [JsonProperty("Title")]
     public string Title { get; set; } // Movie Title
 
-    [JsonProperty("Vote_average")]
     public double Vote_average { get; set; } // Average rating out of ten
 
-    [JsonProperty("Certification")]
     public string Certification { get; set; } // age certification like PG-13, R rated ETC.
 
-    [JsonProperty("Directors")]
-    public List<Dictionary<string, string>> Directors { get; set; } // list of dicts containing ID and name of directors
+    public List<string> Directors { get; set; } // list of dicts containing ID and name of directors
 
-    public Film(int id, List<string> genres, string original_language, string overview, string release_date, int runtime, string title, double voteaverage, string certification, List<Dictionary<string, string>> directors)
+    public Film(int id, List<string> genres, string original_language, string overview, string release_date, int runtime, string title, double voteaverage, string certification, List<string> directors)
     {
         Id = id;
         Genres = genres;

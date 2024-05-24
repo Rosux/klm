@@ -47,6 +47,4 @@ public class MovieConverter<T> : JsonConverter
             JArray.FromObject(list).WriteTo(writer);
         }
     }
-
-
 }

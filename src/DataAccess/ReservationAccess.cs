@@ -198,7 +198,7 @@ public class ReservationAccess : DatabaseHandler
                     (string)(x.Property("Title").Value),
                     (double)(x.Property("Vote_average").Value),
                     (string)(x.Property("Certification").Value),
-                    (List<Dictionary<string, string>>)JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(x.Property("Directors").Value.ToString())
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Directors").Value.ToString())
                 );
             }
             else if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
