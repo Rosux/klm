@@ -1480,174 +1480,304 @@ public static class MenuHelper{
 
     #region Table
     /// <summary>
-    /// Convert a generic list of items to a dictionary holding columns of the original generic list.
-    /// </summary>
-    /// <typeparam name="T">The type of what the list holds.</typeparam>
-    /// <param name="items">A generic list of items that gets converted to a column structured dictionary.</param>
-    /// <returns>A dictionary that has a key for each column and the data saved as strings.</returns>
-    private static Dictionary<string, List<string>> CreateColumns<T>(List<T> items)
-    {
-        // dict holds basically a structure like this
-        /*
-            "Name": ["Bob", "Peter", "Tony"],
-            "Email": ["Bob@mail.com", "Peter@mail.com", "Tony@mail.com"],
-        */
-        Dictionary<string, List<string>> columns = new Dictionary<string, List<string>>();
-
-        MemberInfo[] defaultMembers = typeof(T).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
-        foreach(MemberInfo defaultMemberInfo in defaultMembers)
-        {
-            columns.Add(defaultMemberInfo.Name.ToString(), new List<string>());
-        }
-
-        foreach(T item in items)
-        {
-            if(item == null)
-            {
-                continue;
-            }
-            MemberInfo[] itemMembers = item.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
-            foreach(MemberInfo member in itemMembers)
-            {
-                 // member here is the name of the field/property (for a User this would be Id, FirstName, LastName, Email, Password, Role)
-                if(columns.ContainsKey(member.Name))
-                {
-                    string memberDataString = "N/A";
-                    if(member.MemberType == MemberTypes.Property)
-                    {
-                        PropertyInfo memberProperty = (PropertyInfo)member;
-                        if(memberProperty.GetValue(item) != null)
-                        {
-                            memberDataString = memberProperty.GetValue(item).ToString();
-                        }
-                    }
-                    else if(member.MemberType == MemberTypes.Field)
-                    {
-                        FieldInfo memberField = (FieldInfo)member;
-                        if(memberField.GetValue(item) != null)
-                        {
-                            memberDataString = memberField.GetValue(item).ToString();
-                        }
-                    }
-                    columns[member.Name].Add(memberDataString);
-                }
-            }
-        }
-        return columns;
-    }
-
-    /// <summary>
     /// Calculate the width of each column based on the longest value or header of that column.
     /// </summary>
-    /// <param name="columns">A dictionary holding the data for each column. Each key represents a property/field name, and the corresponding value is a list of data values in that column.</param>
+    /// <typeparam name="T">The type of item to get the properties from.</typeparam>
+    /// <param name="items">A list of items where the longest word gets generated from</param>
     /// <param name="headers">A dictionary representing the headers of the table. Each key represents a column name, and the corresponding value is the property/field for that the columns data.</param>
     /// <returns>A list of integers representing the maximum width for each column in characters.</returns>
-    private static List<int> GetMaxColumnWidths(Dictionary<string, List<string>> columns, Dictionary<string, string> headers){
+    private static List<int> GetMaxColumnWidths<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
         List<int> columnWidths = new List<int>();
-        // loop over all headers (being for example {ColumnName, FieldName/PropertyName})
-        for(int i=0;i<headers.Count;i++){
-            KeyValuePair<string, string> kvp = headers.ElementAt(i);
-            string itemPropertyName = kvp.Value;
-            columnWidths.Add(kvp.Key.ToString().Length); // add the length of the header
-            foreach(string d in columns[itemPropertyName]){
-                if(d.Length >= columnWidths[i]){
-                    columnWidths[i] = d.Length;
+        // loop over all items
+        int columnIndex = 0;
+        foreach(KeyValuePair<string, Func<T, object>> header in headers){
+            string headerName = header.Key;
+            columnWidths.Add(headerName.Length);
+            for(int i=0;i<items.Count;i++){
+                string propertyValue = header.Value(items[i]).ToString() ?? "";
+                if(propertyValue.Length >= columnWidths[columnIndex]){
+                    columnWidths[columnIndex] = propertyValue.Length;
                 }
             }
+            columnIndex++;
         }
         return columnWidths;
     }
 
-    public static void Table<T>(List<T> items, Dictionary<string, string> headers)
+    public static void Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>> propertyEditMapping, Func<T, bool> saveEditedUserMethod)
     {
-        Dictionary<string, List<string>> columns = CreateColumns(items);
+        // create a list of editable options (like UserName, Email, role etc)
+        List<string> editOptions = new List<string>();
+        if(canEdit){
+            foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
+                editOptions.Add(editMapping.Key);
+            }
+        }
+
+        // if you can edit the data and ur not a user prevent editing (failsafe for incompetent developers in case a user ever uses this method (jk jk not incompetent))
+        if(canEdit && Program.CurrentUser != null && Program.CurrentUser.Role == UserRole.USER){
+            return;
+        }
+
         List<List<T>> chunks = new List<List<T>>();
         for (int i=0;i<items.Count;i+=10)
         {
             chunks.Add(items.Skip(i).Take(10).ToList());
         }
 
-        // get the width of each column
-        List<int> columnWidths = GetMaxColumnWidths(columns, headers);
-
-        // get the total table width (for alignment purposes and ease of use)
-        // │ Firstname │ LongestName │ LongestEmail │\n
-        // ^^=2       ^^^=3         ^^^ = 3        ^^=2
-        // ............--------------...............=
-        int totalWidth = 1; // 1 since the end of the line has a vertical bar
-        foreach(int textLength in columnWidths){
-            totalWidth += 2 + textLength + 1; // 2 is the 2 spaces before the text (being "| ") and then the max text length (columnWidths) and then 1 for the space after the text (in "| text |" it would be " |"<- this one)
-        }
-
-
+        Dictionary<MemberInfo, (object, object)> propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+        T editedObject = default(T);
+        bool editing = false;
+        int editSelection = 0;
+        int currentPageSelection = 0;
         int currentPage = 0;
         int maxPage = chunks.Count-1;
         ConsoleKey key;
         do
         {
+            // get the width of each column
+            List<int> columnWidths = GetMaxColumnWidths(items, headers);
+
+            // get the total table width (for alignment purposes and ease of use)
+            // │ Firstname │ LongestName │ LongestEmail │\n
+            // ^^=2       ^^^=3         ^^^ = 3        ^^=2
+            // ............--------------...............=
+            int totalWidth = 1; // 1 since the end of the line has a vertical bar
+            foreach(int textLength in columnWidths){
+                totalWidth += 2 + textLength + 1; // 2 is the 2 spaces before the text (being "| ") and then the max text length (columnWidths) and then 1 for the space after the text (in "| text |" it would be " |"<- this one)
+            }
+
+            // create the edit table text
+            List<string> editOptionData = new List<string>();
+            if(canEdit){
+                foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
+                    string dataString = editMapping.Value.Accessor(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                    if(editing){
+                        foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
+                            if(editMapping.Value.Accessor(editedObject).ToString() == kvp.Value.Item1.ToString()){
+                                (object oldData, object newData) = kvp.Value;
+                                if(oldData.ToString() != newData.ToString()){
+                                    dataString = $"{oldData} -> {newData}";
+                                }
+                            }
+                        }
+                    }
+                    editOptionData.Add(": "+dataString);
+                }
+            }
+            // calculate the longest edit table options
+            int longestEditOption = 0;
+            for(int i=0;i<editOptions.Count;i++){
+                if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+            }
+            if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
+            if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
+            if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
+
             // create the page arrows
             string pageArrows = $"{currentPage+1}/{maxPage+1}";
             // 8 in the next line stands for "| <-" and "-> |" totaling to 8 characters
-            for(int i=Math.Max(0, (totalWidth-pageArrows.Length) - 8);i>0;i--){
+            for(int i=Math.Max(0, totalWidth-pageArrows.Length - 8);i>0;i--){
                 pageArrows = ((i % 2 == 1) ? " " : "") + pageArrows + ((i % 2 == 0) ? " " : "");
             }
             pageArrows = (currentPage > 0 ? "│ <-" : "│   ") + pageArrows + (currentPage < maxPage ? "-> │" : "   │");
 
-            // clear the screen and print the table
-            Console.Clear();
+            #region Table String List
+            List<string> tableStringLines = new List<string>();
 
             // prints the top line
-            Console.Write($"┌{new string('─', totalWidth-2)}┐\n");
+            tableStringLines.Add($"┌{new string('─', totalWidth-2)}┐");
 
             // prints the <- pagenumber ->
-            Console.Write($"{pageArrows}\n");
+            tableStringLines.Add($"{pageArrows}");
 
             // prints the seperator between page number and headers
+            string seperatorLine1 = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 // the +2 is for a space at both sides
-                Console.Write($"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┬')}");
+                seperatorLine1 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┬')}";
             }
+            tableStringLines.Add(seperatorLine1);
 
             // prints the headers
-            Console.Write("\n");
+            string headerLine = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 string headerText = headers.Keys.ToList()[i];
-                Console.Write($"{(i==0 ? '│' : "")} {headerText}{new string(' ', Math.Max(0, columnWidths[i] - headerText.Length))} │");
+                headerLine += $"{(i==0 ? '│' : "")} {headerText}{new string(' ', Math.Max(0, columnWidths[i] - headerText.Length))} │";
             }
+            tableStringLines.Add(headerLine);
 
             // prints the seperator between headers and data
-            Console.Write("\n");
+            string seperatorLine2 = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 // the +2 is for a space at both sides
-                Console.Write($"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┼')}");
+                seperatorLine2 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┼')}";
             }
+            tableStringLines.Add(seperatorLine2);
 
             // prints the data
-            Console.Write("\n");
             for(int i=0;i<chunks[currentPage].Count;i++){ // loop over all items (like all Users)
-                Console.Write("│");
+                string dataLine = "";
+                dataLine += "│";
                 int j = 0;
-                foreach(string header in headers.Values){
-                    string itemText = columns[header].ElementAt((currentPage*10)+i);
-                    Console.Write($" {itemText}{new string(' ', Math.Max(0, columnWidths[j]-itemText.Length))} │");
+                foreach(Func<T, object> header in headers.Values){
+                    string itemText = header(chunks[currentPage][i]).ToString();
+                    dataLine += $" {itemText}{new string(' ', Math.Max(0, columnWidths[j]-itemText.Length))} │";
                     j++;
                 }
-                Console.Write("\n");
+                tableStringLines.Add(dataLine);
             }
 
             // print the bottom line
+            string bottomLine = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 // the +2 is for a space at both sides
-                Console.Write($"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '┴')}");
+                bottomLine += $"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '┴')}";
             }
+            tableStringLines.Add(bottomLine);
+            #endregion
+
+            #region Edit string list
+            List<string> editStringLines = new List<string>();
+            editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
+            for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
+                string editLine = editOptions[i];
+                string editDataLine = editOptionData[i];
+                editStringLines.Add($"│ {editLine}{editDataLine}{new string(' ', Math.Max(0, longestEditOption-(editLine.Length+editDataLine.Length)))} │");
+            }
+            editStringLines.Add($"├─{new string('─', Math.Max(0, longestEditOption))}─┤");
+            editStringLines.Add($"│ Save changes{new string(' ', Math.Max(0, longestEditOption-"Save changes".Length))} │");
+            editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
+            editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
+            #endregion
+
+            // clear the screen and print the table
+            Console.Clear();
+            for(int i=0;i<Math.Max(editStringLines.Count, tableStringLines.Count);i++){
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(0, 2) : new string(' ', 2))}");
+                Console.BackgroundColor = (i == 5+currentPageSelection && !editing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(2, tableStringLines[i].Length-4) : new string(' ', totalWidth-4))}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(tableStringLines[i].Length-2, 2) : new string(' ', 2))}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                if(!canEdit){
+                    Console.Write("\n");
+                    continue;
+                }
+                Console.Write($" {(i==5+currentPageSelection ? "->" : "  ")} ");
+                // if i is on the seperator line in the edit block we decrease i by 1 to offset the color (weird hack but works)
+                int selectionOffset = editSelection >= editOptions.Count ? 1 : 0;
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(0, 2) : "")}");
+                Console.BackgroundColor = (i - selectionOffset == 1 + editSelection && editing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(2, editStringLines[i].Length-4) : "")}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(editStringLines[i].Length-2, 2) : "")}");
+                Console.Write("\n");
+            }
+            Console.Write($"\nUser the Arrow Keys to move around\n{(canEdit ? "Press Enter to select a row to edit\n" : "")}{(canCancel ? "Press Escape to go back\n" : "")}");
 
             key = Console.ReadKey(true).Key;
 
             if(key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
                 currentPage += (key == ConsoleKey.LeftArrow) ? -1 : 1;
             }
+            if(key == ConsoleKey.Escape && canCancel){
+                break;
+            }
+            if(key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow){
+                if(!editing){
+                    currentPageSelection += key == ConsoleKey.UpArrow ? -1 : 1;
+                }else{
+                    editSelection += key == ConsoleKey.UpArrow ? -1 : 1;
+                }
+            }
+            if(key == ConsoleKey.Enter && !editing && canEdit){
+                editing = true;
+                editedObject = chunks[currentPage][currentPageSelection];
+                MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+                propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                foreach(MemberInfo member in toBeEditedMembers){
+                    object memberData = null;
+                    if(member.MemberType == MemberTypes.Property){
+                        PropertyInfo memberProperty = (PropertyInfo)member;
+                        memberData = (object)memberProperty.GetValue(editedObject);
+                    }
+                    if(member.MemberType == MemberTypes.Field){
+                        FieldInfo memberProperty = (FieldInfo)member;
+                        memberData = (object)memberProperty.GetValue(editedObject);
+                    }
+                    propertyUpdate.Add(member, (memberData, memberData));
+                }
+            }else if(key == ConsoleKey.Enter && editing && canEdit){
+                if(editSelection == 2+editOptions.Count-2){ // user selected Save Changes
+                    // save the user data here
+                    if(editedObject != null){
+                        // update all members (fields and properties)
+                        MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+                        foreach(MemberInfo member in toBeEditedMembers){
+                            foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
+                                if(member == updatedMember.Key){
+                                    PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
+                                    if(p != null){
+                                        p.SetValue(editedObject, updatedMember.Value.Item2);
+                                    }
+                                    FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
+                                    if(f != null){
+                                        f.SetValue(editedObject, updatedMember.Value.Item2);
+                                    }
+                                }
+                            }
+                        }
+                        // send new data to the save method given by user
+                        bool shouldRevert = !saveEditedUserMethod.Invoke(editedObject);
+                        // revert data if the data didnt get saved (we are working with references and not copies sadly (stupid c#))
+                        if(shouldRevert){
+                            // set data back
+                            foreach(MemberInfo member in toBeEditedMembers){
+                                foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
+                                    if(member == updatedMember.Key){
+                                        PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
+                                        if(p != null){
+                                            p.SetValue(editedObject, updatedMember.Value.Item1);
+                                        }
+                                        FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
+                                        if(f != null){
+                                            f.SetValue(editedObject, updatedMember.Value.Item1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    editing = false;
+                    editSelection = 0;
+                    editedObject = default(T);
+                    propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                }else if(editSelection == 2+editOptions.Count-1){ // user selected Discard Changes
+                    editing = false;
+                    editSelection = 0;
+                    editedObject = default(T);
+                    propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
+                    if(editedObject != null){
+                        object currentPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.Accessor(editedObject);
+                        object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
+                        foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
+                            if(member.Value.Item1.ToString() == currentPropertyValue.ToString()){
+                                propertyUpdate[member.Key] = (currentPropertyValue, newPropertyValue);
+                            }
+                        }
+                    }
+                }
+            }
             currentPage = Math.Clamp(currentPage, 0, chunks.Count-1);
+            currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count-1);
+            editSelection = Math.Clamp(editSelection, 0, 2+editOptions.Count-1);
         }while(true);
+        return;
+        // return null;
     }
     #endregion
 }

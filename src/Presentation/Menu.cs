@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using TimeLine;
 class Menu
 {
     public static void Start()
@@ -85,33 +87,88 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        // UserAccess u = new UserAccess();
-        // List<User> baka = u.GetAllUsers();
-        // Dictionary<string, string> headers = new Dictionary<string, string>();
-        // headers.Add("Email :)", "Email");
-        // headers.Add("User's name", "LastName");
-        // headers.Add("User's pass", "Password");
-        // // headers.Add("User's Roles (maybe not)", "Role");
-        // MenuHelper.Table(baka, headers);
 
-        // ConsumptionAccess c = new ConsumptionAccess();
-        // List<Consumption> cs = c.ReadConsumption();
-        // Dictionary<string, string> cheaders = new Dictionary<string, string>
-        // {
-        //     { "Consumption name???????????", "Name" },
-        //     { "pr (euros)", "Price" }
-        // };
-        // MenuHelper.Table(cs, cheaders);
+        bool editUsers = MenuHelper.SelectFromList("Select an option", new Dictionary<string, bool>(){
+            {"Edit Users", true},
+            {"Edit Films", false},
+        });
 
+        if(editUsers){
+            UserAccess u = new UserAccess();
+            List<User> baka = u.GetAllUsers();
+            // string is the header text
+            // User is the type of the model you want in the table
+            // object is what the Func must return
+            Dictionary<string, Func<User, object>> headers = new Dictionary<string, Func<User, object>>(){
+                //     ^required    ^     ^
+                //                  ^     ^the type you want the table to use for the User instance (like User.FirstName)
+                //                  ^specifies the type u want to use in the table (in this case its users so we use User)
+                {"UserName", u => u.FirstName},
+                {"Role van de user?", u => u.Role},
+                {"e-maillll", u => u.Email},
+                {"e-pass", u => u.Password},
+                {"e-idk nog een ding", u => u.LastName},
+            };
+            Dictionary<string, PropertyEditMapping<User>> editStuff = new Dictionary<string, PropertyEditMapping<User>>(){
+                {"Firstname", new(u=>u.FirstName, GetNewFirstName)},
+                {"Lastname", new(u=>u.LastName, GetNewLastName)},
+                {"Role", new(u=>u.Role, GetNewRole)},
+                {"Id", new(u=>u.Id, GetNewId)},
+            };
+            MenuHelper.Table(baka, headers, true, true, editStuff, SaveEditedUser);
+            // the SaveEditedUser must return a boolean indicating if the data is saved or not
+        }else{
+            FilmAcesser f = new FilmAcesser(); // film model
+            List<Film> fs = f.Get_info(); // put all films in a list
+            Dictionary<string, Func<Film, object>> fheaders = new Dictionary<string, Func<Film, object>> // create a dictionary with the headername and property of the item
+            {
+                { "Film Name", f => f.Title}, // print "Film Name" bovenaan en gebruikt Film.Title om dat in de lijst te zetten
+                { "hoe lang duurt deze film?", f => f.Runtime } // print "hoe lang duurt deze film?" bovenaan en gebruikt Film.Runtime om dat in de lijst te zetten
+            };
+            Dictionary<string, PropertyEditMapping<Film>> editSettings = new Dictionary<string, PropertyEditMapping<Film>>(){
+                {"Title", new(f=>f.Title, (Film u)=>{
+                    return MenuHelper.SelectText("Select the new film title:", "(\\S| )") ?? "";
+                })},
+                {"Length", new(f=>f.Runtime, (Film u)=>{
+                    return MenuHelper.SelectInteger("Select the new film length:", "", false, 0, 0, 500) ?? 0;
+                })},
+            };
+            MenuHelper.Table(fs, fheaders, true, true, editSettings, (Film)=>{
+                // lets just say the film changes are saved
+                return true;
+            });
+        }
+        
 
-        FilmAcesser f = new FilmAcesser();
-        List<Film> fs = f.Get_info();
-        Dictionary<string, string> fheaders = new Dictionary<string, string>
-        {
-            { "Film Name", "Title" },
-            { "hoe lang duurt deze kanker film?", "Runtime" }
-        };
-        MenuHelper.Table(fs, fheaders);
+    }
 
+    public static bool SaveEditedUser(User editedUserObject){
+        Console.Clear();
+        Console.WriteLine(editedUserObject.Id);
+        Console.WriteLine(editedUserObject.FirstName);
+        Console.WriteLine(editedUserObject.LastName);
+        Console.WriteLine(editedUserObject.Email);
+        Console.WriteLine(editedUserObject.Password);
+        Console.WriteLine(editedUserObject.Role);
+        Console.ReadKey(true);
+        return true;
+    }
+
+    public static object GetNewLastName(User userObject){
+        Console.Write($"old data: {userObject.LastName}\nFill in the new Lastname: ");
+        return Console.ReadLine() ?? "Default User LastName";
+    }
+
+    public static object GetNewFirstName(User userObject){
+        Console.Write($"old data: {userObject.FirstName}\nFill in the new Firstname: ");
+        return Console.ReadLine() ?? "Default User FirstName";
+    }
+
+    public static object GetNewRole(User userObject){
+        return UserRole.USER;
+    }
+
+    public static object GetNewId(User userObject){
+        return -1;
     }
 }
