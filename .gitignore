@@ -398,7 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Databases and storage files (fuck u im not manually reseting the database everytime)
-Film.json
-Id.json
+# Film.json
+# Id.json
 Series.json
 *.db
