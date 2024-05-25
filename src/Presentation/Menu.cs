@@ -115,7 +115,7 @@ class Menu
                 {"Role", new(u=>u.Role, GetNewRole)},
                 {"Id", new(u=>u.Id, GetNewId)},
             };
-            User? y = MenuHelper.Table(baka, headers, true, true, false, editStuff, SaveEditedUser, false, ()=>{return new User("fname", "lname", "email", "pass");}, false, (User u)=>{return true;});
+            User? y = MenuHelper.Table(baka, headers, false, true, true, editStuff, SaveEditedUser, true, ()=>{return new User("fname", "lname", "email", "pass");}, true, (User u)=>{return true;});
             if(y == null){
                 Console.WriteLine("NO USER SELECTED!");
             }else{

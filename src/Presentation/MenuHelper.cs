@@ -1504,6 +1504,22 @@ public static class MenuHelper{
         return columnWidths;
     }
 
+    /// <summary>
+    /// Creates a table that holds a list of objects.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> being a method that gets a type T object and returns an object of any type.</param>
+    /// <param name="canSelect">A boolean indicating if the user is able to select a row. The item on this row will be returned.</param>
+    /// <param name="canCancel">A boolean indicating if the user can press escape to cancel everything and return back.</param>
+    /// <param name="canEdit">A boolean indicating if the user is able to edit properties of the items.</param>
+    /// <param name="propertyEditMapping">A Dictionary where the key is the editing text and the value being a PropertyEditMapping instance of type T that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the user object and returns an object being the new member of type T.</param>
+    /// <param name="saveEditedUserMethod">A Func<T, bool> that takes in the newly edited T object and returns a boolean indicating if it saved or not.</param>
+    /// <param name="canAdd">A boolean indicating if the user can add a new object of type T. If the user chooses to make a new object of type T it will call the addMethod.</param>
+    /// <param name="addMethod">A Func<T?> that creates a new instance of object T or NULL and returns it. If the result is NULL the new instance wont get saved. If the result is the new object it gets added to the table.</param>
+    /// <param name="canDelete">A boolean indicating if the user can delete the item in the list. Uses the deleteMethod to delete the instance.</param>
+    /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
+    /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
     public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod)
     {
         if(propertyEditMapping == null || saveEditedUserMethod == null){
@@ -1788,12 +1804,18 @@ public static class MenuHelper{
             #region Input
             key = Console.ReadKey(true).Key;
 
-            if(key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
+            if(!editing && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)){
                 currentPage += (key == ConsoleKey.LeftArrow) ? -1 : 1;
                 currentPageSelection = 0;
             }
-            if(key == ConsoleKey.Escape && canCancel){
-                break;
+            if(key == ConsoleKey.Escape){
+                if(canCancel && !editing){
+                    break;
+                }
+                if(editing){
+                    editing = false;
+                    editSelection = 0;
+                }
             }
             if(key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow){
                 if(!editing){
@@ -1976,6 +1998,7 @@ public static class MenuHelper{
     }
     #endregion
 
+    #region String Helpers
     private static string Format(string data, int totalWidth, char d=' ')
     {
         return $"{data}{new string(d, Math.Max(0, totalWidth-data.Length))}";
@@ -1994,6 +2017,7 @@ public static class MenuHelper{
         }
         return m;
     }
+    #endregion
 }
 
 // ┌─┬┐
