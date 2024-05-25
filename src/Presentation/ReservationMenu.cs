@@ -165,7 +165,12 @@ public static class ReservationMenu
                     do{
                         Console.Clear();
                         MenuHelper.PrintSeats(SelectedRoom, entertainments, x, y);
-                        Console.WriteLine("This seat already has entertainment:");
+                        Console.WriteLine("Press escape to return and save\n");
+                        if(entertainments.Any(e => e.SeatRow == y && e.SeatColumn == x)){
+                            Console.WriteLine("This seat already has an or multiple entertainment:");
+                        }else{
+                            Console.WriteLine("This seat has no entertainments yet.");
+                        }
                         foreach (var entertainment in entertainments)
                         {
                             if (entertainment.SeatRow == y && entertainment.SeatColumn == x)

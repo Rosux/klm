@@ -1479,7 +1479,6 @@ public static class MenuHelper{
     #region PrintSeats
     public static void PrintSeats(Room r,List<Entertainment> entertainments, int x, int y)
     {   
-        Console.WriteLine("Press escape to return and save");
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
         Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
