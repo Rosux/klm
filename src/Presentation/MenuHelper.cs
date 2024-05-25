@@ -1949,11 +1949,13 @@ public static class MenuHelper{
                         editing = false;
                         editSelection = 0;
                         editedObject = default(T);
-                        if(chunks[currentPage].Count-1 == 0){
-                            currentPage--;
-                            currentPageSelection = chunks[currentPage].Count-1;
-                        }else{
-                            currentPageSelection--;
+                        if(remove){
+                            if(chunks[currentPage].Count-1 == 0){
+                                currentPage--;
+                                currentPageSelection = chunks[currentPage].Count-1;
+                            }else{
+                                currentPageSelection--;
+                            }
                         }
                     }
                     #endregion
