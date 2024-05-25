@@ -115,7 +115,12 @@ class Menu
                 {"Role", new(u=>u.Role, GetNewRole)},
                 {"Id", new(u=>u.Id, GetNewId)},
             };
-            MenuHelper.Table(baka, headers, true, true, editStuff, SaveEditedUser);
+            User? y = MenuHelper.Table(baka, headers, true, true, false, editStuff, SaveEditedUser, false, ()=>{return new User("fname", "lname", "email", "pass");}, false, (User u)=>{return true;});
+            if(y == null){
+                Console.WriteLine("NO USER SELECTED!");
+            }else{
+                Console.WriteLine($"USER: {y.FirstName}, {y.Id}, {y.Email}, {y.Role}");
+            }
             // the SaveEditedUser must return a boolean indicating if the data is saved or not
         }else{
             FilmAcesser f = new FilmAcesser(); // film model
@@ -133,12 +138,11 @@ class Menu
                     return MenuHelper.SelectInteger("Select the new film length:", "", false, 0, 0, 500) ?? 0;
                 })},
             };
-            MenuHelper.Table(fs, fheaders, true, true, editSettings, (Film)=>{
+            MenuHelper.Table(fs, fheaders, false, true, false, editSettings, (Film)=>{
                 // lets just say the film changes are saved
                 return true;
-            });
+            }, true, ()=>{return fs[0];}, true, (Film f)=>{return true;});
         }
-        
 
     }
 

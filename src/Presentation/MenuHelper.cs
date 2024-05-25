@@ -1504,8 +1504,23 @@ public static class MenuHelper{
         return columnWidths;
     }
 
-    public static void Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>> propertyEditMapping, Func<T, bool> saveEditedUserMethod)
+    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod)
     {
+        if(propertyEditMapping == null || saveEditedUserMethod == null){
+            canEdit = false;
+        }
+        if(addMethod == null){
+            canAdd = false;
+        }
+        if(deleteMethod == null){
+            canDelete = false;
+        }
+        if(canSelect){
+            canDelete = false;
+            canEdit = false;
+            canAdd = false;
+        }
+
         // create a list of editable options (like UserName, Email, role etc)
         List<string> editOptions = new List<string>();
         if(canEdit){
@@ -1515,26 +1530,57 @@ public static class MenuHelper{
         }
 
         // if you can edit the data and ur not a user prevent editing (failsafe for incompetent developers in case a user ever uses this method (jk jk not incompetent))
-        if(canEdit && Program.CurrentUser != null && Program.CurrentUser.Role == UserRole.USER){
-            return;
-        }
-
-        List<List<T>> chunks = new List<List<T>>();
-        for (int i=0;i<items.Count;i+=10)
-        {
-            chunks.Add(items.Skip(i).Take(10).ToList());
+        if((canEdit || canDelete || canAdd) && Program.CurrentUser != null && Program.CurrentUser.Role == UserRole.USER){
+            return default(T);
         }
 
         Dictionary<MemberInfo, (object, object)> propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
         T editedObject = default(T);
+        bool showEditTable = (canEdit || canDelete);
         bool editing = false;
         int editSelection = 0;
         int currentPageSelection = 0;
         int currentPage = 0;
-        int maxPage = chunks.Count-1;
         ConsoleKey key;
         do
         {
+            #region Generate pages
+            List<List<T>> chunks = new List<List<T>>();
+            for (int i=0;i<items.Count;i+=10)
+            {
+                chunks.Add(items.Skip(i).Take(10).ToList());
+            }
+            int maxPage = chunks.Count-1;
+            if(currentPage > maxPage){
+                currentPage--;
+            }
+            #endregion
+
+            #region Create edit table values (": oldData -> newData")
+            List<string> editOptionData = new List<string>();
+            if(showEditTable && chunks.Count > 0){
+                // create the edit table text
+                if(canEdit){
+                    foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
+                        string dataString = editMapping.Value.Accessor(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                        if(editing){
+                            foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
+                                if(editMapping.Value.Accessor(editedObject).ToString() == kvp.Value.Item1.ToString()){
+                                    (object oldData, object newData) = kvp.Value;
+                                    if(oldData.ToString() != newData.ToString()){
+                                        dataString = $"{oldData} -> {newData}";
+                                    }
+                                }
+                            }
+                        }
+                        editOptionData.Add(": "+dataString);
+                    }
+                }
+
+            }
+            #endregion
+
+            #region Calculate lengths of tables/strings
             // get the width of each column
             List<int> columnWidths = GetMaxColumnWidths(items, headers);
 
@@ -1547,33 +1593,22 @@ public static class MenuHelper{
                 totalWidth += 2 + textLength + 1; // 2 is the 2 spaces before the text (being "| ") and then the max text length (columnWidths) and then 1 for the space after the text (in "| text |" it would be " |"<- this one)
             }
 
-            // create the edit table text
-            List<string> editOptionData = new List<string>();
-            if(canEdit){
-                foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                    string dataString = editMapping.Value.Accessor(chunks[currentPage][currentPageSelection]).ToString() ?? "";
-                    if(editing){
-                        foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
-                            if(editMapping.Value.Accessor(editedObject).ToString() == kvp.Value.Item1.ToString()){
-                                (object oldData, object newData) = kvp.Value;
-                                if(oldData.ToString() != newData.ToString()){
-                                    dataString = $"{oldData} -> {newData}";
-                                }
-                            }
-                        }
-                    }
-                    editOptionData.Add(": "+dataString);
-                }
-            }
             // calculate the longest edit table options
             int longestEditOption = 0;
-            for(int i=0;i<editOptions.Count;i++){
-                if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+            if(showEditTable && chunks.Count > 0){
+                for(int i=0;i<editOptions.Count;i++){
+                    if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+                }
+                if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
+                if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
+                if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
             }
-            if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
-            if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
-            if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
+            if(canDelete){
+                if($"Delete {typeof(T)}".Length > longestEditOption){longestEditOption = $"Delete {typeof(T)}".Length;}
+            }
+            #endregion
 
+            #region Table String List
             // create the page arrows
             string pageArrows = $"{currentPage+1}/{maxPage+1}";
             // 8 in the next line stands for "| <-" and "-> |" totaling to 8 characters
@@ -1582,11 +1617,10 @@ public static class MenuHelper{
             }
             pageArrows = (currentPage > 0 ? "│ <-" : "│   ") + pageArrows + (currentPage < maxPage ? "-> │" : "   │");
 
-            #region Table String List
             List<string> tableStringLines = new List<string>();
 
             // prints the top line
-            tableStringLines.Add($"┌{new string('─', totalWidth-2)}┐");
+            tableStringLines.Add($"┌{Format('─', totalWidth-2)}┐");
 
             // prints the <- pagenumber ->
             tableStringLines.Add($"{pageArrows}");
@@ -1603,7 +1637,7 @@ public static class MenuHelper{
             string headerLine = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 string headerText = headers.Keys.ToList()[i];
-                headerLine += $"{(i==0 ? '│' : "")} {headerText}{new string(' ', Math.Max(0, columnWidths[i] - headerText.Length))} │";
+                headerLine += $"{(i==0 ? '│' : "")} {Format(headerText, columnWidths[i])} │";
             }
             tableStringLines.Add(headerLine);
 
@@ -1611,77 +1645,152 @@ public static class MenuHelper{
             string seperatorLine2 = "";
             for(int i=0;i<headers.Keys.ToList().Count;i++){
                 // the +2 is for a space at both sides
-                seperatorLine2 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┼')}";
+                if(chunks.Count > 0){
+                    seperatorLine2 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┼')}";
+                }else{
+                    seperatorLine2 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┴')}";
+                }
             }
             tableStringLines.Add(seperatorLine2);
 
             // prints the data
-            for(int i=0;i<chunks[currentPage].Count;i++){ // loop over all items (like all Users)
-                string dataLine = "";
-                dataLine += "│";
-                int j = 0;
-                foreach(Func<T, object> header in headers.Values){
-                    string itemText = header(chunks[currentPage][i]).ToString();
-                    dataLine += $" {itemText}{new string(' ', Math.Max(0, columnWidths[j]-itemText.Length))} │";
-                    j++;
+            if(chunks.Count > 0){
+                for(int i=0;i<chunks[currentPage].Count;i++){ // loop over all items (like all Users)
+                    string dataLine = "";
+                    dataLine += "│";
+                    int j = 0;
+                    foreach(Func<T, object> header in headers.Values){
+                        string itemText = header(chunks[currentPage][i]).ToString();
+                        dataLine += $" {Format(itemText, columnWidths[j])} │";
+                        j++;
+                    }
+                    tableStringLines.Add(dataLine);
                 }
-                tableStringLines.Add(dataLine);
+            }else{
+                tableStringLines.Add($"│ {Center("No row found", totalWidth-4)} │");
             }
 
-            // print the bottom line
-            string bottomLine = "";
-            for(int i=0;i<headers.Keys.ToList().Count;i++){
+            if(canAdd){
+                // prints the seperator line
+                string seperatorLine3 = "";
+                for(int i=0;i<headers.Keys.ToList().Count;i++){
+                    // the +2 is for a space at both sides
+                    if(chunks.Count > 0){
+                        seperatorLine3 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '┴')}";
+                    }else{
+                        seperatorLine3 += $"{(i==0 ? '├' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┤' : '─')}";
+                    }
+                }
+                tableStringLines.Add(seperatorLine3);
+
+                // prints the Add T line
+                tableStringLines.Add($"│ {Format($"Add new {typeof(T)}", totalWidth-4)} │");
+
+                // print the bottom line
                 // the +2 is for a space at both sides
-                bottomLine += $"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '┴')}";
+                tableStringLines.Add($"└{new string('─', totalWidth-2)}┘");
+            }else{
+                string bottomLine = "";
+                for(int i=0;i<headers.Keys.ToList().Count;i++){
+                    // the +2 is for a space at both sides
+                    if(chunks.Count > 0){
+                        bottomLine += $"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '┴')}";
+                    }else{
+                        bottomLine += $"{(i==0 ? '└' : "")}{new string('─', columnWidths[i]+2)}{(i==headers.Keys.ToList().Count-1 ? '┘' : '─')}";
+                    }
+                }
+                tableStringLines.Add(bottomLine);
             }
-            tableStringLines.Add(bottomLine);
+
             #endregion
 
             #region Edit string list
             List<string> editStringLines = new List<string>();
-            editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
-            for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
-                string editLine = editOptions[i];
-                string editDataLine = editOptionData[i];
-                editStringLines.Add($"│ {editLine}{editDataLine}{new string(' ', Math.Max(0, longestEditOption-(editLine.Length+editDataLine.Length)))} │");
+            if(showEditTable && canEdit && chunks.Count > 0){
+                editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
+                for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
+                    string editLine = editOptions[i];
+                    string editDataLine = editOptionData[i];
+                    editStringLines.Add($"│ {editLine}{editDataLine}{new string(' ', Math.Max(0, longestEditOption-(editLine.Length+editDataLine.Length)))} │");
+                }
+                editStringLines.Add($"├─{new string('─', Math.Max(0, longestEditOption))}─┤");
+                editStringLines.Add($"│ Save changes{new string(' ', Math.Max(0, longestEditOption-"Save changes".Length))} │");
+                editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
+                if(canDelete){
+                    editStringLines.Add($"├{Format('─', longestEditOption+2)}┤");
+                    editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
+                }
+                editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
+            }else if(showEditTable && canDelete){
+                editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
+                editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
+                editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
+
             }
-            editStringLines.Add($"├─{new string('─', Math.Max(0, longestEditOption))}─┤");
-            editStringLines.Add($"│ Save changes{new string(' ', Math.Max(0, longestEditOption-"Save changes".Length))} │");
-            editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
-            editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
             #endregion
 
+            #region Print table
             // clear the screen and print the table
             Console.Clear();
             for(int i=0;i<Math.Max(editStringLines.Count, tableStringLines.Count);i++){
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(0, 2) : new string(' ', 2))}");
-                Console.BackgroundColor = (i == 5+currentPageSelection && !editing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                if(chunks.Count > 0 && currentPageSelection == chunks[currentPage].Count){
+                    Console.BackgroundColor = (canAdd && currentPageSelection == chunks[currentPage].Count && i==6+currentPageSelection) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                }else{
+                    Console.BackgroundColor = (i == 5+currentPageSelection && !editing && chunks.Count > 0) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                }
+                if(chunks.Count == 0 && i == 7){
+                    Console.BackgroundColor = ConsoleColor.DarkGray;
+                }
                 Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(2, tableStringLines[i].Length-4) : new string(' ', totalWidth-4))}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(tableStringLines[i].Length-2, 2) : new string(' ', 2))}");
                 Console.BackgroundColor = ConsoleColor.Black;
-                if(!canEdit){
+                if(!showEditTable || chunks.Count == 0){
                     Console.Write("\n");
                     continue;
                 }
                 Console.Write($" {(i==5+currentPageSelection ? "->" : "  ")} ");
-                // if i is on the seperator line in the edit block we decrease i by 1 to offset the color (weird hack but works)
-                int selectionOffset = editSelection >= editOptions.Count ? 1 : 0;
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(0, 2) : "")}");
-                Console.BackgroundColor = (i - selectionOffset == 1 + editSelection && editing) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+
+                // if i is on the seperator line in the edit block we decrease i by 1 to offset the color (weird hack but works)
+                if(canDelete && canEdit){
+                    int selectionOffset = editSelection >= editOptions.Count ? 1 : 0;
+                    if(editSelection == 3+editOptions.Count-1){
+                        selectionOffset++;
+                    }
+                    if(i == 1 + selectionOffset + editSelection && editing){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }else{
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+                }else if(canEdit){
+                    int selectionOffset = editSelection >= editOptions.Count ? 1 : 0;
+                    if(i == 1 + selectionOffset + editSelection && editing){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }else{
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+                }else if(canDelete){
+                    Console.BackgroundColor = i == 1 && editing ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                }
+
                 Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(2, editStringLines[i].Length-4) : "")}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(editStringLines[i].Length-2, 2) : "")}");
                 Console.Write("\n");
             }
             Console.Write($"\nUser the Arrow Keys to move around\n{(canEdit ? "Press Enter to select a row to edit\n" : "")}{(canCancel ? "Press Escape to go back\n" : "")}");
+            #endregion
 
+            #region Input
             key = Console.ReadKey(true).Key;
 
             if(key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow){
                 currentPage += (key == ConsoleKey.LeftArrow) ? -1 : 1;
+                currentPageSelection = 0;
             }
             if(key == ConsoleKey.Escape && canCancel){
                 break;
@@ -1693,93 +1802,198 @@ public static class MenuHelper{
                     editSelection += key == ConsoleKey.UpArrow ? -1 : 1;
                 }
             }
-            if(key == ConsoleKey.Enter && !editing && canEdit){
-                editing = true;
-                editedObject = chunks[currentPage][currentPageSelection];
-                MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
-                propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
-                foreach(MemberInfo member in toBeEditedMembers){
-                    object memberData = null;
-                    if(member.MemberType == MemberTypes.Property){
-                        PropertyInfo memberProperty = (PropertyInfo)member;
-                        memberData = (object)memberProperty.GetValue(editedObject);
-                    }
-                    if(member.MemberType == MemberTypes.Field){
-                        FieldInfo memberProperty = (FieldInfo)member;
-                        memberData = (object)memberProperty.GetValue(editedObject);
-                    }
-                    propertyUpdate.Add(member, (memberData, memberData));
-                }
-            }else if(key == ConsoleKey.Enter && editing && canEdit){
-                if(editSelection == 2+editOptions.Count-2){ // user selected Save Changes
-                    // save the user data here
-                    if(editedObject != null){
-                        // update all members (fields and properties)
-                        MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
-                        foreach(MemberInfo member in toBeEditedMembers){
-                            foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
-                                if(member == updatedMember.Key){
-                                    PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
-                                    if(p != null){
-                                        p.SetValue(editedObject, updatedMember.Value.Item2);
-                                    }
-                                    FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
-                                    if(f != null){
-                                        f.SetValue(editedObject, updatedMember.Value.Item2);
-                                    }
-                                }
-                            }
-                        }
-                        // send new data to the save method given by user
-                        bool shouldRevert = !saveEditedUserMethod.Invoke(editedObject);
-                        // revert data if the data didnt get saved (we are working with references and not copies sadly (stupid c#))
-                        if(shouldRevert){
-                            // set data back
-                            foreach(MemberInfo member in toBeEditedMembers){
-                                foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
-                                    if(member == updatedMember.Key){
-                                        PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
-                                        if(p != null){
-                                            p.SetValue(editedObject, updatedMember.Value.Item1);
-                                        }
-                                        FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
-                                        if(f != null){
-                                            f.SetValue(editedObject, updatedMember.Value.Item1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    editing = false;
-                    editSelection = 0;
-                    editedObject = default(T);
-                    propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
-                }else if(editSelection == 2+editOptions.Count-1){ // user selected Discard Changes
-                    editing = false;
-                    editSelection = 0;
-                    editedObject = default(T);
-                    propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
-                }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
-                    if(editedObject != null){
-                        object currentPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.Accessor(editedObject);
-                        object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
-                        foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
-                            if(member.Value.Item1.ToString() == currentPropertyValue.ToString()){
-                                propertyUpdate[member.Key] = (currentPropertyValue, newPropertyValue);
-                            }
-                        }
-                    }
-                }
+            if(key == ConsoleKey.Enter && canSelect){
+                #region Select
+                return chunks[currentPage][currentPageSelection];
+                #endregion
             }
-            currentPage = Math.Clamp(currentPage, 0, chunks.Count-1);
-            currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count-1);
-            editSelection = Math.Clamp(editSelection, 0, 2+editOptions.Count-1);
+            if(key == ConsoleKey.Enter && !editing && (canEdit || canDelete)){
+                bool adding = false;
+                if(chunks.Count > 0){
+                    if(currentPageSelection == chunks[currentPage].Count){
+                        adding = true;
+                    }else{
+                        editing = true;
+                        editedObject = chunks[currentPage][currentPageSelection];
+                        MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+                        propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                        foreach(MemberInfo member in toBeEditedMembers){
+                            object memberData = null;
+                            if(member.MemberType == MemberTypes.Property){
+                                PropertyInfo memberProperty = (PropertyInfo)member;
+                                memberData = (object)memberProperty.GetValue(editedObject);
+                            }
+                            if(member.MemberType == MemberTypes.Field){
+                                FieldInfo memberProperty = (FieldInfo)member;
+                                memberData = (object)memberProperty.GetValue(editedObject);
+                            }
+                            propertyUpdate.Add(member, (memberData, memberData));
+                        }
+                    }
+                }else{
+                    adding = true;
+                }
+                if(adding && canAdd && addMethod != null){
+                    #region Add new T
+                    // Func<T?>? addMethod
+                    T? newT = addMethod.Invoke();
+                    if(newT != null){
+                        items.Add(newT);
+                    }
+                    editing = false;
+                    editSelection = 0;
+                    editedObject = default(T);
+                    #endregion
+                }
+            }else if(key == ConsoleKey.Enter && editing && (canEdit || canDelete)){
+                bool deleting = false;
+                if(canEdit){
+                    if(editSelection == 3+editOptions.Count-1 && canDelete){
+                        deleting = true;
+                    }else{
+                        #region Editing
+                        if(editSelection == 2+editOptions.Count-2){ // user selected Save Changes
+                            // save the user data here
+                            if(editedObject != null){
+                                // update all members (fields and properties)
+                                MemberInfo[] toBeEditedMembers = editedObject.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.MemberType == MemberTypes.Property || m.MemberType == MemberTypes.Field).ToArray();
+                                foreach(MemberInfo member in toBeEditedMembers){
+                                    foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
+                                        if(member == updatedMember.Key){
+                                            PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
+                                            if(p != null){
+                                                p.SetValue(editedObject, updatedMember.Value.Item2);
+                                            }
+                                            FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
+                                            if(f != null){
+                                                f.SetValue(editedObject, updatedMember.Value.Item2);
+                                            }
+                                        }
+                                    }
+                                }
+                                // send new data to the save method given by user
+                                bool shouldRevert = !saveEditedUserMethod.Invoke(editedObject);
+                                // revert data if the data didnt get saved (we are working with references and not copies sadly (stupid c#))
+                                if(shouldRevert){
+                                    // set data back
+                                    foreach(MemberInfo member in toBeEditedMembers){
+                                        foreach(KeyValuePair<MemberInfo, (object, object)> updatedMember in propertyUpdate){
+                                            if(member == updatedMember.Key){
+                                                PropertyInfo p = editedObject.GetType().GetProperty(updatedMember.Key.Name.ToString());
+                                                if(p != null){
+                                                    p.SetValue(editedObject, updatedMember.Value.Item1);
+                                                }
+                                                FieldInfo f = editedObject.GetType().GetField(updatedMember.Key.Name.ToString());
+                                                if(f != null){
+                                                    f.SetValue(editedObject, updatedMember.Value.Item1);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            editing = false;
+                            editSelection = 0;
+                            editedObject = default(T);
+                            propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                        }else if(editSelection == 2+editOptions.Count-1){ // user selected Discard Changes
+                            editing = false;
+                            editSelection = 0;
+                            editedObject = default(T);
+                            propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
+                        }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
+                            if(editedObject != null){
+                                object currentPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.Accessor(editedObject);
+                                object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
+                                foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
+                                    if(member.Value.Item1.ToString() == currentPropertyValue.ToString()){
+                                        propertyUpdate[member.Key] = (currentPropertyValue, newPropertyValue);
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+                    }
+                }else if(canDelete){
+                    deleting = true;
+                }
+                if(deleting){
+                    #region Deleting
+                    if(deleteMethod != null){
+                        bool remove = deleteMethod.Invoke(editedObject);
+                        if(remove){
+                            items.Remove(editedObject);
+                        }
+                        editing = false;
+                        editSelection = 0;
+                        editedObject = default(T);
+                        if(chunks[currentPage].Count-1 == 0){
+                            currentPage--;
+                            currentPageSelection = chunks[currentPage].Count-1;
+                        }else{
+                            currentPageSelection--;
+                        }
+                    }
+                    #endregion
+                }
+
+            }
+            #endregion
+
+            #region Clamping Values
+            currentPage = Math.Clamp(currentPage, 0, Math.Max(0, chunks.Count-1));
+            if(chunks.Count > 0){
+                if(canAdd){
+                    currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count);
+                }else{
+                    currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count-1);
+                }
+            }else{
+                currentPageSelection = 0;
+            }
+            if(canEdit && canDelete){
+                editSelection = Math.Clamp(editSelection, 0, 3+editOptions.Count-1);
+            }else if(canEdit){
+                editSelection = Math.Clamp(editSelection, 0, 2+editOptions.Count-1);
+            }else if(canDelete){
+                editSelection = Math.Clamp(editSelection, 0, 0);
+            }
+            if(chunks.Count > 0){
+                if(currentPageSelection == chunks[currentPage].Count){
+                    showEditTable = false;
+                }else if(canEdit || canDelete){
+                    showEditTable = true;
+                }
+            }else{
+                showEditTable = false;
+                editing = false;
+                editSelection = 0;
+                editedObject = default(T);
+            }
+            #endregion
         }while(true);
-        return;
-        // return null;
+        return default(T);
     }
     #endregion
+
+    private static string Format(string data, int totalWidth, char d=' ')
+    {
+        return $"{data}{new string(d, Math.Max(0, totalWidth-data.Length))}";
+    }
+
+    private static string Format(char d, int repeatTimes)
+    {
+        return $"{new string(d, Math.Max(0, repeatTimes))}";
+    }
+
+    private static string Center(string data, int totalWidth, char filler=' ')
+    {
+        string m = data;
+        for(int i=Math.Max(0, totalWidth-data.Length);i>0;i--){
+            m = ((i % 2 == 1) ? filler : "") + m + ((i % 2 == 0) ? filler : "");
+        }
+        return m;
+    }
 }
 
 // ┌─┬┐
