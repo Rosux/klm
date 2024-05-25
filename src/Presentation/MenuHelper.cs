@@ -1996,19 +1996,62 @@ public static class MenuHelper{
         }while(true);
         return default(T);
     }
+
+    /// <summary>
+    /// Displays a table that holds a list of objects and allows the user to select an item.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects.</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> is a method that gets a type T object and returns an object of any type.</param>
+    /// <param name="canCancel">A boolean indicating if the user can press escape to cancel the selection and return back.</param>
+    /// <returns>Returns the selected object of type T, or NULL if the selection is cancelled by pressing escape.</returns>
+    public static T? SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canCancel){
+        return Table(items, headers, true, canCancel, false, null, null, false, null, false, null);
+    }
+
+    /// <summary>
+    /// Displays a table that holds a list of objects and allows the user to select an item.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects.</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> is a method that gets a type T object and returns an object of any type.</param>
+    /// <returns>Returns the selected object of type T.</returns>
+    public static T SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
+        return Table(items, headers, true, false, false, null, null, false, null, false, null);
+    }
     #endregion
 
     #region String Helpers
+    /// <summary>
+    /// Creates a string of length totalWidth by putting the input data on the left side and padding it on the right with the specified char.
+    /// </summary>
+    /// <param name="data">A string that gets padded.</param>
+    /// <param name="totalWidth">An integer indicating the maximum length of the final result. (overflows if data is longer than totalWidth)</param>
+    /// <param name="d">A character used for the padding. Default is a space character.</param>
+    /// <returns>A string of format "{data}d*totalWidth-data.Length"</returns>
     private static string Format(string data, int totalWidth, char d=' ')
     {
         return $"{data}{new string(d, Math.Max(0, totalWidth-data.Length))}";
     }
 
+    /// <summary>
+    /// Creates a string by repeating the specified character for the given number of times.
+    /// </summary>
+    /// <param name="d">A character to be repeated.</param>
+    /// <param name="repeatTimes">An integer indicating the number of times to repeat the character. If repeatTimes is less than or equal to zero, an empty string is returned.</param>
+    /// <returns>A string consisting of the character repeated repeatTimes times.</returns>
     private static string Format(char d, int repeatTimes)
     {
         return $"{new string(d, Math.Max(0, repeatTimes))}";
     }
 
+    /// <summary>
+    /// Centers the input data within a string of specified total width, padding with the specified filler character.
+    /// </summary>
+    /// <param name="data">A string that will be centered.</param>
+    /// <param name="totalWidth">An integer indicating the total width of the final result. If totalWidth is less than the length of data, the data is returned as is.</param>
+    /// <param name="filler">A character used for padding. Default is a space character.</param>
+    /// <returns>A string with the input data centered and padded on both sides with the filler character.</returns>
     private static string Center(string data, int totalWidth, char filler=' ')
     {
         string m = data;
