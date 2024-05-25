@@ -28,6 +28,7 @@ public static class ReservationMenu
         }
 
         TimeLine.Holder timeline = new TimeLine.Holder();
+        List<Entertainment> entertainments = new List<Entertainment>();
 
         bool addingToTimeline = true;
         bool save = false;
@@ -158,14 +159,59 @@ public static class ReservationMenu
                     );
                 }},
                 {"Add Entertainment", ()=>{
-                    //Ask the user to provide the date they want a entertainment to take place
-                    DateOnly EntertainmentDate = MenuHelper.SelectDate("Select Entertainment date and time", startDate, startDate, endDate);
-                    //Ask the user to provide the time they want a entertainment to take place
-                    TimeOnly EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime);
-                    //Convert the provided date and time to a DateTime format
-                    DateTime Time = new DateTime(EntertainmentDate.Day, EntertainmentDate.Month, EntertainmentDate.Year, EntertainmentStartTime.Hour, EntertainmentStartTime.Minute, 0);
-                    MenuHelper.PrintSeats(SelectedRoom);
-
+                    int x = 0;
+                    int y = 0;
+                    ConsoleKey key;
+                    do{
+                        Console.Clear();
+                        MenuHelper.PrintSeats(SelectedRoom, entertainments, x, y);
+                        Console.WriteLine("This seat already has entertainment:");
+                        foreach (var entertainment in entertainments)
+                        {
+                            if (entertainment.SeatRow == y && entertainment.SeatColumn == x)
+                            {
+                                Console.WriteLine($"Entertainment: {entertainment.Text} at {entertainment.Time}");
+                            }
+                        }
+                        key = Console.ReadKey(true).Key;
+                        // handle selecting seat column and row (X=column and Y=row)
+                        if(key == ConsoleKey.UpArrow){
+                            y--;
+                        }else if(key == ConsoleKey.DownArrow){
+                            y++;
+                        }else if(key == ConsoleKey.LeftArrow){
+                            x--;
+                        }else if(key == ConsoleKey.RightArrow){
+                            x++;
+                        }
+                        y = Math.Clamp(y, 0, SelectedRoom.Seats.Length-1);
+                        x = Math.Clamp(x, 0, SelectedRoom.Seats[y].Length-1);
+                        // Selecting a seat will show the entertainment linked to that specific seat
+                        if(key == ConsoleKey.Enter){
+                            //Ask the user to provide the date they want a entertainment to take place
+                            DateOnly EntertainmentDate = MenuHelper.SelectDate("Select Entertainment date and time", startDate, startDate, endDate);
+                            //Ask the user to provide the time they want a entertainment to take place
+                            TimeOnly EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime);
+                            //Convert the provided date and time to a DateTime format
+                            DateTime Time = new DateTime(EntertainmentDate.Year, EntertainmentDate.Month, EntertainmentDate.Day, EntertainmentStartTime.Hour, EntertainmentStartTime.Minute, 0);
+                            Console.Write("Enter the entertainment description: ");
+                            string? text = MenuHelper.SelectText("Enter the entertainment description:", "", true, 0 , 20, "([A-z]| )");
+                            if (text == null){
+                                return;
+                            }
+                            //Check for confirmation for user.
+                            string prompt = $"Are you sure you want to save the following entertainment to the chair:\nDescription: {text}\nDate: {EntertainmentDate}\nTime: {EntertainmentStartTime}";
+                            if(!MenuHelper.Confirm(prompt)){
+                                return;
+                            }
+                            //Add entertainment to the list and provide a update message
+                            entertainments.Add(new Entertainment(SelectedRoom.Id, Time, text, y, x));
+                            Console.WriteLine("Entertainment added successfully.");
+                        }
+                        if(key == ConsoleKey.Escape){
+                            break;
+                        }
+                    }while(true);
                 }},
                 {"Save", ()=>{
                     save = true;
@@ -187,7 +233,7 @@ public static class ReservationMenu
                 new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0),
                 (double)(GroupSize * 12.0) + totalPrice,
                 timeline,
-                new List<Entertainment>()
+                entertainments
             );
             return r;
         }else if(!save){

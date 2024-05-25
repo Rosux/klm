@@ -1477,8 +1477,9 @@ public static class MenuHelper{
     #endregion
 
     #region PrintSeats
-    public static void PrintSeats(Room r)
+    public static void PrintSeats(Room r,List<Entertainment> entertainments, int x, int y)
     {   
+        Console.WriteLine("Press escape to return and save");
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
         Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
@@ -1497,14 +1498,14 @@ public static class MenuHelper{
                 Console.Write("│ ");
                 for(int j=0;j<Math.Max(widestSeats, r.Seats[i].Length);j++)
                 {
-                    // foreach(Entertainment e in entertainments){
-                    //     // if an entertainment takes place at this seat make it "gold"
-                    //     if(e.SeatRow == i && e.SeatColumn == j){
-                    //         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    //     }
-                    // }
+                    foreach(Entertainment e in entertainments){
+                        // if an entertainment takes place at this seat make it "gold"
+                        if(e.SeatRow == i && e.SeatColumn == j){
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        }
+                    }
                     // if x and y are the selected seat make the background color light gray
-                    // Console.BackgroundColor = (i == y && j == x) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    Console.BackgroundColor = (i == y && j == x) ? ConsoleColor.DarkGray : ConsoleColor.Black;
                     // print box (based on line print the top or bottom)
                     Console.Write(j < r.Seats[i].Length && r.Seats[i][j] ? (line==0 ? "╔═╗" : "╚═╝") : "   ");
                     // reset colors
