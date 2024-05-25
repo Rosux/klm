@@ -197,6 +197,7 @@ public static class ReservationMenu
                             DateOnly EntertainmentDate = MenuHelper.SelectDate("Select Entertainment date and time", startDate, startDate, endDate);
                             //Ask the user to provide the time they want a entertainment to take place
                             TimeOnly EntertainmentStartTime;
+                            //Check if the time stays within the timetable of the reservation
                             if (EntertainmentDate == startDate && EntertainmentDate == endDate){
                                 EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime, endTime);
                             }else if (EntertainmentDate == startDate){
@@ -213,7 +214,7 @@ public static class ReservationMenu
                             if (text == null){
                                 return;
                             }
-                            //Check for confirmation for user.
+                            //Check for confirmation for user
                             string prompt = $"Are you sure you want to save the following entertainment to the chair:\nDescription: {text}\nDate: {EntertainmentDate}\nTime: {EntertainmentStartTime}";
                             if(!MenuHelper.Confirm(prompt)){
                                 return;
