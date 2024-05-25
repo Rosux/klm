@@ -196,7 +196,16 @@ public static class ReservationMenu
                             //Ask the user to provide the date they want a entertainment to take place
                             DateOnly EntertainmentDate = MenuHelper.SelectDate("Select Entertainment date and time", startDate, startDate, endDate);
                             //Ask the user to provide the time they want a entertainment to take place
-                            TimeOnly EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime);
+                            TimeOnly EntertainmentStartTime;
+                            if (EntertainmentDate == startDate && EntertainmentDate == endDate){
+                                EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime, endTime);
+                            }else if (EntertainmentDate == startDate){
+                                EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                            }else if (EntertainmentDate == endDate){
+                                EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), TimeOnly.MinValue, endTime);
+                            }else{
+                                EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
+                            }
                             //Convert the provided date and time to a DateTime format
                             DateTime Time = new DateTime(EntertainmentDate.Year, EntertainmentDate.Month, EntertainmentDate.Day, EntertainmentStartTime.Hour, EntertainmentStartTime.Minute, 0);
                             Console.Write("Enter the entertainment description: ");
