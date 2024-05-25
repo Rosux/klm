@@ -1950,10 +1950,12 @@ public static class MenuHelper{
                         editSelection = 0;
                         editedObject = default(T);
                         if(remove){
-                            if(chunks[currentPage].Count-1 == 0){
+                            if(chunks[currentPage].Count == 0){
+                                // go page back
                                 currentPage--;
-                                currentPageSelection = chunks[currentPage].Count-1;
+                                currentPageSelection = 0;
                             }else{
+                                // go upo 1 spot
                                 currentPageSelection--;
                             }
                         }
