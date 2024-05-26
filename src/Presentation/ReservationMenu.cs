@@ -163,7 +163,6 @@ public static class ReservationMenu
                     int y = 0;
                     ConsoleKey key;
                     do{
-                        Console.Clear();
                         MenuHelper.PrintSeats(SelectedRoom, entertainments, x, y);
                         Console.WriteLine("Press escape to return and save\n");
                         if(entertainments.Any(e => e.SeatRow == y && e.SeatColumn == x)){

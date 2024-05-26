@@ -1477,8 +1477,16 @@ public static class MenuHelper{
     #endregion
 
     #region PrintSeats
+    /// <summary>
+    /// PrintSeats gets the selectedroom, a list of entertainments on seats and the coordinates of those seats.
+    /// </summary>
+    /// <param name="r">The RoomId which will be used to get the seat layout.</param>
+    /// <param name="entertainments">Hold a list of entertainments on a seat.</param>
+    /// <param name="x">The Row coordinates of a seat.</param>
+    /// <param name="y">The Column coordinates of a seat.</param>
     public static void PrintSeats(Room r,List<Entertainment> entertainments, int x, int y)
     {   
+        Console.Clear();
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;
         Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
