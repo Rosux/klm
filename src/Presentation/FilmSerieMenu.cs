@@ -305,7 +305,7 @@ class FilmSerieMenu
                 {$"Original language {Selected[1]}", ()=>{
                     Language = getLanguage();
                     Selected[1] = "✓";
-                    Console.WriteLine($"Language successfully set to: {Language}]n Press enter to continue... ");
+                    Console.WriteLine($"Language successfully set to: {Language} \nPress enter to continue... ");
                     Console.ReadKey();
                 }},
                 {$"Overview (plot) {Selected[2]}", ()=>{
@@ -535,7 +535,7 @@ class FilmSerieMenu
     {
         List<string> givenGenres = new List<string>();
 
-        Console.WriteLine("Enter (multiple) genres. \nPress enter after every entry.\nEnter on empty entry to continue.");
+        Console.WriteLine("Enter (multiple) genres. \nPress ENTER after every entry.\nENTER on empty entry to continue.");
 
         while (true)
         {
@@ -585,8 +585,6 @@ class FilmSerieMenu
         {
             givenlanguage = "English";
             Console.WriteLine("No input given, language changed to: English ");
-            Console.WriteLine("Press enter to continue... ");
-            Console.ReadKey();
             return givenlanguage;
         }
         else
@@ -594,4 +592,6 @@ class FilmSerieMenu
             return givenlanguage;
         }
     }
+
+    
 }
