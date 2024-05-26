@@ -299,54 +299,34 @@ public static class UserMenu{
 
     public static User AddNewUser()
     {
-        string firstName = "";
-        string lastName = "";
-        string password = "";
-        while (true){
-            Console.WriteLine("Enter user first name:");
-            firstName = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(firstName))
-            {
-                Console.WriteLine("First name cannot be empty. Please try again.");
-                continue;
-            }
-            break;
-        }
-
-        while (true){
-            Console.WriteLine("Enter user last name:");
-            lastName = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(lastName))
-            {
-                Console.WriteLine("Last name cannot be empty. Please try again.");
-                continue;
-            }
-            break;
-        }
-        string email;
-        do
+        string? firstName = GetValidInput("Enter User first name:", 3, 20);
+        if (firstName == null)
         {
-            Console.WriteLine("Enter user email:");
-            email = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                Console.WriteLine("Email cannot be empty. Please try again.");
-                continue;
-            }
+            return null;
         }
-        while (!IsValidEmail(email));
-            Console.WriteLine("Enter user password (totally secured btw):");
-            while(true){
-            password = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                Console.WriteLine("Password cannot be empty. Please try again.");
-                continue;
-            }
-            break;
+        string? lastName = GetValidInput("Enter User last name:", 3, 20);
+        if (lastName == null)
+        {
+            return null;
         }
-        User user = new User(firstName, lastName, email, password);
-        Console.WriteLine("User has been added");
+        string? email = GetValideEmail("Enter User email:", 3, 20);
+        if (email == null)
+        {
+            return null;
+        }
+        string passwordHash = "";
+        string? password = GetValidPassword("Enter User password:", 6, 20);
+        if (password == null)
+        {
+            return null;
+        }
+        string? password2 = GetValidPassword("Enter User password again:", 6, 20, true, password);
+        if (password2 == null)
+        {
+            return null;
+        }
+        passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
+        User user = new User(firstName, lastName, email, passwordHash);
         return user;
     }
 
@@ -423,6 +403,11 @@ public static class UserMenu{
     public static void NoUsersToRemove(){
         Console.Clear();
         Console.WriteLine("There are no Users stored to remove.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+    public static void NotSure(){
+        Console.Clear();
+        Console.WriteLine("User not removed\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void UserRemoved(){
