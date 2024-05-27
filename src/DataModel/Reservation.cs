@@ -8,8 +8,9 @@ public class Reservation
     public DateTime EndDate;
     public double Price;
     public TimeLine.Holder TimeLine = new TimeLine.Holder();
+    public List<Entertainment> Entertainments = new List<Entertainment>();
 
-    public Reservation(int Id, int RoomId, int UserId, int GroupSize, DateTime StartDate, DateTime EndDate, double Price, TimeLine.Holder TimeLine){
+    public Reservation(int Id, int RoomId, int UserId, int GroupSize, DateTime StartDate, DateTime EndDate, double Price, TimeLine.Holder TimeLine, List<Entertainment> Entertainments){
         this.Id = Id;
         this.RoomId = RoomId;
         this.UserId = UserId;
@@ -18,9 +19,10 @@ public class Reservation
         this.EndDate = EndDate;
         this.Price = Price;
         this.TimeLine = TimeLine;
+        this.Entertainments = Entertainments;
     }
-    
-    public Reservation(int RoomId, int UserId, int GroupSize, DateTime StartDate, DateTime EndDate, double Price, TimeLine.Holder TimeLine){
+
+    public Reservation(int RoomId, int UserId, int GroupSize, DateTime StartDate, DateTime EndDate, double Price, TimeLine.Holder TimeLine, List<Entertainment> Entertainments){
         this.Id = null;
         this.RoomId = RoomId;
         this.UserId = UserId;
@@ -29,5 +31,6 @@ public class Reservation
         this.EndDate = EndDate;
         this.Price = Price;
         this.TimeLine = TimeLine;
+        this.Entertainments = Entertainments;
     }
 }
