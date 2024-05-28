@@ -1,9 +1,11 @@
+using Newtonsoft.Json;
+
 /// <summary>
 /// Holds the entertainment of a specific seat
 /// </summary>
 public class Entertainment
 {
-    public int Id = -1; // id saved in the database -1 if not saved
+    public int RoomId = -1; // id saved in the database -1 if not saved
     public DateTime Time; // when the entertainment should start
     public string Text = ""; // the text explaining what kind of entertainment should be happening (like strippers or birthday cake)
     public int SeatRow; // x axis (row)
@@ -32,9 +34,10 @@ public class Entertainment
     /// <param name="text">Describes the entertainment.</param>
     /// <param name="seatRow">An integer indicating the seat row.</param>
     /// <param name="seatColumn">An integer indicating the seat column.</param>
-    public Entertainment(int id, DateTime time, string text, int seatRow, int seatColumn)
+    [JsonConstructor]
+    public Entertainment(int roomId, DateTime time, string text, int seatRow, int seatColumn)
     {
-        Id = id;
+        RoomId = roomId;
         Time = time;
         Text = text;
         SeatRow = seatRow;
