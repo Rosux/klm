@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using TimeLine;
 class Menu
 {
     public static void Start()
@@ -41,7 +43,7 @@ class Menu
                         }},
                         {"Rooms", ()=>{
                             // room editor
-                            RoomLogic.Menu();
+                            RoomLogic.Menus();
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
