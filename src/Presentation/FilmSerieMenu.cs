@@ -446,7 +446,8 @@ class FilmSerieMenu
     {
         if(filmlogic_obj.Check_films_exist())
         {
-            Film ToRemove = MenuHelper.SelectMovie();
+            Film? ToRemove = MenuHelper.SelectMovie();
+            if(ToRemove == null){return;}
             bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
             if (a)
             {   
@@ -471,6 +472,8 @@ class FilmSerieMenu
             string Selectedmoviegenres = String.Join(", ", SelectedFilm.Genres);
             string Selecteddirectors = String.Join(", ", SelectedFilm.Directors);
             string OverviewDisplay = GetDisplayString(SelectedFilm.Overview);
+            Film? SelectedFilm = MenuHelper.SelectMovie();
+            if(SelectedFilm == null){return;}
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
             {
