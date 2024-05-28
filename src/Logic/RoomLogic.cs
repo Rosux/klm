@@ -1,123 +1,260 @@
+/// <summary>
+/// This class handles stuff like adding/removing/editing rooms
+/// </summary>
 public static class RoomLogic
 {
     private static RoomAccess r = new RoomAccess();
 
-    /// takes a int and uses it to make a new room with the int as capcity
-    /// then calls the method ConformationRoom with asks if he is suer he wants to make a new room
-    /// then calls the method AddToRoomTable to add a new room to the data base
-    /// <param name="GivenCapacity">Interger with capacity for new room.</param>
-    public static void CreateRoom(int GivenCapacity)
+    /// <summary>
+    /// Creates a menu of 4 options to choose from and a back option. Options are: "Show room", "Add room", "Remove room", "Edit room".
+    /// </summary>
+    public static void Menus()
     {
-        /// creates new room with given capacity
-        Room newRoom = new Room(GivenCapacity);
-        Console.Clear();
-        /// asks for conformation to createroom
-        bool? choice = ConformationRoom("Save this room?", $"New room created with capacity: {GivenCapacity}.");
-        /// if conformation is not given it calls method RoomMenu.Action2() it basiclay goes back to the start
-        if(choice!= null)
+        bool running = true;
+        while(running)
         {
-            if((bool)choice)
-            {
-                /// ads new room to database
+            // gives the user a UI with all options
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"1. Show all rooms", ()=>{
+                    ShowAllRooms();
+                }},
+                {"2. Add a room", ()=>{
+                    AddRoom();
+                }},
+                {"3. Remove a room", ()=>{
+                    RemoveRoom();
+                }},
+                {"4. Edit a room", ()=>{
+                    EditRoom();
+                }},
+                {"5. Exit to main menu", ()=>{
+                    running = false;
+                }},
+            });
+        }
+    }
+
+    /// <summary>
+    /// Prints all rooms an a neat UI and has the option to go back.
+    /// </summary>
+    public static void ShowAllRooms()
+    {
+        ///count all the rooms. if there are none show a "No rooms found" text otherwise print the rooms
+        if(r.GetAllRooms().Count == 0){
+            RoomMenu.NoRoomsFoundNotification();
+        }else{
+            Room? chosenroom = ChooseRoom("choose a room to see");
+            if(chosenroom != null){
                 Console.Clear();
-                int newRoomId = r.AddToRoomTable(newRoom);
-                Console.WriteLine($"New room created: \nID: {newRoomId}. \nCapacity: {GivenCapacity}.\n\nPress any key to continue...");
+                Console.WriteLine(RoomLayoutPrinter(chosenroom));
                 Console.ReadKey(true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Ask the user to select a room and to delete it. Has an option to go back at any time.
+    /// </summary>
+    public static void RemoveRoom()
+    {
+        // convert all rooms to a dictionary
+        Dictionary<string, Room> rooms = new Dictionary<string, Room>();
+        foreach(Room room in RoomLogic.r.GetAllRooms()){
+            rooms.Add($"{room.Id}: {room.Capacity}", room);
+        }
+        // if there are no rooms show the user a "No rooms found" text
+        if(rooms.Count == 0){
+            RoomMenu.NoRoomsFoundNotification();
+            return;
+        }
+        // ask the user to select a room for deletion
+        Room? selectedRoom = ChooseRoom("Select a room to delete");
+        if(selectedRoom == null){
+            // user pressed escape so dont delete anything and return to the menu
+            return;
+        }else{
+            // ask the user if theyre sure they want to delete the room
+            bool deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
+            if(deletion){
+                // if the user answered yes remove the room and show the user if it worked or not
+                bool success = r.RemoveRoom(selectedRoom.Id);
+                RoomMenu.RoomDeletedNotification(success);
+            }else{
+                // user answered no so dont delete anything and return to the menu
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// lets the admin add a room by using the following steps:
+    /// 1. asks how much rows he wants using menuhelper.selectinterger
+    /// 2. asks how much seats he wants per row using menuhelper.selectinterger
+    /// 3. gives the admin the option to remove or reinstae seats using RoomLayoutManager
+    /// 4. than asks if the admin wants to save the rrom.
+    /// </summary>
+    /// <param name="given_rows"> a interger that gives the rows for the room (only used for loop)</param>
+    /// <param name="seatss">a interger that gives the seats for the room (only used for loop)</param>
+    public static void AddRoom(int given_rows = 0, int seatss = 0)
+    {
+        int? GivenRows_p = null;
+        if(given_rows == 0)
+        {
+            GivenRows_p = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 2147483647);
+        }
+        else
+        {
+            GivenRows_p = given_rows;
+        }
+        if (GivenRows_p  != null)
+        {
+            int rows = (int)GivenRows_p;
+            int? GivenSeats_p = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 2147483647);
+            /// makes the layout for the room
+            if (GivenSeats_p  != null)
+            {
+                int seats_per_rows = 0;
+                int extra_seats = 0;
+                int capacity = rows * (int) GivenSeats_p;
+                if(capacity%rows == 0)
+                {
+                    seats_per_rows = capacity/rows;
+                }
+                else
+                {
+                    extra_seats = capacity%rows;
+                    seats_per_rows = capacity/rows;
+                }
+                int i = 0;
+                bool[][] seats = new bool[rows][];
+
+                while(i < rows)
+                {
+                    List<bool> seats_row = new List<bool>();
+                    int j = 0;
+                    if(extra_seats == 0)
+                    {
+                        while(j < seats_per_rows)
+                        {
+                            seats_row.Add(true);
+                            j++;
+                        }
+                    }
+                    else
+                    {
+                        while(j < seats_per_rows)
+                        {
+                            seats_row.Add(true);
+                            if(i < extra_seats && j == 0)
+                            {
+                                seats_row.Add(true);
+                            }
+                            j++;
+                        }
+                    }
+                    bool[] row = seats_row.ToArray();
+                    seats[i] = row;
+                    i++;
+                }
+                Room room = new(seats);
+                string prefix = "This is the current room layout:";
+                string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
+                /// lets admin remove or reinsate seats
+                Room room_finished = RoomLayoutManager(room, prefix, suffix);
+                if(room_finished != null)
+                {
+                    /// asks for conformation
+                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{RoomLayoutPrinter(room_finished)}\nAre you sure you want to add this room? ");
+                    if(conformation)
+                    {
+                        /// if conformation is given it adds the room to the database
+                        r.AddRoom(room_finished);
+                        Console.WriteLine("\nRoom added sucessfully.");
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey(true);
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nAction cancelled.");
+                        Console.Write($"\n\nPress any key to continue...");
+                        Console.ReadKey(true);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Going back.");
+                    Console.Write($"\n\nPress any key to continue...");
+                    AddRoom(rows, 0);
+                }
             }
             else
             {
-                Console.Clear();
-                Console.WriteLine($"Room discarded.\n\nPress any key to continue...");
-                Console.ReadKey(true);
+                Console.WriteLine("Going back.");
+                Console.Write($"\n\nPress any key to continue...");
+                AddRoom(0, 0);
             }
         }
         else
         {
-            RoomMenu.Action2();
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
         }
     }
+
     /// <summary>
-    /// removes the give room from database if conformation is given
+    /// lets the admin edit a room by taking these steps:
+    /// 1. lets the admin select a room using ChooseRoom
+    /// 2. lets admin edit the selcted room by using RoomLayouManager
+    /// 3. asks if the admin wants to save changes
+    /// 4. either cancels action or submits changes
     /// </summary>
-    /// <param name="room">Takes room object to remove form database</param>
-    public static void RemoveRoom(Room room)
+    /// <param name="chosenroom"> takes a room object you want to edit (is only used for loop)</param>
+    public static void EditRoom(Room chosenroom = null)
     {
-        List<string> options = new List<string>(){"Yes", "No"};
-        /// asks for conformation to remove room
-        bool? choice = ConformationRoom($"remove this room?", $"Selected room:\nId: {room.Id}.\nCapacity: {room.Capacity}.",options);
-        /// if conformation is not given it calls method RoomMenu.Action3() it basiclay goes back to the start
-        if(choice!= null)
+        if(chosenroom == null)
         {
-            if((bool)choice)
+            /// kets user choose a room
+            chosenroom = ChooseRoom("choose a room to edit");
+        }
+        if (chosenroom != null)
+        {
+            string prefix = "This is the current room layout:";
+            string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
+            /// lets user edit the room
+            Room? edited_room = RoomLayoutManager(chosenroom, prefix, suffix);
+            if (edited_room != null)
             {
-                /// removes given room from database
-                Console.Clear();
-                r.RemoveFromRoomTable(room.Id);
-                Console.WriteLine($"Room succesfully removed.\n\nPress any key to continue...");
-                Console.ReadKey(true);
+                /// asks if he wants to save changes
+                bool conformation = MenuHelper.Confirm($"new room layout:\n{RoomLayoutPrinter(edited_room)}\nAre you sure you want to make these changes ");
+                if(conformation)
+                {
+                    /// edits room
+                    r.EditRoom(edited_room);
+                    Console.WriteLine("\nRoom changed sucessfully.");
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey(true);
+                }
+                else
+                {
+                    Console.WriteLine("\nAction cancelled.");
+                    Console.Write($"\n\nPress any key to continue...");
+                    Console.ReadKey(true);
+                }
             }
             else
             {
-                Console.Clear();
-                Console.WriteLine($"Room not removed.\n\nPress any key to continue...");
-                Console.ReadKey(true);
+                EditRoom();
             }
         }
-        else
-        {
-            RoomMenu.Action3();
-        }
-    }
-    /// <summary>
-    /// chages the given room's capactiy by given capacity
-    /// </summary>
-    /// <param name="room"> Takes room object to edit</param>
-    /// <param name="capacity"> Takes new capcity</param>
-    public static void EditRoom(Room room, int capacity)
-    {
-        List<string> options = new List<string>(){"Yes", "No"};
-        string text = $"Old room: {r.GetRoom(room.Id)}.\n" + $"New room: Room-ID = {room.Id} Capacity = {capacity}.";
-        /// asks for conformation to edit room
-        bool? choice = ConformationRoom($"Save these changes?", text, options);
-        /// if conformation is not given it calls method RoomMenu.Action4(room) it basiclay goes back to the start 
-        if(choice!= null)
-        {
-            if((bool)choice)
-            {
-                /// edits the given room
-                Console.Clear();
-                r.EditFromRoomTable(room.Id, capacity);
-                Console.WriteLine($"Changes saved succesfully.\n\nPress any key to continue...");
-                Console.ReadKey(true);
-            }
-            else
-            {
-                Console.Clear();
-                Console.WriteLine($"Changes not saved.\n\nPress any key to continue...");
-                Console.ReadKey(true);
-            }
-        }
-        else
-        {
-            RoomMenu.Action4(room);
-        }
-    }
-    
-    /// <summary>
-    /// returns a list of info from all rooms
-    /// </summary>
-    /// <returns> a list of info from all rooms </returns>
-    public static List<string> GetAllRooms()
-    {
-        return r._getAllRooms();
     }
 
     /// <summary>
     /// gives the user an Interface wher he can see all the rooms and choose one to return
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
-    /// <returns>The selcted room as a Room object or null to cancel the action</returns>
-    public static Room? ChooseRoom(string prefix = "Choose a room") 
+    /// <returns>The selcted room as a Room object or null to cancel the action</returns> 
+    public static Room? ChooseRoom(string prefix = "Choose a room")
     {
         int page = 0;
         int i = 0;
@@ -133,8 +270,16 @@ public static class RoomLogic
         List<int> alllength = new List<int>();
         int longest = 0;
         /// checks for longest string per page and adds it to list alllength
+        if (roomlist_room.Count == 0)
+        {
+            Console.WriteLine("No rooms have been found\n");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+            return null;
+        }
         foreach(Room room in roomlist_room)
         {
+            bool check = true;
             string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
             if(room_str.Length > longest)
             {
@@ -147,15 +292,21 @@ public static class RoomLogic
                     alllength.Add(prefix.Length);
                     longest = 0;
                     i = 0;
+                    check = false;
+                    
                 }
                 else
                 {
                     alllength.Add(longest);
                     longest = 0;
                     i = 0;
+                    check = false;
                 }
             }
-            i++;
+            if(check)
+            {
+                i++;
+            }
         }
         if(longest != 0)
         {
@@ -216,38 +367,20 @@ public static class RoomLogic
                 Console.Write($"{new String(' ', Math.Max(0, alllength[page] - zin.Length))} │\n");
                 i++;
             }
+
+            Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
+            string pageNumber = $"{page+1}/{allroomlist.Count}";
+            string pageArrows = $"{pageNumber}";
+            // add spaces on each side of the page number
+            for (int ii=1;ii<=Math.Max(2, alllength[page]-pageNumber.Length-4);ii++){
+                pageArrows = ((ii % 2 == 1) ? " " : "") + pageArrows + ((ii % 2 == 0) ? " " : "");
+            }
+            // add arrows on the correct sides of the page number
+            pageArrows = (page > 0 ? "<-" : "  ") + pageArrows + (page < allroomlist.Count-1 ? "->" : "  ");
             /// prints the arrows under the page
-            if(allroomlist.Count == 1 )
-            {
-                Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - 2 ))} {page+1}/{allroomlist.Count}");
-                Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - 1 * j ))} │\n");
-                Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-            }
-            else
-            {
-                if(page == 0)
-                {
-                    Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 1 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 * j ))} -> │\n");
-                    Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                }
-                else if(page == allroomlist.Count-1)
-                {
-                    Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ <- {new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 2 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length + 2 - j + 1 ))} │\n");
-                    Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                }
-                else
-                {
-                    Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-                    Console.Write($"│ <-{new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - 1 ))} {page+1}/{allroomlist.Count}");
-                    Console.Write($"{ new String(' ', Math.Max(0, alllength[page]/2 - $"{page+1}/{allroomlist.Count}".Length - j ))} -> │\n");
-                    Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
-                }
-            }
+            Console.Write($"│ {pageArrows} │\n");
+            Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
+            
             key = Console.ReadKey(true).Key;
              /// lets user go up and down page to selcect a room
             if (key == ConsoleKey.UpArrow && choice > 0 + 10 * page) 
@@ -284,88 +417,237 @@ public static class RoomLogic
     }
 
     /// <summary>
-    /// gives the user an interface with two choises ont to confirm and on to deny
+    /// this method takes a room object and returns a string of its layout
     /// </summary>
-    /// <param name="prefix">A string of text printed before the selected value.</param>
-    /// <param name="text">A string containing the question to confirm.</param>
-    /// <param name="options"> a list eith strings of options currently only to one to confirm and one to deny</param>
-    /// <returns> a boolean true to cofirm and false to deny</returns>
-    public static bool? ConformationRoom(string prefix = "", string text = "", List<string> options = null)
+    /// <param name="room">takes a room object to make the layout of</param>
+    /// <returns>a string that is the room layout</returns>
+    public static string RoomLayoutPrinter(Room room)
     {
-        int choice = 0;
-        int longest = 0;
-        int i = 0;
-        /// if no list is given it creates one wit options save and cancel
-        if (options == null)
+        string layout = "";
+        int choice_seat = 0;
+        int ii = 0;
+        int iii = 0;
+        string header = "Screen";
+        int h = 1;
+        int longest = 2;
+        int SeatPerRow = room.Seats[0].Length;
+        bool[][] seats = room.Seats;
+        foreach(bool[] row in seats)
         {
-            options ??= new List<string>();
-            options.Add("Save");
-            options.Add("Discard");
-        }
-        i = 1;
-        /// checks for longest string
-        foreach(string option in options)
-        {
-            string option_str = $"{i}. "+ option + ".";
-            if(option_str.Length > longest)
-            {
-                longest = option_str.Length;
+            longest = 2;
+            foreach(bool seatss in row)
+            { 
+                longest = longest + 3;
             }
-            i++;
         }
-        if (prefix.Length > longest)
+        if(header.Length > longest)
         {
-            longest = prefix.Length;
+            longest = header.Length;
+            h = 2;
         }
+        for(int k=0;k<longest - "Screen".Length;k++)
+        {
+            header = ((k % 2 == 1) ? "─" : "") + header + ((k % 2 == 0) ? "─" : "");
+            // header
+        }
+            List<List<string>> all_row_top = new List<List<string>>();
+            List<List<string>> all_row_bottom = new List<List<string>>();
+            foreach(bool[] row in seats)
+            {
+                List<string> row_top = new List<string>();
+                List<string> row_bottom = new List<string>();
+                foreach(bool seatss in row)
+                {         
+                    if (seatss)
+                    {
+                        row_top.Add("╔═╗");
+                        row_bottom.Add("╚═╝");
+                    }
+                    else
+                    {
+                        row_top.Add("   ");
+                        row_bottom.Add("   ");
+                    }
+                }
+                all_row_top.Add(row_top);
+                all_row_bottom.Add(row_bottom);
+            }
+            var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
+            Console.Clear();
+            //Console.WriteLine(prefix + "\n");
+            layout = layout + $"┌{header}┐\n";
+            ii = 0;
+            iii = 0;
+            foreach(var (row_top, row_bottom) in zip)
+            {
+                layout = layout + "│ ";
+                foreach(string seat_top in row_top)
+                {
+                    
+                    if (ii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    layout = layout + seat_top;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    ii++;
+                }
+                layout = layout + $"{new string(' ', h)}│";
+                layout = layout + "\n";
+                layout = layout + "│ ";
+                foreach(string seat_bottom in row_bottom)
+                {
+                    if (iii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    layout = layout + seat_bottom;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    iii++;
+                }
+                layout = layout + $"{new string(' ', h)}│";
+                layout = layout + "\n";         
+            }
+                layout = layout + $"└{new string('─', longest)}┘\n\n";
+            //Console.Write(suffix);
+            return layout;
+    }
+    /// <summary>
+    /// this maethode takes a room and lets the admin edit this rooms layout
+    /// </summary>
+    /// <param name="room"> a room object it uses to manage its layout</param>
+   /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <returns></returns>
+    public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
+    {
         ConsoleKey key;
-        /// prints UI
+        int choice_seat = 0;
+        int ii = 0;
+        int iii = 0;
+        string header = "Screen";
+        int h = 1;
+        int longest = 2;
+        int SeatPerRow = room.Seats[0].Length;
+        bool[][] seats = room.Seats;
+        foreach(bool[] row in seats)
+        {
+            longest = 2;
+            foreach(bool seatss in row)
+            { 
+                longest = longest + 3;
+            }
+        }
+        if(header.Length > longest)
+        {
+            longest = header.Length;
+            h = 2;
+        }
+        for(int k=0;k<longest - "Screen".Length;k++)
+        {
+            header = ((k % 2 == 1) ? "─" : "") + header + ((k % 2 == 0) ? "─" : "");
+            // header
+        }
+
         do
         {
-            /// prints text if given
-            Console.Clear();
-            Console.WriteLine("Press escape to go back.\n");
-            if(text != "")
+            List<List<string>> all_row_top = new List<List<string>>();
+            List<List<string>> all_row_bottom = new List<List<string>>();
+            foreach(bool[] row in seats)
             {
-                Console.WriteLine(text +"\n");
+                List<string> row_top = new List<string>();
+                List<string> row_bottom = new List<string>();
+                foreach(bool seatss in row)
+                {         
+                    if (seatss)
+                    {
+                        row_top.Add("╔═╗");
+                        row_bottom.Add("╚═╝");
+                    }
+                    else
+                    {
+                        row_top.Add("   ");
+                        row_bottom.Add("   ");
+                    }
+                }
+                all_row_top.Add(row_top);
+                all_row_bottom.Add(row_bottom);
             }
-            /// prints header
-            Console.WriteLine($"┌─{prefix}{new String('─', Math.Max(0, longest - prefix.Length))}─┐");
-            i = 0;
-            /// prints options
-            foreach(string option in options)
+            bool not_empty_check = false;
+            foreach(bool[] row in seats)
+            {
+                foreach(bool seatss in row)
+                {
+                    if (seatss)
+                    {
+                        not_empty_check = true;
+                    }
+                }
+            }
+            var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
+            Console.Clear();
+            Console.WriteLine(prefix + "\n");
+            Console.Write($"┌{header}┐\n");
+            ii = 0;
+            iii = 0;
+            foreach(var (row_top, row_bottom) in zip)
             {
                 Console.Write("│ ");
-                /// if currently selected make the background darkgray instead of black
-                if (i == choice){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                Console.Write($"{i+1}. {options[i]}.");
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"{new String(' ', Math.Max(0, longest - $"{i+1}. {options[i]}.".Length))} │\n");
-                i++;
-            }
-            Console.Write($"└─{new string('─', Math.Max(0, longest ))}─┘\n");
-            /// lets user go through options
-            key = Console.ReadKey(true).Key;
-            if (key == ConsoleKey.UpArrow && choice > 0) 
-            {  
-                Console.Clear();
-                choice --;
-            }
-            else if (key == ConsoleKey.DownArrow && choice < options.Count-1)
-            {  
-                Console.Clear();
-                choice ++;
-            }
-            /// returns true if first option is chosen and fals if second option is chosen
-            else if (key == ConsoleKey.Enter)
-            { 
-                if (choice == 0)
+                foreach(string seat_top in row_top)
                 {
-                    return true;
+                    
+                    if (ii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.Write(seat_top);
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    ii++;
+                }
+                Console.Write($"{new string(' ', h)}│");
+                Console.WriteLine();
+                Console.Write("│ ");
+                foreach(string seat_bottom in row_bottom)
+                {
+                    if (iii == choice_seat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.Write(seat_bottom);
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    iii++;
+                }
+                Console.Write($"{new string(' ', h)}│");
+                Console.WriteLine();         
+            }
+            Console.Write($"└{new string('─', longest)}┘\n\n");
+            Console.Write(suffix);
+            key = Console.ReadKey(true).Key;
+            if(key == ConsoleKey.Escape)
+            {
+                break;
+            }
+            else if(key == ConsoleKey.RightArrow && choice_seat < ii - 1)
+            {
+                choice_seat++;
+            }
+            else if(key == ConsoleKey.LeftArrow && choice_seat != 0)
+            {
+                choice_seat--;
+            }
+            else if(key == ConsoleKey.UpArrow && choice_seat >= SeatPerRow)
+            {
+                choice_seat = choice_seat - SeatPerRow;
+            }
+            else if(key == ConsoleKey.DownArrow&& choice_seat < ii - SeatPerRow)
+            {
+                choice_seat = choice_seat + SeatPerRow;
+            }
+            else if(key == ConsoleKey.Spacebar)
+            {
+                int selcted_row = choice_seat/SeatPerRow;
+                int selcted_seat = choice_seat%SeatPerRow;
+                if(seats[selcted_row][selcted_seat])
+                {
+                    seats[selcted_row][selcted_seat] = false;
                 }
                 else
                 {
-                    return false;
+                    seats[selcted_row][selcted_seat] = true;
                 }
+            }
+            else if(key == ConsoleKey.Enter && not_empty_check)
+            {
+                Room room_finisehed = new(room.Id, seats);
+                return room_finisehed;
             }
         }while(key != ConsoleKey.Escape);
         return null;
