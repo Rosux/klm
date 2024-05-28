@@ -418,7 +418,8 @@ class FilmSerieMenu
     {
         if(filmlogic_obj.Check_films_exist())
         {
-            Film ToRemove = MenuHelper.SelectMovie();
+            Film? ToRemove = MenuHelper.SelectMovie();
+            if(ToRemove == null){return;}
             bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
             if (a)
             {   
@@ -439,7 +440,8 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             Console.WriteLine("Search for a movie you want to change");
-            Film SelectedFilm = MenuHelper.SelectMovie();
+            Film? SelectedFilm = MenuHelper.SelectMovie();
+            if(SelectedFilm == null){return;}
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
             {
