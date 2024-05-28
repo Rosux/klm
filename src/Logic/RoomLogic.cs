@@ -46,8 +46,7 @@ public static class RoomLogic
             Room? chosenroom = ChooseRoom("choose a room to see");
             if(chosenroom != null){
                 Console.Clear();
-                List<Entertainment> entertainments = new List<Entertainment>(){};
-                Menu.PrintSeats(chosenroom, entertainments, -1, -1);
+                Console.WriteLine(RoomLayoutPrinter(chosenroom));
                 Console.ReadKey(true);
             }
         }
