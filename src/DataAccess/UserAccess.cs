@@ -22,7 +22,7 @@ public class UserAccess : DatabaseHandler{
             command.Parameters.AddWithValue("@LastName", user.LastName);
             command.Parameters.AddWithValue("@Email", user.Email);
             command.Parameters.AddWithValue("@Password", user.Password);
-            command.Parameters.AddWithValue("@Role", "ADMIN");
+            command.Parameters.AddWithValue("@Role", user.Role.ToString());
 
             object result = command.ExecuteScalar();
             if (result != null && int.TryParse(result.ToString(), out userId)){
