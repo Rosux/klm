@@ -87,8 +87,14 @@ public static class RoomLogic
     }
 
     /// <summary>
-    /// Ask the user to make a new room. saves it to the database. Has the option to go back at any time.
+    /// lets the admin add a room by using the following steps:
+    /// 1. asks how much rows he wants using menuhelper.selectinterger
+    /// 2. asks how much seats he wants per row using menuhelper.selectinterger
+    /// 3. gives the admin the option to remove or reinstae seats using RoomLayoutManager
+    /// 4. than asks if the admin wants to save the rrom.
     /// </summary>
+    /// <param name="given_rows"> a interger that gives the rows for the room (only used for loop)</param>
+    /// <param name="seatss">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int given_rows = 0, int seatss = 0)
     {
         int? GivenRows_p = null;
@@ -104,6 +110,7 @@ public static class RoomLogic
         {
             int rows = (int)GivenRows_p;
             int? GivenSeats_p = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 2147483647);
+            /// makes the layout for the room
             if (GivenSeats_p  != null)
             {
                 int seats_per_rows = 0;
@@ -152,12 +159,15 @@ public static class RoomLogic
                 Room room = new(seats);
                 string prefix = "This is the current room layout:";
                 string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
+                /// lets admin remove or reinsate seats
                 Room room_finished = RoomLayoutManager(room, prefix, suffix);
                 if(room_finished != null)
                 {
+                    /// asks for conformation
                     bool conformation = MenuHelper.Confirm($"Current room layout:\n{RoomLayoutPrinter(room_finished)}\nAre you sure you want to add this room? ");
                     if(conformation)
                     {
+                        /// if conformation is given it adds the room to the database
                         r.AddRoom(room_finished);
                         Console.WriteLine("\nRoom added sucessfully.");
                         Console.Write($"\n\nPress any key to continue...");
@@ -191,28 +201,35 @@ public static class RoomLogic
             Console.ReadKey(true);
         }
     }
-    
-    
 
     /// <summary>
-    /// Ask the user to select a room and to make any edits for that room if they wish. Has the option to go back at any time.
+    /// lets the admin edit a room by taking these steps:
+    /// 1. lets the admin select a room using ChooseRoom
+    /// 2. lets admin edit the selcted room by using RoomLayouManager
+    /// 3. asks if the admin wants to save changes
+    /// 4. either cancels action or submits changes
     /// </summary>
+    /// <param name="chosenroom"> takes a room object you want to edit (is only used for loop)</param>
     public static void EditRoom(Room chosenroom = null)
     {
         if(chosenroom == null)
         {
+            /// kets user choose a room
             chosenroom = ChooseRoom("choose a room to edit");
         }
         if (chosenroom != null)
         {
             string prefix = "This is the current room layout:";
             string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
+            /// lets user edit the room
             Room? edited_room = RoomLayoutManager(chosenroom, prefix, suffix);
             if (edited_room != null)
             {
+                /// asks if he wants to save changes
                 bool conformation = MenuHelper.Confirm($"new room layout:\n{RoomLayoutPrinter(edited_room)}\nAre you sure you want to make these changes ");
                 if(conformation)
                 {
+                    /// edits room
                     r.EditRoom(edited_room);
                     Console.WriteLine("\nRoom changed sucessfully.");
                     Console.Write($"\n\nPress any key to continue...");
@@ -232,6 +249,11 @@ public static class RoomLogic
         }
     }
 
+    /// <summary>
+    /// gives the user an Interface wher he can see all the rooms and choose one to return
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <returns>The selcted room as a Room object or null to cancel the action</returns> 
     public static Room? ChooseRoom(string prefix = "Choose a room")
     {
         int page = 0;
@@ -394,6 +416,11 @@ public static class RoomLogic
         return null;
     }
 
+    /// <summary>
+    /// this method takes a room object and returns a string of its layout
+    /// </summary>
+    /// <param name="room">takes a room object to make the layout of</param>
+    /// <returns>a string that is the room layout</returns>
     public static string RoomLayoutPrinter(Room room)
     {
         string layout = "";
@@ -479,6 +506,13 @@ public static class RoomLogic
             //Console.Write(suffix);
             return layout;
     }
+    /// <summary>
+    /// this maethode takes a room and lets the admin edit this rooms layout
+    /// </summary>
+    /// <param name="room"> a room object it uses to manage its layout</param>
+   /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <returns></returns>
     public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
     {
         ConsoleKey key;
