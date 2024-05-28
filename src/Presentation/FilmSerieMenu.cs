@@ -273,14 +273,18 @@ class FilmSerieMenu
         List<string> Selected = new List<string>() { "X", "X", "X", "X", "X", "X", "X", "X", "X"};
 
         List<string> Genres = new List<string>(); // Film parts
-        string Language = "";
+        string? Language = "";
         string Overview = "";
+        string OverviewDisplay = "";
         string Releasedate = "";
         int Runtime = 0;
         string Title = "";
+        string TitleDisplay = "";
         double Vote_average = 0;
         string Certification = "";
         List<string> Directors = new List<string>();
+        string Selectedmoviegenres = "";
+        string Selecteddirectors = "";
 
         int AddLoop = 1;
         while(AddLoop == 1)
@@ -288,7 +292,7 @@ class FilmSerieMenu
             if(filmlogic_obj.Check_films_exist())
             {
                 MenuHelper.SelectOptions("Choose what part you want to change", new Dictionary<string, Action>(){
-                {$"Genres {Selected[0]}", ()=>{
+                {$"Genres {Selected[0]} {Selectedmoviegenres}", ()=>{
                     Genres = GetGenres();
                     if (Genres == null)
                     {
@@ -297,18 +301,26 @@ class FilmSerieMenu
                     }
                     else
                     {
+                        Selectedmoviegenres = String.Join(", ", Genres);
                         Selected[0] = "✓";
                         Console.WriteLine("Genres successfully added to selection.\nPress enter to continue... ");
                         Console.ReadKey();
                     }
                 }},
-                {$"Original language {Selected[1]}", ()=>{
+                {$"Original language {Selected[1]} {Language}", ()=>{
                     Language = getLanguage();
-                    Selected[1] = "✓";
-                    Console.WriteLine($"Language successfully set to: {Language} \nPress enter to continue... ");
-                    Console.ReadKey();
+                    if (Language == null)
+                    {
+
+                    }
+                    else
+                    {
+                        Selected[1] = "✓";
+                        Console.WriteLine($"Language successfully set to: {Language} \nPress enter to continue... ");
+                        Console.ReadKey();
+                    }
                 }},
-                {$"Overview (plot) {Selected[2]}", ()=>{
+                {$"Overview (plot) {Selected[2]} {OverviewDisplay}", ()=>{
                     Console.WriteLine("Overview (plot): ");
                     Overview = Console.ReadLine();
                     if (Overview == "" || Overview == null)
@@ -318,15 +330,24 @@ class FilmSerieMenu
                     Selected[2] = "✓";
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
+                    OverviewDisplay = GetDisplayString(Overview);
+                    if (Overview.Length > Console.WindowWidth)
+                    {
+                        OverviewDisplay = $"{Overview.Substring(0, (Console.WindowWidth - 25))}...";
+                    }
+                    else
+                    {
+                        OverviewDisplay = Overview;
+                    }
                 }},
-                {$"Release date {Selected[3]}", ()=>{
+                {$"Release date {Selected[3]} {Releasedate}", ()=>{
                     DateOnly x = MenuHelper.SelectDate("Select a release date");
                     Releasedate = x.ToString("yyyy-MM-dd");
                     Selected[3] = "✓";
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {$"Runtime {Selected[4]}", ()=>{
+                {$"Runtime {Selected[4]} {Runtime}", ()=>{
                     int? i = getDuration();
                     if (i == null)
                     {
@@ -343,31 +364,40 @@ class FilmSerieMenu
                     }
 
                 }},
-                {$"Title {Selected[5]}", ()=>{
+                {$"Title {Selected[5]} {TitleDisplay}", ()=>{
                     Console.WriteLine("Enter title: ");
                     Title = Console.ReadLine();
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
+                    TitleDisplay = GetDisplayString(Title);
                     Selected[5] = "✓";
                 }},
-                {$"Vote average {Selected[6]}", ()=>{
-                    Vote_average = getVoteAverage();
-                    Console.WriteLine("Press enter to continue... ");
-                    Console.ReadKey();
-                    Selected[6] = "✓";
+                {$"Vote average {Selected[6]} {Vote_average}", ()=>{
+                    Vote_average = (double)getVoteAverage();
+                    if (Vote_average == null)
+                    {
+                        
+                    }
+                    else
+                    {
+                        Console.WriteLine("Press enter to continue... ");
+                        Console.ReadKey();
+                        Selected[6] = "✓";
+                    }
                 }},
-                {$"Certification {Selected[7]}", ()=>{
+                {$"Certification {Selected[7]} {Certification}", ()=>{
                     Console.WriteLine("Certification (PG)");
                     Certification = Console.ReadLine();
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                     Selected[7] = "✓";
                 }},
-                {$"Director {Selected[8]}", ()=>{
+                {$"Director {Selected[8]} {Selecteddirectors}", ()=>{
                     Console.WriteLine("Director");
                     string director = Console.ReadLine();
                     // Create a list to store director information
                     Directors.Add(director);
+                    Selecteddirectors = String.Join(", ", Directors);
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                     Selected[8] = "✓";
@@ -386,17 +416,15 @@ class FilmSerieMenu
                         // use string.join to display all contents of the lists
                         string Selectedmoviegenres = String.Join(", ", Genres);
                         string Selecteddirectors = String.Join(", ", Directors);
-                        Console.WriteLine($"Genres: {Selectedmoviegenres}\nLanguage: {Language}\nOverview: {Overview}\n\nRelease date: {Releasedate}\nRuntime: {Runtime}\nTitle: {Title}\nVote average (/10): {Vote_average}\nCertification: {Certification}\nDirectors: {Selecteddirectors}");
-                        Console.WriteLine("Are you sure you want to add this movie? Y/N");
-                        string a = Console.ReadLine();
-                        if (a == "Y" || a == "y")
+                        bool ConfirmAdd = MenuHelper.Confirm($"Genres: {Selectedmoviegenres}\nLanguage: {Language}\nOverview: {Overview}\n\nRelease date: {Releasedate}\nRuntime: {Runtime}\nTitle: {Title}\nVote average (/10): {Vote_average}\nCertification: {Certification}\nDirectors: {Selecteddirectors}\n Are you sure you want to add this movie?");
+                        if (ConfirmAdd)
                         {
                             int id = filmlogic_obj.CreateID();
                             Console.WriteLine(filmlogic_obj.Add_film(new Film(id, Genres, Language, Overview, Releasedate, (int)Runtime, Title, Vote_average, Certification, Directors)));
                             Thread.Sleep(5000);
                             AddLoop = 0;
                         }
-                        if (a == "N" || a == "n")
+                        if (!ConfirmAdd)
                         {
                             MenuHelper.SelectOptions("Select an action", new Dictionary<string, Action>(){
                                 {$"Keep editing movie", ()=>{
@@ -440,23 +468,27 @@ class FilmSerieMenu
         {
             Console.WriteLine("Search for a movie you want to change");
             Film SelectedFilm = MenuHelper.SelectMovie();
+            string Selectedmoviegenres = String.Join(", ", SelectedFilm.Genres);
+            string Selecteddirectors = String.Join(", ", SelectedFilm.Directors);
+            string OverviewDisplay = GetDisplayString(SelectedFilm.Overview);
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
             {
                 MenuHelper.SelectOptions("Choose what part you want to change", new Dictionary<string, Action>(){
-                {"Genres", ()=>{
+                {$"Genres: {Selectedmoviegenres}", ()=>{
                     List<string> GivenGenres = GetGenres();
+                    Selectedmoviegenres = String.Join(", ", GivenGenres);
                     Console.WriteLine(filmlogic_obj.change_genre(film_id, GivenGenres));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Original language", ()=>{
+                {$"Original language: {SelectedFilm.Original_language}", ()=>{
                     string givenlanguage = getLanguage();
                     Console.WriteLine(filmlogic_obj.change_language(film_id, givenlanguage));
                     Console.WriteLine($"Language succesfully changed to {givenlanguage}\nPress enter to continue...");
                     Console.ReadKey();
                 }},
-                {"Overview (plot)", ()=>{
+                {$"Overview (plot): {OverviewDisplay}", ()=>{
                     Console.WriteLine("New overview (plot): ");
                     string Overview = Console.ReadLine();
                     if (Overview == "" || Overview == null)
@@ -464,17 +496,18 @@ class FilmSerieMenu
                         Overview = "No movie plot";
                     }
                     Console.WriteLine(filmlogic_obj.change_overview(film_id, Overview));
+                    OverviewDisplay = GetDisplayString(Overview);
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Release date", ()=>{
+                {$"Release date: {SelectedFilm.Release_date}", ()=>{
                     DateOnly x = MenuHelper.SelectDate("Select new release date");
                     string ReleaseDate = x.ToString("yyyy-MM-dd");
                     Console.WriteLine(filmlogic_obj.change_releasedate(film_id, ReleaseDate));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Runtime", ()=>{
+                {$"Runtime: {SelectedFilm.Runtime}", ()=>{
                     int? i = getDuration();
                     if (i == null)
                     {
@@ -488,33 +521,34 @@ class FilmSerieMenu
                     }
 
                 }},
-                {"Title", ()=>{
+                {$"Title: {SelectedFilm.Title}", ()=>{
                     Console.WriteLine("New title: ");
                     string new_title = Console.ReadLine();
                     Console.WriteLine(filmlogic_obj.change_title(film_id, new_title));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Vote average", ()=>{
-                    double d = getVoteAverage();
+                {$"Vote average: {SelectedFilm.Vote_average}", ()=>{
+                    double d = (double)getVoteAverage();
                     Console.WriteLine(filmlogic_obj.change_vote(film_id, d));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Certification", ()=>{
+                {$"Certification: {SelectedFilm.Certification}", ()=>{
                     Console.WriteLine("Certification (PG)");
                     string certification = Console.ReadLine();
                     Console.WriteLine(filmlogic_obj.change_certification(film_id, certification));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {"Director", ()=>{
+                {$"Director: {Selecteddirectors}", ()=>{
                     Console.WriteLine("Director");
                     string director = Console.ReadLine();
                     // Create a list to store director information
                     List<string> directorInfo = new List<string>();
                     directorInfo.Add(director);
                     Console.WriteLine(filmlogic_obj.change_director(film_id, directorInfo));
+                    Selecteddirectors = String.Join(", ", directorInfo);
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
@@ -559,39 +593,30 @@ class FilmSerieMenu
     {
         return MenuHelper.SelectInteger("Select a duration ", "Minutes", true, 1, 0);
     }
-    private static double getVoteAverage()
+    private static double? getVoteAverage()
     {
-        Console.WriteLine("Rating (/10)");
-        string voteAverageString = Console.ReadLine();
-        double voteAverage;
-        if (string.IsNullOrEmpty(voteAverageString))
-        {
-            return voteAverage = 0;
-        }
-        if (!double.TryParse(voteAverageString, out voteAverage))
-        {
-            Console.WriteLine("Invalid input. Vote average set to 0.");
-            voteAverage = 0;
-        }
-        return voteAverage;
+        return MenuHelper.SelectPrice("Select a vote average /10", "", true, 0.0, 10.0);
     }
 
-    private static string getLanguage()
+    private static string? getLanguage()
     {
-        Console.WriteLine("");
-        Console.Write("Original Language: ");
-        string givenlanguage = Console.ReadLine();
-        if(givenlanguage == "" || givenlanguage == null)
+        return  MenuHelper.SelectText("Select a language", "", true, 0, int.MaxValue, "([A-z]| )");
+    }
+
+
+    //Checks the current windowWidth and caps 
+    //the given string to this to not break menuhelper
+    public static string GetDisplayString(string givenstring)
+    {
+        string returnstring;
+        if (givenstring.Length > Console.WindowWidth)
         {
-            givenlanguage = "English";
-            Console.WriteLine("No input given, language changed to: English ");
-            return givenlanguage;
+            returnstring = $"{givenstring.Substring(0, (Console.WindowWidth - 25))}...";
         }
         else
         {
-            return givenlanguage;
+            returnstring = givenstring;
         }
+        return returnstring;
     }
-
-    
 }

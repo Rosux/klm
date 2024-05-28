@@ -1294,6 +1294,60 @@ public static class MenuHelper{
         Console.Clear();
         return price;
     }
+
+    public static double? SelectPrice(string prefix="", string suffix="", bool canCancel=false, double minimumPrice=double.MinValue, double maximumPrice=double.MaxValue)
+    {
+        string input = "";
+        string error = "";
+        double price = minimumPrice;
+        string keybinds = "Press Enter to confirm";
+        if(canCancel){keybinds += "\nPress Escape to cancel";}
+
+        ConsoleKey key;
+        ConsoleKeyInfo RawKey;
+        do
+        {
+            if (price < minimumPrice || price > maximumPrice)
+            {
+                error = $"Please select a value between {minimumPrice} and {maximumPrice}";
+            }
+            else
+            {
+                error = "";
+            }
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n{error}\n\n{keybinds}\n{suffix}");
+            RawKey = Console.ReadKey(true);
+            key = RawKey.Key;
+
+            if(key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if(key == ConsoleKey.Escape && canCancel){
+                Console.Clear();
+                return null;
+            }
+            if(key == ConsoleKey.Enter && double.TryParse(input, out price) && price >= minimumPrice && price <= maximumPrice){
+                break;
+            }
+            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
+                if(input.Length == 0){
+                    input += "0,";
+                }else{
+                    input += ",";
+                }
+            }
+            if(char.IsDigit(RawKey.KeyChar)){
+                if(input.Contains(',') && input.Length >= 3 && input[input.Length-3] == ','){
+                    continue;
+                }
+                input += RawKey.KeyChar.ToString();
+            }
+
+        }while(true);
+        Console.Clear();
+        return price;
+    }
     #endregion
 
     #region Confirmation
