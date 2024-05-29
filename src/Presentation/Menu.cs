@@ -2,9 +2,9 @@ using System;
 class Menu
 {
     public static void Start()
-    {
+    {   
         Console.Title = "24/7 BINGE WATCH CINEMA!";
-        Console.CursorVisible = false;
+        Console.CursorVisible = true;
         Console.WriteLine("Welcome to 24-7 binge watch cinema!");
         // asks the user to choose either of these options
         while(true){
@@ -116,6 +116,7 @@ class Menu
         int y = 0;
         ConsoleKey key;
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             MenuHelper.PrintSeats(r, entertainments, x, y);
             key = Console.ReadKey(true).Key;

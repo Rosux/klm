@@ -21,6 +21,7 @@ public class ReservationOverviewUserMenu
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey();
                     }
+                    Console.CursorVisible = false;
                     Console.Clear();
                 }},
                 {"2. Exit to main menu", ()=>{

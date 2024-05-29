@@ -113,6 +113,7 @@ public class UserTable{
                     roleMax = 5;
                 }
                 maxLength += firstMax + lastMax + mailMax + roleMax + 17;
+                Console.CursorVisible = false;
                 Console.Clear();
                 Console.WriteLine("Press escape to go back");
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -455,6 +456,7 @@ public class UserTable{
                 {
                     if (currentEditSelected == 1)
                     {
+                        Console.CursorVisible = false;
                         Console.Clear();
                         first = UserMenu.GetValidInput("Enter your Firstname:", 3, 20);
                         if (first != null)
@@ -463,6 +465,7 @@ public class UserTable{
                         }
                     }else if(currentEditSelected == 2)
                     {
+                        Console.CursorVisible = false;
                         Console.Clear();
                         last = UserMenu.GetValidInput("Enter your Lastname:", 3, 20);
                         if (last != null)
@@ -471,6 +474,7 @@ public class UserTable{
                         }
                     }else if(currentEditSelected == 3)
                     {
+                        Console.CursorVisible = false;
                         Console.Clear();
                         mail = UserMenu.GetValideEmail("Enter your email:", 3, 20);
                         if (mail != null)
@@ -479,6 +483,7 @@ public class UserTable{
                         }
                     }else if(currentEditSelected == 4)
                     {
+                        Console.CursorVisible = false;
                         Console.Clear();
                         MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
                             {"1. User", ()=>{
@@ -490,6 +495,7 @@ public class UserTable{
                         });
                     }else if(currentEditSelected == 6)
                     {
+                        Console.CursorVisible = false;
                         Console.Clear();
                         bool answers = u.UpdateUser(editedUser);
                         if (answers)

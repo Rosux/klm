@@ -21,6 +21,7 @@ public static class ReservationOverviewAdminMenu
                         Console.Write($"\n\n Press any key to continue...");
                         Console.ReadKey(true);
                     }
+                    Console.CursorVisible = false;
                     Console.Clear();
                 }},
                 {"2. View all reservations for this week",()=> {
@@ -71,8 +72,10 @@ public static class ReservationOverviewAdminMenu
                     {
                         Console.Write($"\n\n Press any key to continue...");
                         Console.ReadKey(true);
+                        Console.CursorVisible = false;
                         Console.Clear();
                     }
+                    Console.CursorVisible = false;
                     Console.Clear();
                 }},
                 {"3. Choose date",()=> {
@@ -99,6 +102,7 @@ public static class ReservationOverviewAdminMenu
                         {
                             Console.Write($"\n\n Press any key to continue...");
                             Console.ReadKey(true);
+                            Console.CursorVisible = false;
                             Console.Clear();
                         }
                     }

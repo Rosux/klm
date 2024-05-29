@@ -285,6 +285,7 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {   //This gets reservations and gives all the details in the prefix towards the timeline. 
+                    Console.CursorVisible = false;
                     Console.Clear();
                     MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
                 }
@@ -323,6 +324,7 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {
+                    Console.CursorVisible = false;
                     Console.Clear();
                     return selectedReservation;
 
@@ -368,6 +370,7 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {
+                    Console.CursorVisible = false;
                     Console.Clear();
                     return selectedReservation;
 
@@ -414,6 +417,7 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {
+                    Console.CursorVisible = false;
                     Console.Clear();
                     return selectedReservation;
 
@@ -459,6 +463,7 @@ public static class ReservationMenu
 
                 if (selectedReservation != null)
                 {
+                    Console.CursorVisible = false;
                     Console.Clear();
                     return selectedReservation;
 
@@ -476,12 +481,14 @@ public static class ReservationMenu
     }
 
     public static void Error(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
 
     public static void Saved(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("Your reservation has been saved succesfully.\n\nPress any key to continue");
         Console.ReadKey(true);

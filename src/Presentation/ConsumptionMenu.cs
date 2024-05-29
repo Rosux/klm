@@ -143,26 +143,31 @@ public static class ConsumptionMenu
     }
 
     public static void Error(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void Saved(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("Your changes are saved succesfully.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void Deleted(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("Items are removed succesfully.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void NoItems(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("There are no products stored to edit.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void NoItemsToRemove(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("There are no products stored to remove.\n\nPress any key to continue");
         Console.ReadKey(true);

@@ -10,6 +10,7 @@ public class RoomMenu
     /// </summary>
     public static void PrintAllRooms()
     {
+        Console.CursorVisible = false;
         Console.Clear();
         Dictionary<string, Room> rooms = new Dictionary<string, Room>();
         foreach(Room r in r.GetAllRooms()){
@@ -24,6 +25,7 @@ public class RoomMenu
     /// <param name="success">A boolean indicating if the deletion was succesful</param>
     public static void RoomDeletedNotification(bool success)
     {
+        Console.CursorVisible = false;
         Console.Clear();
         Console.ForegroundColor = success ? ConsoleColor.Green : ConsoleColor.Red;
         Console.Write(success ? "Room succesfully deleted" : "Room deletion failed, try again later");
@@ -37,6 +39,7 @@ public class RoomMenu
     /// </summary>
     public static void NoRoomsFoundNotification()
     {
+        Console.CursorVisible = false;
         Console.Clear();
         Console.Write("No rooms have been found\n\nPress any key to continue...");
         Console.ReadKey(true);

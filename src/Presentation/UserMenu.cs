@@ -66,6 +66,7 @@ public static class UserMenu{
         string error= "";
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -102,6 +103,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -118,6 +120,7 @@ public static class UserMenu{
             {
                 error += $"Email already exists.\n";
             }
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -161,6 +164,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -179,6 +183,7 @@ public static class UserMenu{
         string error= "";
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -229,6 +234,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -237,6 +243,8 @@ public static class UserMenu{
     {
         string Email = "";
         do{
+            Console.CursorVisible = false;
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -255,6 +263,8 @@ public static class UserMenu{
         }while(true);
         string Password = "";
         do{
+            Console.CursorVisible = false;
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -421,21 +431,25 @@ public static class UserMenu{
     }
 
     public static void NoUsersToRemove(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("There are no Users stored to remove.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void UserRemoved(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("The user has been removed.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void UserAdded(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("The user has been added.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
     public static void WrongLogin(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
