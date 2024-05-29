@@ -106,7 +106,9 @@ public class FilmLogic
     {
         string info = "";
         FilmAcesser filmacesser = new();
+        //get list of all films
         List<Film> list_films = filmacesser.Get_info();
+        //loop through all films to change the part
         foreach(Film film in list_films)
         {
             if(film.Id == id)
@@ -115,6 +117,7 @@ public class FilmLogic
                 film.Title = new_title;
             }
         }
+        //write new list to the json
         filmacesser.Return_info(list_films);
         return info;
     }
@@ -218,6 +221,7 @@ public class FilmLogic
         filmacesser.Return_info(list_films);
         return info;
     }
+    // change age certification of given film (id)
     public string change_certification(int id, string new_certification)
     {
         string info = "";
@@ -234,6 +238,8 @@ public class FilmLogic
         filmacesser.Return_info(list_films);
         return info;
     }
+
+    //Changes the director of a given film (id)
     public string change_director(int id, List<string> directorsList)
     {
         string info = "";

@@ -467,12 +467,11 @@ class FilmSerieMenu
     {
         if(filmlogic_obj.Check_films_exist())
         {
+            Film? SelectedFilm = MenuHelper.SelectMovie();
             Console.WriteLine("Search for a movie you want to change");
-            Film SelectedFilm = MenuHelper.SelectMovie();
             string Selectedmoviegenres = String.Join(", ", SelectedFilm.Genres);
             string Selecteddirectors = String.Join(", ", SelectedFilm.Directors);
             string OverviewDisplay = GetDisplayString(SelectedFilm.Overview);
-            Film? SelectedFilm = MenuHelper.SelectMovie();
             if(SelectedFilm == null){return;}
             int film_id = SelectedFilm.Id;
             if (SelectedFilm != null)
@@ -492,7 +491,8 @@ class FilmSerieMenu
                     Console.ReadKey();
                 }},
                 {$"Overview (plot): {OverviewDisplay}", ()=>{
-                    Console.WriteLine("New overview (plot): ");
+                    Console.WriteLine($"------------------------\nOld overview: {SelectedFilm.Overview}\n------------------------");
+                    Console.WriteLine("\nNew overview (plot): ");
                     string Overview = Console.ReadLine();
                     if (Overview == "" || Overview == null)
                     {

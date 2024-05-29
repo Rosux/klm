@@ -6,7 +6,10 @@ public class Film : Media, IComparable
 
     [JsonProperty("genres")]
     [JsonConverter(typeof(MovieConverter<string>))]
-    public List<string> Genres
+     // ^^MovieConverter.cs --> Newtonsoft.JsonConverter overload to 
+     //accept both string and list of string because 
+     //newtonsoft writes a list with a single entry as a string, not a list
+    public List<string> Genres // list of genres
     {
         get => _genres ?? new List<string>();
         set => _genres = value;
