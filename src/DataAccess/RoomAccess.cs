@@ -1,66 +1,89 @@
+using Newtonsoft.Json;
+
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
+    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
 
+    /// <summary>
+    /// Create a new room.
+    /// </summary>
+    /// <param name="room">An instance of the room to create.</param>
+    /// <returns>A room if creation is succesful otherwise null.</returns>
+    public Room? AddRoom(Room room)
+    {
+        Room? newRoom = null;
+        _Conn.Open();
+        string query = "INSERT INTO Rooms (Capacity, Seats) VALUES (@capacity, @seats); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@capacity", room.Capacity);
+            Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            Command.ExecuteNonQuery();
+            // SQLiteDataReader reader = Command.ExecuteReader();
+            // if(reader.Read()){
+            //     newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
+            // }
+        }
+        _Conn.Close();
+        return newRoom;
     }
 
-    public int AddToRoomTable(Room room)
+    /// <summary>
+    /// Updates a room item in the database.
+    /// </summary>
+    /// <param name="room">A room instance to update. Must hold the new data and have a valid id.</param>
+    /// <returns>A boolean indicating if the update was successful.</returns>
+    public bool EditRoom(Room room)
     {
-        int newRoomId = -1;
+        int rowsAffected;
         _Conn.Open();
-        string query = "INSERT INTO Rooms (Capacity) VALUES (@capacity); SELECT last_insert_rowid();";
-        var command = new SQLiteCommand(query, _Conn);
-        command.Parameters.AddWithValue("@capacity", room.Capacity);
-        newRoomId = Convert.ToInt32(command.ExecuteScalar());
+        string query = "UPDATE Rooms SET Capacity=@capacity, Seats=@seats WHERE ID=@id";
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@id", room.Id);
+            Command.Parameters.AddWithValue("@capacity", room.Capacity);
+            Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            rowsAffected = Command.ExecuteNonQuery();
+        }
         _Conn.Close();
-        return newRoomId;
+        return rowsAffected > 0;
     }
-    public void EditFromRoomTable(int id, int capacity)
+
+    /// <summary>
+    /// Remove a room with specific ID.
+    /// </summary>
+    /// <param name="id">The room with ID to remove.</param>
+    /// <returns>A boolean indicating if the room was removed.</returns>
+    public bool RemoveRoom(int id)
     {
-        _Conn.Open();
-        string query = "UPDATE Rooms SET Capacity=@capacity WHERE ID=@id";
-        var command = new SQLiteCommand(query, _Conn);
-        command.Parameters.AddWithValue("@id", id);
-        command.Parameters.AddWithValue("@capacity", capacity);
-        command.ExecuteNonQuery();
-        _Conn.Close();
-    }
-    public void RemoveFromRoomTable(int roomid)
-    {
+        int rowsAffected;
         _Conn.Open();
         string query = "DELETE FROM Rooms WHERE ID=@id";
-        var command = new SQLiteCommand(query, _Conn);
-        command.Parameters.AddWithValue("@id", roomid);
-        command.ExecuteNonQuery();
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@id", id);
+            rowsAffected = Command.ExecuteNonQuery();
+        }
         _Conn.Close();
+        return rowsAffected > 0;
     }
-    public string GetRoom(int id)
+
+    /// <summary>
+    /// Returns a room with specific ID, null if not found.
+    /// </summary>
+    /// <param name="id">The ID to search for.</param>
+    /// <returns>A Room object if found otherwise null.</returns>
+    public Room? GetRoomById(int id)
     {
-        string RoomInfo = "";
+        Room? r = null;
         _Conn.Open();
         string query = "SELECT * from Rooms WHERE ID=@id";
-        var command = new SQLiteCommand(query, _Conn);
-        command.Parameters.AddWithValue("@id", id);
-        SQLiteDataReader reader = command.ExecuteReader();
-        while (reader.Read()) 
-                {
-                    RoomInfo = $"Room-ID = {reader.GetValue(0).ToString()} Capacity = {reader.GetValue(1).ToString()}";
-                }
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+            Command.Parameters.AddWithValue("@id", id);
+            SQLiteDataReader reader = Command.ExecuteReader();
+            while(reader.Read())
+            {
+                r = new Room(reader.GetInt32(0), reader.GetString(2));
+            }
+        }
         _Conn.Close();
-        return RoomInfo;
-    }
-    public List<string> _getAllRooms()
-    {
-        _Conn.Open();
-        List<string> roomlist = new List<string>();
-        string query = "SELECT * FROM Rooms";
-        var command = new SQLiteCommand(query, _Conn);
-        SQLiteDataReader reader = command.ExecuteReader();
-        while (reader.Read())  
-                {  
-                    roomlist.Add($"Room-ID = {reader.GetValue(0).ToString()} Capacity = {reader.GetValue(1).ToString()}");   
-                } 
-        _Conn.Close();
-        return roomlist;
+        return r;
     }
 
     /// <summary>
@@ -72,14 +95,14 @@ public class RoomAccess : DatabaseHandler {
         List<Room> roomlist = new List<Room>();
         _Conn.Open();
         string query = "SELECT * FROM Rooms WHERE Capacity >= @MinRoomSize";
-        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@MinRoomSize", filterMinSize);
             SQLiteDataReader reader = Command.ExecuteReader();
             while (reader.Read())
             {
                 int id = reader.GetInt32(0);
-                int nocap = reader.GetInt32(1);
-                roomlist.Add(new Room(id, nocap));
+                string layoutJson = reader.GetString(2);
+                roomlist.Add(new Room(id, layoutJson));
             }
         }
         _Conn.Close();
@@ -95,7 +118,7 @@ public class RoomAccess : DatabaseHandler {
         int maxCapacity = 0;
         _Conn.Open();
         string query = "SELECT MAX(Capacity) FROM Rooms";
-        using (SQLiteCommand Command = new SQLiteCommand(query, _Conn))
+        using(SQLiteCommand Command = new SQLiteCommand(query, _Conn))
         {
             object result = Command.ExecuteScalar();
             if (result != DBNull.Value)

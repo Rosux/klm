@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 public class ReservationAccess : DatabaseHandler
 {
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
+
     /// <summary>
     /// Get a list of all reservations.
     /// </summary>
@@ -25,12 +26,14 @@ public class ReservationAccess : DatabaseHandler
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
                 string timeline_str = reader.GetString(7);
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str), entertainments));
             }
         }
         _Conn.Close();
         return reservations;
     }
+
     /// <summary>
     /// Get a list of all the reservations falling on a specific date.
     /// </summary>
@@ -57,7 +60,8 @@ public class ReservationAccess : DatabaseHandler
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
                 string timeline_str = reader.GetString(7);
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str), entertainments));
             }
         }
         _Conn.Close();
@@ -91,7 +95,8 @@ public class ReservationAccess : DatabaseHandler
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
                 string timeline_str = reader.GetString(7);
-                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str), entertainments));
             }
         }
         _Conn.Close();
@@ -121,7 +126,8 @@ public class ReservationAccess : DatabaseHandler
                 DateTime enddate = DateTime.Parse(reader.GetString(5));
                 double price = reader.GetDouble(6);
                 string timeline_str = reader.GetString(7);
-                reservations.Add(new Reservation(reservationid, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str)));
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                reservations.Add(new Reservation(reservationid, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str), entertainments));
             }
         }
         _Conn.Close();
@@ -135,8 +141,8 @@ public class ReservationAccess : DatabaseHandler
     /// <returns>A boolean indicating if the reservation was saved.</returns>
     public bool CreateReservation(Reservation reservation){
         _Conn.Open();
-        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine)
-        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine)";
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine, Entertainments)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine, @Entertainments)";
         int rowsAffected;
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
@@ -147,6 +153,7 @@ public class ReservationAccess : DatabaseHandler
             Launch.Parameters.AddWithValue("@EndDate", reservation.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
             Launch.Parameters.AddWithValue("@Price", reservation.Price);
             Launch.Parameters.AddWithValue("@TimeLine", reservation.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(reservation.Entertainments));
             rowsAffected = Launch.ExecuteNonQuery();
         }
         _Conn.Close();
@@ -236,5 +243,4 @@ public class ReservationAccess : DatabaseHandler
         }
         return newTimeLine;
     }
-
 }

@@ -1,178 +1,102 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using BCrypt.Net;
+
 public static class UserMenu{
     private static UserAccess u = new UserAccess();
 
-    public static User? Register()
+    /// <summary>
+    /// Asks the user to fill in fields and return a new User object with the field data.
+    /// </summary>
+    /// <returns>A User object or NULL if the user cancels.</returns>
+    public static User? GetNewUser()
     {
-        string? firstName = GetValidInput("Enter your first name:", 3, 20);
+        string? firstName = GetValidInput("Enter first name:", 3, 20);
         if (firstName == null)
         {
             return null;
         }
-        string? lastName = GetValidInput("Enter your last name:", 3, 20);
+        string? lastName = GetValidInput("Enter last name:", 3, 20);
         if (lastName == null)
         {
             return null;
         }
-        string? email = GetValideEmail("Enter your email:", 3, 20);
+        string? email = GetValideEmail("Enter email:", 3, 20);
         if (email == null)
         {
             return null;
         }
-        string passwordHash = "";
-        string? password = GetValidPassword("Enter your password:", 6, 20);
+        string? password = GetValidPassword("Enter password:", 6, 20);
         if (password == null)
         {
             return null;
         }
-        string? password2 = GetValidPassword("Enter your password again:", 6, 20, true, password);
+        string? password2 = GetValidPassword("Enter password again:", 6, 20, true, password);
         if (password2 == null)
         {
             return null;
         }
-        passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
+        string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
         User user = new User(firstName, lastName, email, passwordHash);
         return user;
     }
 
-    public static void NotifyAddUser(bool x)
-    {
-        if(x)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("User has been added. Press any key to continue");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.ReadKey(true);
-        }else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("User has not been added. Press any key to continue");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.ReadKey(true);
-        }
-    }
     /// <summary>
-    /// This checks allot of statements that need to be true before you can press enter and go to the next valid input.
+    /// Asks the user to fill in login credentials and returns then as a user.
     /// </summary>
-    /// <param name="prompt">Here you can give the promt that should be printed at the top before you get the readkey.</param>
-    /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
-    /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
-    /// <returns>Return the user given string.</returns>
-    public static string? GetValidInput(string prompt, int minLength, int maxLength)
+    /// <returns>A empty user instance except for an Email and raw Password</returns>
+    public static User? GetLoginCredentials()
     {
-        string input = "";
-        string error= "";
-        do
-        {
+        string Email = "";
+        do{
             Console.Clear();
-            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(error);
-            Console.ForegroundColor = ConsoleColor.White;
-            error = "";
-            ConsoleKeyInfo keyInfo;
-            keyInfo = Console.ReadKey(true);
-            if (keyInfo.Key == ConsoleKey.Enter && Regex.IsMatch(input, "[A-z]") && input.Length <= maxLength && input.Length >= minLength)
-            {
+            Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if (keyInfo.Key == ConsoleKey.Backspace)
-            {
-                if (input.Length > 0)
-                {
-                    input = input.Substring(0, input.Length - 1);
-                }
+            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0){
+                Email = Email.Remove(Email.Length-1);
             }
-            if (keyInfo.Key == ConsoleKey.Escape)
-            {
+            if(!char.IsControl(keyInfo.KeyChar)){
+                Email += keyInfo.KeyChar;
+            }
+            if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
             }
-            if (char.IsLetter(keyInfo.KeyChar))
-            {
-                input += keyInfo.KeyChar;
+        }while(true);
+        string Password = "";
+        do{
+            Console.Clear();
+            Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            if(keyInfo.Key == ConsoleKey.Enter){
+                break;
             }
-            if (input.Length < minLength || input.Length > maxLength)
-            {
-                error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
+            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0){
+                Password = Password.Remove(Password.Length-1);
             }
-            if (!Regex.IsMatch(input, "[A-z]"))
-            {
-                error += $"Input must only contain letters.\n";
+            if(!char.IsControl(keyInfo.KeyChar)){
+                Password += keyInfo.KeyChar;
+            }
+            if(keyInfo.Key == ConsoleKey.Escape){
+                return null;
             }
         }while(true);
-        Console.Clear();
-        return input;
+        return new User(null, null, Email, Password);
     }
 
-    public static string GetValideEmail(string prompt, int minLength, int maxLength)
-    {
-        string input = "";
-        string error= "";
-        do
-        {
-            error = "";
-            User? user = u.VerifyUser(input);
-            if (user != null)
-            {
-                error += $"Email already exists.\n";
-            }
-            Console.Clear();
-            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(error);
-            Console.ForegroundColor = ConsoleColor.White;
-            ConsoleKeyInfo keyInfo;
-            MailAddress b;
-            keyInfo = Console.ReadKey(true);
-            if (keyInfo.Key == ConsoleKey.Escape)
-            {
-                return null;
-            }
-            if (!char.IsControl(keyInfo.KeyChar))
-            {
-                input += keyInfo.KeyChar;
-            }
-            if (!MailAddress.TryCreate(input, out b))
-            {
-                error += $"email is not valid";
-            }
-            if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
-            {
-                if (user == null)
-                {
-                    break;
-                }
-            }
-            if (keyInfo.Key == ConsoleKey.Backspace)
-            {
-                if (input.Length > 0)
-                {
-                    input = input.Substring(0, input.Length - 1);
-                }
-            }
-            if (input.Length < minLength || input.Length > maxLength)
-            {
-                error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
-            }
-            if (!Regex.IsMatch(input, "[A-z]"))
-            {
-                error += $"Input must only contain letters.\n";
-            }
-        }while(true);
-        Console.Clear();
-        return input;
-    }
+
+    #region Input validation
     /// <summary>
-    /// This is the same as the above but a little different because you need to use this twice to check if both passwords are the same.
+    /// Asks the user to fill in a password and checks if its strong enough.
     /// </summary>
-    /// <param name="prompt">Here you type the promt that should be written above the readkey.</param>
-    /// <param name="minLength">Here you give how long the minimum lenght must be for the input.</param>
-    /// <param name="maxLength">Here you give how long the maximum lenght must be for the input.</param>
-    /// <param name="secondPass">Her you give a true if its the second password your providing or false if its the first password.</param>
-    /// <param name="firstPassword">Here you give the first password if secondPass is true.</param>
-    /// <returns>Return the user given string.</returns>
+    /// <param name="prompt">A string containing text for the user to read.</param>
+    /// <param name="minLength">Minimum length required for the password.</param>
+    /// <param name="maxLength">Maximum length required for the password.</param>
+    /// <param name="secondPass">A boolean indicating if the password should match the firstPassword parameter.</param>
+    /// <param name="firstPassword">A string of the first password that gets compared to check if the passwords both match.</param>
+    /// <returns>A string containing the password if it matches or NULL if the user cancels.</returns>
     private static string? GetValidPassword(string prompt, int minLength, int maxLength, bool secondPass = false, string firstPassword = "")
     {
         string input = "";
@@ -233,60 +157,130 @@ public static class UserMenu{
         return input;
     }
 
-    public static User? Login()
+    /// <summary>
+    /// Asks the user to fill in a string of only A-Z characters with a minimum and maximum length.
+    /// </summary>
+    /// <param name="prompt">A string containing text for the user to read.</param>
+    /// <param name="minLength">Minimum length required for the value.</param>
+    /// <param name="maxLength">Minimum length required for the value.</param>
+    /// <returns>A string contaning the user input or NULL if the user cancels.</returns>
+    public static string? GetValidInput(string prompt, int minLength, int maxLength)
     {
-        string Email = "";
-        do{
+        string input = "";
+        string error= "";
+        do
+        {
             Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if(keyInfo.Key == ConsoleKey.Enter){
+            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(error);
+            Console.ForegroundColor = ConsoleColor.White;
+            error = "";
+            ConsoleKeyInfo keyInfo;
+            keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.Enter && Regex.IsMatch(input, "[A-z]") && input.Length <= maxLength && input.Length >= minLength)
+            {
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0){
-                Email = Email.Remove(Email.Length-1);
+            if (keyInfo.Key == ConsoleKey.Backspace)
+            {
+                if (input.Length > 0)
+                {
+                    input = input.Substring(0, input.Length - 1);
+                }
             }
-            if(!char.IsControl(keyInfo.KeyChar)){
-                Email += keyInfo.KeyChar;
-            }
-            if(keyInfo.Key == ConsoleKey.Escape){
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
                 return null;
             }
-        }while(true);
-        string Password = "";
-        do{
-            Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            if(keyInfo.Key == ConsoleKey.Enter){
-                break;
+            if (char.IsLetter(keyInfo.KeyChar))
+            {
+                input += keyInfo.KeyChar;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0){
-                Password = Password.Remove(Password.Length-1);
+            if (input.Length < minLength || input.Length > maxLength)
+            {
+                error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
             }
-            if(!char.IsControl(keyInfo.KeyChar)){
-                Password += keyInfo.KeyChar;
-            }
-            if(keyInfo.Key == ConsoleKey.Escape){
-                return null;
+            if (!Regex.IsMatch(input, "[A-z]"))
+            {
+                error += $"Input must only contain letters.\n";
             }
         }while(true);
-        return new User(null, null, Email, Password);
+        Console.Clear();
+        return input;
     }
 
-    private static bool IsValidEmail(string email)
+    /// <summary>
+    /// Asks the user to type in a valid email.
+    /// </summary>
+    /// <param name="prompt">A string containing text for the user to read.</param>
+    /// <param name="minLength">Minimum length required for the email.</param>
+    /// <param name="maxLength">Maximum length required for the email.</param>
+    /// <returns>A string containing the email or NULL in case the user cancels.</returns>
+    public static string? GetValideEmail(string prompt, int minLength, int maxLength)
     {
-        if (email.Contains("@") && (email.EndsWith(".com") || email.EndsWith(".nl")))
+        string input = "";
+        string error= "";
+        do
         {
-            return true;
-        }
-        else
-        {
-            Console.WriteLine("Invalid email format. Please enter a valid email address.");
-            return false;
-        }
+            error = "";
+            User? user = u.VerifyUser(input);
+            if (user != null)
+            {
+                error += $"Email already exists.\n";
+            }
+            Console.Clear();
+            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(error);
+            Console.ForegroundColor = ConsoleColor.White;
+            ConsoleKeyInfo keyInfo;
+            MailAddress b;
+            keyInfo = Console.ReadKey(true);
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                return null;
+            }
+            if (!char.IsControl(keyInfo.KeyChar))
+            {
+                input += keyInfo.KeyChar;
+            }
+            if (!MailAddress.TryCreate(input, out b))
+            {
+                error += $"email is not valid";
+            }
+            if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
+            {
+                if (user == null)
+                {
+                    break;
+                }
+            }
+            if (keyInfo.Key == ConsoleKey.Backspace)
+            {
+                if (input.Length > 0)
+                {
+                    input = input.Substring(0, input.Length - 1);
+                }
+            }
+            if (input.Length < minLength || input.Length > maxLength)
+            {
+                error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
+            }
+            if (!Regex.IsMatch(input, "[A-z]"))
+            {
+                error += $"Input must only contain letters.\n";
+            }
+        }while(true);
+        Console.Clear();
+        return input;
     }
 
+    /// <summary>
+    /// Checks if a given password is strong enough.
+    /// </summary>
+    /// <param name="password">A string containing the raw password.</param>
+    /// <returns>A boolean indicating if it is strong enough or not.</returns>
     private static bool IsStrongPassword(string password)
     {
         var hasLowercase = new Regex(@"[a-z]").IsMatch(password);
@@ -296,135 +290,69 @@ public static class UserMenu{
 
         return hasLowercase && hasUppercase && hasSpecialChar && hasNumber;
     }
+    #endregion
 
-    public static User AddNewUser()
-    {
-        string? firstName = GetValidInput("Enter User first name:", 3, 20);
-        if (firstName == null)
-        {
-            return null;
-        }
-        string? lastName = GetValidInput("Enter User last name:", 3, 20);
-        if (lastName == null)
-        {
-            return null;
-        }
-        string? email = GetValideEmail("Enter User email:", 3, 20);
-        if (email == null)
-        {
-            return null;
-        }
-        string passwordHash = "";
-        string? password = GetValidPassword("Enter User password:", 6, 20);
-        if (password == null)
-        {
-            return null;
-        }
-        string? password2 = GetValidPassword("Enter User password again:", 6, 20, true, password);
-        if (password2 == null)
-        {
-            return null;
-        }
-        passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
-        User user = new User(firstName, lastName, email, passwordHash);
-        return user;
-    }
-
-    public static User? RemoveUser(){
-        List<User> users = u.GetAllUsers();
-        if (users.Count == 0) {
-            Console.WriteLine("There are no Users available to remove.");
-            return null;
-        }else {
-            Dictionary<string, User> d = new Dictionary<string, User>();
-            foreach (User user in u.GetAllUsers()){
-                d.Add(user.FirstName, user);
-            }
-            return MenuHelper.SelectFromList("Select user to delete", true, d);
-        }
-    }
-
-    public static User? EditUser(User USR){
-        User editedUser = USR;
-        bool changing = true;
-        bool x = false;
-        while (changing)
-        {
-            MenuHelper.SelectOptions("Select User property to edit", new Dictionary<string, Action>(){
-                {"Name", ()=>{
-                    Console.WriteLine("Enter the new name of the User:");
-                    editedUser.FirstName = Console.ReadLine();
-                }},
-                {"LastName", ()=>{
-                    Console.WriteLine("Enter the new LastName of the User:");
-                    editedUser.LastName = Console.ReadLine();
-                }},
-                {"Email", ()=>{
-                    Console.WriteLine("Enter the new Email of the User:");
-                    editedUser.Email = Console.ReadLine();
-                }},
-                {"Password", ()=>{
-                    Console.WriteLine("Enter the new Password of the User:");
-                    editedUser.Password = Console.ReadLine();
-                }},
-                {"Role", ()=>{
-                    bool running = true;
-                    while(running)
-                    {
-                        MenuHelper.SelectOptions("Choose what to change the Role to", new Dictionary<string, Action>(){
-                            {"1. User", ()=>{
-                                editedUser.Role = UserRole.USER;
-                                running = false;
-                            }},
-                            {"2. Admin", ()=>{
-                                editedUser.Role = UserRole.ADMIN;
-                                running = false;
-                            }},
-                        });
-                    }
-                }},
-                {"Save changes", ()=>{
-                    changing = false;
-                    x = true;
-                }},
-                {"Discard changes", ()=>{
-                    changing = false;
-                    x = false;
-                }},
-            });
-        }
-        if(x){
-            return editedUser;
-        }else{
-            return null;
-        }
-    }
-
-    public static void NoUsersToRemove(){
-        Console.Clear();
-        Console.WriteLine("There are no Users stored to remove.\n\nPress any key to continue");
-        Console.ReadKey(true);
-    }
-    public static void NotSure(){
-        Console.Clear();
-        Console.WriteLine("User not removed\n\nPress any key to continue");
-        Console.ReadKey(true);
-    }
-    public static void UserRemoved(){
-        Console.Clear();
-        Console.WriteLine("The user has been removed.\n\nPress any key to continue");
-        Console.ReadKey(true);
-    }
-    public static void UserAdded(){
-        Console.Clear();
-        Console.WriteLine("The user has been added.\n\nPress any key to continue");
-        Console.ReadKey(true);
-    }
+    #region Text output for validation
+    /// <summary>
+    /// Notifies the user about their password/email not being valid or not matching.
+    /// </summary>
     public static void WrongLogin(){
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Email or password was wrong.\n\nPress any key to continue");
+        Console.WriteLine("Invalid Email or password.\n\nPress any key to continue");
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
     }
+
+    /// <summary>
+    /// Notifies the user about if the user got removed successfully or not.
+    /// </summary>
+    /// <param name="success">A boolean indicating if the removal was successfull.</param>
+    public static void UserRemoved(bool success){
+        Console.Clear();
+        if(success){
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("The user has successfully been removed.\n\nPress any key to continue");
+        }else{
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadKey(true);
+    }
+
+    /// <summary>
+    /// Notifies the user about if the user got added successfully or not.
+    /// </summary>
+    /// <param name="success">A boolean indicating if the adition was successfull.</param>
+    public static void UserAdded(bool success){
+        Console.Clear();
+        if(success){
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("The user has successfully been added.\n\nPress any key to continue");
+        }else{
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadKey(true);
+    }
+
+    /// <summary>
+    /// Notifies the user about if the user got updated successfully or not.
+    /// </summary>
+    /// <param name="success">A boolean indicating if the updating was successfull.</param>
+    public static void UserUpdated(bool success){
+        Console.Clear();
+        if(success){
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("The user has successfully been updated.\n\nPress any key to continue");
+        }else{
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadKey(true);
+    }
+    #endregion
 }
