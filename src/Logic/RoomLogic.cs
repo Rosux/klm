@@ -45,6 +45,7 @@ public static class RoomLogic
         }else{
             Room? chosenroom = ChooseRoom("choose a room to see");
             if(chosenroom != null){
+                Console.CursorVisible = false;
                 Console.Clear();
                 Console.WriteLine(RoomLayoutPrinter(chosenroom));
                 Console.ReadKey(true);
@@ -340,6 +341,7 @@ public static class RoomLogic
         ConsoleKey key;
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.WriteLine("Press escape to exit.\n");
             /// checks if the longest string is even or odd so the printing of the UI is corect
@@ -385,23 +387,27 @@ public static class RoomLogic
              /// lets user go up and down page to selcect a room
             if (key == ConsoleKey.UpArrow && choice > 0 + 10 * page) 
             {  
+                Console.CursorVisible = false;
                 Console.Clear();
                 choice --;
             }
             else if (key == ConsoleKey.DownArrow && choice < 10 + 10 * page-1 && choice < roomlist_room.Count -1)
             {  
+                Console.CursorVisible = false;
                 Console.Clear();
                 choice ++;
             }
              /// lets user go through pages
             if (key == ConsoleKey.RightArrow && page != allroomlist.Count-1)
             {  
+                Console.CursorVisible = false;
                 Console.Clear();
                 page ++;
                 choice = 10 * page;
             }
             else if (key == ConsoleKey.LeftArrow && page != 0)
             {  
+                Console.CursorVisible = false;
                 Console.Clear();
                 page --;
                 choice = 10 * page;
@@ -473,6 +479,7 @@ public static class RoomLogic
                 all_row_bottom.Add(row_bottom);
             }
             var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
+            Console.CursorVisible = false;
             Console.Clear();
             //Console.WriteLine(prefix + "\n");
             layout = layout + $"┌{header}┐\n";
@@ -579,6 +586,7 @@ public static class RoomLogic
                 }
             }
             var zip = all_row_top.Zip(all_row_bottom, (i,j) => (i,j));
+            Console.CursorVisible = false;
             Console.Clear();
             Console.WriteLine(prefix + "\n");
             Console.Write($"┌{header}┐\n");
