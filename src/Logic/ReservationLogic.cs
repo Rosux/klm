@@ -39,10 +39,6 @@ public static class ReservationLogic
     }
     private static void ViewReservations()
     {
-        Reservation? r = ReservationMenu.ShowReservation(Program.CurrentUser.Id);
-        if (r == null)
-        {
-            return;
-        }
+        ReservationMenu.ShowReservation(Program.CurrentUser.Id);
     }
 }

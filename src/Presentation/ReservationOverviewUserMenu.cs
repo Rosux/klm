@@ -8,7 +8,7 @@ public class ReservationOverviewUserMenu
         {
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. View reservation", ()=>{
-                    // lets the user choose a reservation from a list of all his reservations to seethe info
+                    // lets the user choose a reservation from a list of all his reservations to see the info
                     Reservation selected_res = ReservationMenu.GetSpecificReservationUser();
                     if (selected_res != null)
                     {

@@ -250,9 +250,9 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             //Select film to display 
-            Film d = MenuHelper.SelectMovie();
+            Film? d = MenuHelper.SelectMovie();
             if (d != null)
-            {   
+            {
                 string Selectedmoviegenres = String.Join(", ", d.Genres);
                 string Selecteddirectors = String.Join(", ", d.Directors);
                 Console.WriteLine($"All movie info:\nId: {d.Id}\nGenres: {Selectedmoviegenres}\nOriginal Language: {d.OriginalLanguage}\nOverview: {d.Overview}\nRelease date: {d.ReleaseDate} \nRuntime: {d.Runtime}\nTitle: {d.Title}\nVote average: {d.VoteAverage}\nCertification: {d.Certification}\nDirectors: {Selecteddirectors}");
@@ -450,7 +450,7 @@ class FilmSerieMenu
             if(ToRemove == null){return;}
             bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
             if (a)
-            {   
+            {
                 filmlogic_obj.Remove_film(ToRemove.Id);
             }
             else
@@ -468,6 +468,9 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             Film? SelectedFilm = MenuHelper.SelectMovie();
+            if(SelectedFilm == null){
+                return;
+            }
             Console.WriteLine("Search for a movie you want to change");
             string Selectedmoviegenres = String.Join(", ", SelectedFilm.Genres);
             string Selecteddirectors = String.Join(", ", SelectedFilm.Directors);

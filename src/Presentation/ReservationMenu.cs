@@ -285,13 +285,13 @@ public static class ReservationMenu
     /// uses menu helper to gives a list of all reservations to pick one to return
     /// </summary>
     /// <returns>a object of Reservation</returns>
-    public static Reservation? ShowReservation(int loggedUserId)
+    public static void ShowReservation(int loggedUserId)
     {
         List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
         if (reservations.Count == 0)
         {
             Console.WriteLine("There are no reservations available to show.");
-            return null;
+            return;
         }
         else
         {
@@ -301,22 +301,14 @@ public static class ReservationMenu
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
             }
 
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
-            {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {   //This gets reservations and gives all the details in the prefix towards the timeline. 
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
-                }
-            } while (selectedReservation != null);
-
-            return null;
+            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
+            if (selectedReservation != null)
+            {   //This gets reservations and gives all the details in the prefix towards the timeline. 
+                Console.CursorVisible = false;
+                Console.Clear();
+                MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
+            }
+            return;
         }
     }
 
@@ -340,28 +332,11 @@ public static class ReservationMenu
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
             }
 
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
+            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
+            if (selectedReservation != null)
             {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    return selectedReservation;
-
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedReservation != null);
-            Console.WriteLine("\n No reservation selected.");
+                return selectedReservation;
+            }
             return null;
         }
     }
@@ -479,28 +454,12 @@ public static class ReservationMenu
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
             }
 
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
+            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
+            if (selectedReservation != null)
             {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    return selectedReservation;
-
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedReservation != null);
-            Console.WriteLine("\n No reservation selected.");
+                return selectedReservation;
+            }
+            Console.WriteLine("\nNo reservation selected.");
             return null;
         }
     }
