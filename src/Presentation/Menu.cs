@@ -118,6 +118,7 @@ class Menu
         int y = 0;
         ConsoleKey key;
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             MenuHelper.PrintSeats(r, entertainments, x, y);
             key = Console.ReadKey(true).Key;

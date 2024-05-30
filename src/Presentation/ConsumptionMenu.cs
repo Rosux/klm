@@ -55,6 +55,7 @@ public static class ConsumptionMenu
     /// </summary>
     /// <param name="success">A boolean indicating if the updating was successfull.</param>
     public static void ConsumptionUpdated(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -72,6 +73,7 @@ public static class ConsumptionMenu
     /// </summary>
     /// <param name="success">A boolean indicating if the adition was successfull.</param>
     public static void ConsumptionAdded(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -89,6 +91,7 @@ public static class ConsumptionMenu
     /// </summary>
     /// <param name="success">A boolean indicating if the removal was successfull.</param>
     public static void ConsumptionRemoved(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;

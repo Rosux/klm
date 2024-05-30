@@ -39,6 +39,7 @@ public static class MenuHelper{
                 error = "";
             }
 
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
@@ -85,6 +86,7 @@ public static class MenuHelper{
                 return null;
             }
         } while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return num;
     }
@@ -176,6 +178,7 @@ public static class MenuHelper{
             {
                 errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
             }
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{input}\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -201,10 +204,12 @@ public static class MenuHelper{
             }
             if (canCancel && key == ConsoleKey.Escape)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -331,6 +336,7 @@ public static class MenuHelper{
             // some needed calulations
             int startDay = ((int)new DateOnly(SelectedDate.Year, SelectedDate.Month, 1).DayOfWeek - 1 + 7) % 7;
             // print callender
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"{prefix}");
@@ -541,6 +547,7 @@ public static class MenuHelper{
         bool hour = true;
         ConsoleKey key;
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"{prefix}\n\n");
@@ -555,6 +562,7 @@ public static class MenuHelper{
             key = Console.ReadKey(true).Key;
             if (key == ConsoleKey.Escape && CanCancel)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
@@ -583,6 +591,7 @@ public static class MenuHelper{
                 }
             }
         } while (key != ConsoleKey.Enter || time > MaxTime || time < MinTime);
+        Console.CursorVisible = false;
         Console.Clear();
         return time;
     }
@@ -656,6 +665,7 @@ public static class MenuHelper{
         ConsoleKey key;
         do{
             // print menu with options
+            Console.CursorVisible = false;
             Console.Clear();
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
@@ -689,6 +699,7 @@ public static class MenuHelper{
             currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
 
         } while (key != ConsoleKey.Enter);
+        Console.CursorVisible = false;
         Console.Clear();
         // call callback method based on the users choice
         Options.Values.ElementAt(currentSelection).Invoke();
@@ -744,6 +755,7 @@ public static class MenuHelper{
             pageArrows = (currentPage > 0 ? "<-" : "  ") + pageArrows + (currentPage < chunks.Count-1 ? "->" : "  ");
 
             // print menu with options
+            Console.CursorVisible = false;
             Console.Clear();
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
@@ -836,6 +848,7 @@ public static class MenuHelper{
             }
 
             // print the search box thing
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
@@ -920,6 +933,7 @@ public static class MenuHelper{
                             int episode = Convert.ToInt32(allSelectedEpisodes[i].Split('.')[1]);
                             uwu[(Serie)selectedMedia].Add(((Serie)selectedMedia).Seasons[season].Episodes[episode]);
                         }
+                        Console.CursorVisible = false;
                         Console.Clear();
                         return uwu;
                     }
@@ -928,12 +942,14 @@ public static class MenuHelper{
                 }
             }
             if(key == ConsoleKey.Escape){
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
             selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
             cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return selectedMedia;
     }
@@ -965,6 +981,7 @@ public static class MenuHelper{
             }
 
             // print the search box thing
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
@@ -1040,12 +1057,14 @@ public static class MenuHelper{
                 break;
             }
             if(key == ConsoleKey.Escape){
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
             selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
             cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return (Film)selectedMedia;
     }
@@ -1095,7 +1114,7 @@ public static class MenuHelper{
                     if(add && !seasons.Contains($"{i+1}")){seasons.Add($"{i+1}");}
                 }
             }
-
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Series: {serie.Title}\nSeasons: ");
             for(int i=0;i<seasons.Count;i++){
@@ -1263,6 +1282,7 @@ public static class MenuHelper{
         ConsoleKeyInfo RawKey;
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{input}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
@@ -1272,6 +1292,7 @@ public static class MenuHelper{
                 input = input.Remove(input.Length-1);
             }
             if(key == ConsoleKey.Escape && canCancel){
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
@@ -1293,6 +1314,7 @@ public static class MenuHelper{
             }
 
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return price;
     }
@@ -1363,6 +1385,7 @@ public static class MenuHelper{
         ConsoleKey key;
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n\n");
             Console.BackgroundColor = selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
@@ -1455,7 +1478,7 @@ public static class MenuHelper{
                 string Line2 = "";
                 string Line3 = "";
                 string Line4 = "";
-
+                Console.CursorVisible = false;
                 Console.Clear();
                 Line1 += ($"  ");
                 for(int i=0;i<Dates.Count;i++){
@@ -1511,6 +1534,7 @@ public static class MenuHelper{
                 string[] Lines = {Line1, Line2, Line3, Line4};
                 ConsoleKey key;
                 do{
+                    Console.CursorVisible = false;
                     Console.Clear();
                     Console.Write($"{prefix}\n\n");
                     foreach(string Line in Lines){
@@ -1801,6 +1825,7 @@ public static class MenuHelper{
 
             #region Print table
             // clear the screen and print the table
+            Console.CursorVisible = false;
             Console.Clear();
             for(int i=0;i<Math.Max(editStringLines.Count, tableStringLines.Count);i++){
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -2127,7 +2152,8 @@ public static class MenuHelper{
     /// <param name="x">The Row coordinates of a seat.</param>
     /// <param name="y">The Column coordinates of a seat.</param>
     public static void PrintSeats(Room r,List<Entertainment> entertainments, int x, int y)
-    {   
+    {
+        Console.CursorVisible = false;
         Console.Clear();
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;

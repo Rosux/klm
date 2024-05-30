@@ -39,6 +39,7 @@ public class ReservationOverviewLogic
             Consumption cons_cor = null;
             Film film_cor = null;
             Episode episode_cor = null;
+            Console.CursorVisible = false;
             Console.Clear();
             // matches every object in time line to either consumption, episode, film or break
             foreach(TimeLine.Item actie in selected_res.TimeLine.t)
