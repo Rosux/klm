@@ -164,8 +164,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed language from {film.Original_language} min to {language}";
-                film.Original_language = language;
+                info = $"you sucesfully changed language from {film.OriginalLanguage} min to {language}";
+                film.OriginalLanguage = language;
             }
         }
         filmacesser.Return_info(list_films);
@@ -181,8 +181,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed language from {film.Release_date} min to {releasedate}";
-                film.Release_date = releasedate;
+                info = $"you sucesfully changed language from {film.ReleaseDate} min to {releasedate}";
+                film.ReleaseDate = releasedate;
             }
         }
         filmacesser.Return_info(list_films);
@@ -198,8 +198,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed vote average from {film.Vote_average} min to {new_vote_average}";
-                film.Vote_average = new_vote_average;
+                info = $"you sucesfully changed vote average from {film.VoteAverage} min to {new_vote_average}";
+                film.VoteAverage = new_vote_average;
             }
         }
         filmacesser.Return_info(list_films);

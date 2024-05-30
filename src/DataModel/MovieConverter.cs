@@ -40,14 +40,6 @@ public class MovieConverter<T> : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var list = (List<T>)value;
-
-        if (list.Count == 1)
-        {
-            JToken.FromObject(list[0]).WriteTo(writer);
-        }
-        else
-        {
-            JArray.FromObject(list).WriteTo(writer);
-        }
+        JArray.FromObject(list).WriteTo(writer);
     }
 }

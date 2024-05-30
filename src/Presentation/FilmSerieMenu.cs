@@ -255,7 +255,7 @@ class FilmSerieMenu
             {   
                 string Selectedmoviegenres = String.Join(", ", d.Genres);
                 string Selecteddirectors = String.Join(", ", d.Directors);
-                Console.WriteLine($"All movie info:\nId: {d.Id}\nGenres: {Selectedmoviegenres}\nOriginal Language: {d.Original_language}\nOverview: {d.Overview}\nRelease date: {d.Release_date} \nRuntime: {d.Runtime}\nTitle: {d.Title}\nVote average: {d.Vote_average}\nCertification: {d.Certification}\nDirectors: {Selecteddirectors}");
+                Console.WriteLine($"All movie info:\nId: {d.Id}\nGenres: {Selectedmoviegenres}\nOriginal Language: {d.OriginalLanguage}\nOverview: {d.Overview}\nRelease date: {d.ReleaseDate} \nRuntime: {d.Runtime}\nTitle: {d.Title}\nVote average: {d.VoteAverage}\nCertification: {d.Certification}\nDirectors: {Selecteddirectors}");
             }
             else
             {
@@ -280,7 +280,7 @@ class FilmSerieMenu
         int Runtime = 0;
         string Title = "";
         string TitleDisplay = "";
-        double Vote_average = 0;
+        double Voteaverage = 0;
         string Certification = "";
         List<string> Directors = new List<string>();
         string Selectedmoviegenres = "";
@@ -372,9 +372,9 @@ class FilmSerieMenu
                     TitleDisplay = GetDisplayString(Title);
                     Selected[5] = "✓";
                 }},
-                {$"Vote average {Selected[6]} {Vote_average}", ()=>{
-                    Vote_average = (double)getVoteAverage();
-                    if (Vote_average == null)
+                {$"Vote average {Selected[6]} {Voteaverage}", ()=>{
+                    Voteaverage = (double)getVoteAverage();
+                    if (Voteaverage == null)
                     {
                         
                     }
@@ -416,11 +416,11 @@ class FilmSerieMenu
                         // use string.join to display all contents of the lists
                         string Selectedmoviegenres = String.Join(", ", Genres);
                         string Selecteddirectors = String.Join(", ", Directors);
-                        bool ConfirmAdd = MenuHelper.Confirm($"Genres: {Selectedmoviegenres}\nLanguage: {Language}\nOverview: {Overview}\n\nRelease date: {Releasedate}\nRuntime: {Runtime}\nTitle: {Title}\nVote average (/10): {Vote_average}\nCertification: {Certification}\nDirectors: {Selecteddirectors}\n Are you sure you want to add this movie?");
+                        bool ConfirmAdd = MenuHelper.Confirm($"Genres: {Selectedmoviegenres}\nLanguage: {Language}\nOverview: {Overview}\n\nRelease date: {Releasedate}\nRuntime: {Runtime}\nTitle: {Title}\nVote average (/10): {Voteaverage}\nCertification: {Certification}\nDirectors: {Selecteddirectors}\n Are you sure you want to add this movie?");
                         if (ConfirmAdd)
                         {
                             int id = filmlogic_obj.CreateID();
-                            Console.WriteLine(filmlogic_obj.Add_film(new Film(id, Genres, Language, Overview, Releasedate, (int)Runtime, Title, Vote_average, Certification, Directors)));
+                            Console.WriteLine(filmlogic_obj.Add_film(new Film(id, Genres, Language, Overview, Releasedate, (int)Runtime, Title, Voteaverage, Certification, Directors)));
                             Thread.Sleep(5000);
                             AddLoop = 0;
                         }
@@ -484,7 +484,7 @@ class FilmSerieMenu
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {$"Original language: {SelectedFilm.Original_language}", ()=>{
+                {$"Original language: {SelectedFilm.OriginalLanguage}", ()=>{
                     string givenlanguage = getLanguage();
                     Console.WriteLine(filmlogic_obj.change_language(film_id, givenlanguage));
                     Console.WriteLine($"Language succesfully changed to {givenlanguage}\nPress enter to continue...");
@@ -503,10 +503,10 @@ class FilmSerieMenu
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {$"Release date: {SelectedFilm.Release_date}", ()=>{
+                {$"Release date: {SelectedFilm.ReleaseDate}", ()=>{
                     DateOnly x = MenuHelper.SelectDate("Select new release date");
-                    string ReleaseDate = x.ToString("yyyy-MM-dd");
-                    Console.WriteLine(filmlogic_obj.change_releasedate(film_id, ReleaseDate));
+                    string Releasedate = x.ToString("yyyy-MM-dd");
+                    Console.WriteLine(filmlogic_obj.change_releasedate(film_id, Releasedate));
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
@@ -531,7 +531,7 @@ class FilmSerieMenu
                     Console.WriteLine("Press enter to continue... ");
                     Console.ReadKey();
                 }},
-                {$"Vote average: {SelectedFilm.Vote_average}", ()=>{
+                {$"Vote average: {SelectedFilm.VoteAverage}", ()=>{
                     double d = (double)getVoteAverage();
                     Console.WriteLine(filmlogic_obj.change_vote(film_id, d));
                     Console.WriteLine("Press enter to continue... ");

@@ -4,24 +4,27 @@ public class Movie
     public int Id { get; set; }
     private List<string> _genres;
 
-    [JsonProperty("genres")]
+    [JsonProperty("Genres")]
     [JsonConverter(typeof(MovieConverter<string>))]
     public List<string> Genres
     {
         get => _genres ?? new List<string>();
         set => _genres = value;
     }
-    public string Original_language { get; set; } // original language of movies
+    [JsonProperty("Original_language")]
+    public string Originallanguage { get; set; } // original language of movies
 
     public string Overview { get; set; } // string with plot of movie
 
-    public string Release_date { get; set; }
+    [JsonProperty("Release_date")]
+    public string Releasedate { get; set; }
 
     public int Runtime { get; set; } // length of movie in minutes
 
     public string Title { get; set; } // Movie Title
 
-    public double Vote_average { get; set; } // Average rating out of ten
+    [JsonProperty("Vote_average")]
+    public double Voteaverage { get; set; } // Average rating out of ten
 
     public string Certification { get; set; } // age certification like PG-13, R rated ETC.
 
@@ -31,12 +34,12 @@ public class Movie
     {
         Id = id;
         Genres = genres;
-        Original_language = original_language;
+        Originallanguage = original_language;
         Overview = overview;
-        Release_date = release_date;
+        Releasedate = release_date;
         Runtime = runtime;
         Title = title;
-        Vote_average = voteaverage;
+        Voteaverage = voteaverage;
         if(certification != null || certification == "Null")
         {
            Certification = certification; 
