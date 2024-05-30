@@ -1419,8 +1419,6 @@ public static class MenuHelper{
     /// <param name="t">A List of timeline items to display.</param>
     public static void PrintTimeLine(string prefix, string suffix, List<TimeLine.Item> t)
     {
-        Console.WriteLine(t.Count);
-        Console.ReadKey(true);
         List<string> Dates = new List<string>();
         List<DateTime> Times = new List<DateTime>();
         List<string> Action = new List<string>();
