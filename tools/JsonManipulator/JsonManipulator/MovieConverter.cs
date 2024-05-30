@@ -15,7 +15,6 @@ public class MovieConverter<T> : JsonConverter
     {
 
     }
-    //check if object type is list
     public override bool CanConvert(Type objectType)
     {
         return (objectType == typeof(List<T>));
@@ -24,12 +23,10 @@ public class MovieConverter<T> : JsonConverter
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
-        //if token is array return as list
         if (token.Type == JTokenType.Array)
         {
             return token.ToObject<List<T>>();
         }
-        //if token is string return as list
         if (token.Type == JTokenType.String)
         {
             var singleValue = token.ToObject<T>();
@@ -40,6 +37,16 @@ public class MovieConverter<T> : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var list = (List<T>)value;
-        JArray.FromObject(list).WriteTo(writer);
+
+        if (list.Count == 1)
+        {
+            JToken.FromObject(list[0]).WriteTo(writer);
+        }
+        else
+        {
+            JArray.FromObject(list).WriteTo(writer);
+        }
     }
+
+
 }

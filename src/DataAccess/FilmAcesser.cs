@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 public class FilmAcesser
 {
+    //Get list of all movies
     public List<Film> Get_info()
     {
         string path = Path.Combine(Environment.CurrentDirectory, "DataSource", "Films.json");
@@ -9,6 +10,7 @@ public class FilmAcesser
         return list_movies;
     }
 
+    //Write all movies to the JSON
     public void Return_info(List<Film> list_movies)
     {
         StreamWriter writer = new(@"DataSource\Films.json");
@@ -17,6 +19,7 @@ public class FilmAcesser
         writer.Close();
     }
     
+    //Return a list of string with all genres
     public List<string> Get_Genres()
     {
         string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Films.json"));
