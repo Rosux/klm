@@ -334,22 +334,27 @@ public static class ReservationMenu
 
                 Console.Write($"├─{new string('─', Math.Max(0 ,longestLineLength))}─┤\n");
                 for(int i = 0; i < Options.Count; i ++)
-                {
+                {   
+                    Console.Write("│ ");
                     if (currentSelection == i) { Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    Console.Write($"│ {Options[i]}");
+                    Console.Write($"{Options[i]}");
+                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write($"{new String(' ', Math.Max(0, longestLineLength - Options[i].Length))} │\n");
                 }
-
                 Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"└─{new String('─', Math.Max(0, longestLineLength))}─┘");
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.Enter){
-
+                        
+                }
+                if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
+                    currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
                 }
                 if(key == ConsoleKey.Escape){
                     break;
                 }
                 // MenuHelper.PrintTimeLine("", "",  selectedReservation.TimeLine.t);
-            
+                currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
             } while (true);
 
             return null;
