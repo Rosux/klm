@@ -353,7 +353,7 @@ public static class ReservationMenu
                         ShowConsumptions(selectedReservation.TimeLine.t);
                     }
                     if(currentSelection == 2){
-
+                        ShowEntertainments(selectedReservation.Entertainments);
                     }
                     if(currentSelection == 3){
                         break;
@@ -555,6 +555,11 @@ public static class ReservationMenu
     
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
+        List<Consumption> consumptions = new List<Consumption>();
+        List<double> price  = new List<double>();
+        List<TimeOnly> starttime = new List<TimeOnly>();
+        List<TimeOnly> endtime = new List<TimeOnly>(); 
+
         Console.CursorVisible = false;
         Console.Clear();
         ConsoleKey key;
@@ -562,18 +567,34 @@ public static class ReservationMenu
         {
             if(item.Action is Consumption)
             {                   
-                Console.Write($"{((Consumption)(item.Action)).Name}\n");
+                consumptions.Add((Consumption)item.Action);
+                price.Add(((Consumption)item.Action).Price);
+                starttime.Add(((Consumption)item.Action).StartTime);
+                endtime.Add(((Consumption)item.Action).EndTime);
             }
         }
-        do {
-            key = Console.ReadKey(true).Key;
-            if (key == ConsoleKey.Escape){
-                return;
+        MenuHelper.ShowInTable<Consumption>(consumptions, 
+            new Dictionary<string, Func<Consumption, object>>
+            {
+                {"Name", item => item.Name},
+                {"Price", item => item.Price},
+                {"Starting Time", item => item.StartTime},
+                {"Ending Time", item => item.EndTime}
             }
-
-        }while(key != ConsoleKey.Escape);
+        ); 
     }
 
+    public static void ShowEntertainments(List<Entertainment> entertainments){
+            MenuHelper.ShowInTable<Entertainment>(entertainments, 
+            new Dictionary<string, Func<Entertainment, object>>
+            {
+                {"Starting Date/Time", item => item.Time},
+                {"Description", item => item.Text},
+                {"Seat Row", item => item.SeatRow + 1},
+                {"Seat Number", item => item.SeatColumn + 1}
+            }
+        ); 
+    }
     public static void Error(){
         Console.CursorVisible = false;
         Console.Clear();
