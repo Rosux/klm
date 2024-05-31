@@ -1469,8 +1469,7 @@ public static class MenuHelper{
             }
             if(watchables.Count == 0)
                 {
-                    Console.Write($"{prefix}\n\n");
-                    Console.WriteLine("No Consumptions/Movies/Series were added\n\nPress any key to return");
+                    Console.WriteLine("\nNo Consumptions/Movies/Series were added\n\nPress any key to return");
                     Console.ReadKey(true);
 
             }else{

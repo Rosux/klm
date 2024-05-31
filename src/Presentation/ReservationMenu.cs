@@ -289,7 +289,7 @@ public static class ReservationMenu
     {
         List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
         List<string> Options = new List<string>(
-            new string[] { "Timeline", "Consumptions", "Entertainments" }
+            new string[] { "Timeline", "Consumptions", "Entertainments", "Return to menu" }
         );
         if (reservations.Count == 0)
         {
@@ -345,15 +345,23 @@ public static class ReservationMenu
                 Console.Write($"└─{new String('─', Math.Max(0, longestLineLength))}─┘");
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.Enter){
-                        
+                    if(currentSelection == 0)
+                    {
+                        MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.t);
+                    }
+                    if(currentSelection == 1){
+                        ShowConsumptions(selectedReservation.TimeLine.t);
+                    }
+                    if(currentSelection == 2){
+
+                    }
+                    if(currentSelection == 3){
+                        break;
+                    }
                 }
                 if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
                     currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
                 }
-                if(key == ConsoleKey.Escape){
-                    break;
-                }
-                // MenuHelper.PrintTimeLine("", "",  selectedReservation.TimeLine.t);
                 currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
             } while (true);
 
@@ -543,6 +551,27 @@ public static class ReservationMenu
             Console.WriteLine("\n No reservation selected.");
             return null;
         }
+    }
+    
+    public static void ShowConsumptions(List<TimeLine.Item> t)
+    {
+        Console.CursorVisible = false;
+        Console.Clear();
+        ConsoleKey key;
+        foreach (TimeLine.Item item in t)
+        {
+            if(item.Action is Consumption)
+            {                   
+                Console.Write($"{((Consumption)(item.Action)).Name}\n");
+            }
+        }
+        do {
+            key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.Escape){
+                return;
+            }
+
+        }while(key != ConsoleKey.Escape);
     }
 
     public static void Error(){
