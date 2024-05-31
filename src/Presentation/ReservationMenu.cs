@@ -288,6 +288,9 @@ public static class ReservationMenu
     public static Reservation? ShowReservation(int loggedUserId)
     {
         List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
+        List<string> Options = new List<string>(
+            new string[] { "Timeline", "Consumptions", "Entertainments" }
+        );
         if (reservations.Count == 0)
         {
             Console.WriteLine("There are no reservations available to show.");
@@ -300,26 +303,58 @@ public static class ReservationMenu
             {
                 reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
             }
-
             reservationOptions.Add("Return to menu", null);
 
             Reservation selectedReservation = null;
+
+            string header = "Reservation Details";
+            int currentSelection = 0;
+            ConsoleKey key;
+            selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
             do
             {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {   //This gets reservations and gives all the details in the prefix towards the timeline. 
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
+                Console.CursorVisible = false;
+                Console.Clear();
+                string[] details = new string[]
+                {
+                    $"Room Number: {selectedReservation.RoomId}",
+                    $"Group Size: {selectedReservation.GroupSize}",
+                    $"Start Date: {selectedReservation.StartDate}",
+                    $"End Date: {selectedReservation.EndDate}",
+                    $"Price: {selectedReservation.Price}"
+                };
+                
+                Console.BackgroundColor = ConsoleColor.Black;
+                int longestLineLength = Math.Max(header.Length, details.Max(detail => detail.Length));
+                Console.Write($"┌─{header}{new string('─', Math.Max(0 ,longestLineLength - header.Length))}─┐\n");
+                foreach (string detail in details)
+                {
+                    Console.Write($"│ {detail}{new string(' ', Math.Max(0 ,longestLineLength - detail.Length))} │\n");
                 }
-            } while (selectedReservation != null);
+
+                Console.Write($"├─{new string('─', Math.Max(0 ,longestLineLength))}─┤\n");
+                for(int i = 0; i < Options.Count; i ++)
+                {
+                    if (currentSelection == i) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.Write($"│ {Options[i]}");
+                    Console.Write($"{new String(' ', Math.Max(0, longestLineLength - Options[i].Length))} │\n");
+                }
+
+                Console.BackgroundColor = ConsoleColor.Black;
+                key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Enter){
+
+                }
+                if(key == ConsoleKey.Escape){
+                    break;
+                }
+                // MenuHelper.PrintTimeLine("", "",  selectedReservation.TimeLine.t);
+            
+            } while (true);
 
             return null;
         }
     }
-
     /// <summary>
     /// uses menu helper to gives a list of all reservations to pick one to return
     /// </summary>
