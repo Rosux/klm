@@ -281,36 +281,15 @@ public static class ReservationMenu
         return null;
     }
 
-    public static Reservation? ShowReservation(int loggedUserId)
-    {
-        List<Reservation> allReservations = ReservationAccess.GetReservationsByUserId(loggedUserId);
-        Reservation? reservationresult;
-        while(true){
-            reservationresult = MenuHelper.SelectFromTable<Reservation>(allReservations, 
-                new Dictionary<string, Func<Reservation, object>>
-                {
-                    {"Room Number", item => item.RoomId},
-                    {"Group Size", item => item.GroupSize},
-                    {"Start Date", item => item.StartDate},
-                    {"End Date", item => item.EndDate},
-                    {"Price", item => item.Price}
-                },
-                true
-            );
-            if(reservationresult == null){
-                return null;
-            }else{
-                ShowReservationDetails(reservationresult);
-            }
-        }
-    }
-
+    /// <summary>
+    /// Displays a table with all the consumptions that are reserved when booking the reservation.
+    /// </summary>
+    /// <param name="t">A TimeLine which holds the consumptions for a reservation</param>
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
         List<TimeLine.Item> consumptions = new List<TimeLine.Item>();
         Console.CursorVisible = false;
         Console.Clear();
-        ConsoleKey key;
         foreach (TimeLine.Item item in t)
         {
             if(item.Action is Consumption)
@@ -328,6 +307,10 @@ public static class ReservationMenu
         );
     }
 
+    /// <summary>
+    /// Displays a table which holds all the entertainments reserved when booking a reservation.
+    /// </summary>
+    /// <param name="entertainments">A list of entertainments which are linked to the reservation</param>
     public static void ShowEntertainments(List<Entertainment> entertainments){
             MenuHelper.ShowInTable<Entertainment>(entertainments, 
             new Dictionary<string, Func<Entertainment, object>>
@@ -340,6 +323,10 @@ public static class ReservationMenu
         );
     }
 
+    /// <summary>
+    /// Displays all the reservation details and has the options to view TimeLine, Consumptions, Entertainments or return to the menu.
+    /// </summary>
+    /// <param name="selectedReservation">A reservation type which holds all the data of the given reservation</param>
     public static void ShowReservationDetails(Reservation selectedReservation){
         List<string> Options = new List<string>(
             new string[] { "Timeline", "Consumptions", "Entertainments", "Return to menu" }
