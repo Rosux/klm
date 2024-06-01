@@ -47,7 +47,7 @@ class Menu
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
-                            ReservationMenu.ReservationAdminOverview();
+                            ReservationLogic.ReservationAdmin();
                         }},
                         {"Users", ()=>{
                             // starts the userlogic main loop
@@ -68,7 +68,7 @@ class Menu
                 {
                     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Reservations", ()=>{
-                            ReservationLogic.Reservation();
+                            ReservationLogic.ReservationUser();
                         }},
                         {"Logout", ()=>{
                             // goto login screen
@@ -106,7 +106,7 @@ class Menu
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
-                            ReservationMenu.ReservationAdminOverview();
+                            ReservationLogic.ReservationAdmin();
                         }},
                         {"Users", ()=>{
                             // starts the userlogic main loop
@@ -127,7 +127,7 @@ class Menu
                 {
                     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Reservations", ()=>{
-                            ReservationLogic.Reservation();
+                            ReservationLogic.ReservationUser();
                         }},
                         {"Logout", ()=>{
                             // goto login screen

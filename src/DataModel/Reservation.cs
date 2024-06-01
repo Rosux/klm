@@ -10,7 +10,7 @@ public class Reservation
     public double Price
     {
         get => _price;
-        set => _price = Math.Round(value, 2); 
+        set => _price = Math.Floor(value*100d)/100d;
     }
     public TimeLine.Holder TimeLine = new TimeLine.Holder();
     public List<Entertainment> Entertainments = new List<Entertainment>();

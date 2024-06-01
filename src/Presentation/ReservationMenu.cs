@@ -296,7 +296,7 @@ public static class ReservationMenu
                     {"Price", item => item.Price}
                 },
                 true
-            ); 
+            );
             if(reservationresult == null){
                 return null;
             }else{
@@ -304,53 +304,6 @@ public static class ReservationMenu
             }
         }
     }
-
-    /// <summary>
-    /// uses menu helper to gives a list of all reservations during the given date to pick one to return
-    /// </summary>
-    /// <param name="date"></param>
-    /// <returns>object of Reservations</returns>
-    public static Reservation? GetSpecificReservation(DateTime date)
-    {
-    List<Reservation> reservations = ReservationAccess.ReadReservationsDate(date);
-    if (reservations.Count == 0)
-    {
-        Console.WriteLine("\nThere are no reservations during this time period.");
-        return null;
-    }
-    else
-    {
-        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
-            {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
-            }
-
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
-            {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    return selectedReservation;
-
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedReservation != null);
-            Console.WriteLine("\n No reservation selected.");
-            return null;
-        }
-    }    
 
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
@@ -361,18 +314,18 @@ public static class ReservationMenu
         foreach (TimeLine.Item item in t)
         {
             if(item.Action is Consumption)
-            {                   
+            {
                 consumptions.Add(item);
             }
         }
-        MenuHelper.ShowInTable<TimeLine.Item>(consumptions, 
+        MenuHelper.ShowInTable<TimeLine.Item>(consumptions,
             new Dictionary<string, Func<TimeLine.Item, object>>
             {
                 {"Name", item => ((Consumption)item.Action).Name},
                 {"Price", item => ((Consumption)item.Action).Price},
                 {"Order Time", item => item.StartTime},
             }
-        ); 
+        );
     }
 
     public static void ShowEntertainments(List<Entertainment> entertainments){
@@ -384,7 +337,7 @@ public static class ReservationMenu
                 {"Seat Row", item => item.SeatRow + 1},
                 {"Seat Number", item => item.SeatColumn + 1}
             }
-        ); 
+        );
     }
 
     public static void ShowReservationDetails(Reservation selectedReservation){
@@ -406,7 +359,7 @@ public static class ReservationMenu
                 $"End Date: {selectedReservation.EndDate}",
                 $"Price: {selectedReservation.Price}"
             };
-            
+
             Console.BackgroundColor = ConsoleColor.Black;
             int longestLineLength = Math.Max(header.Length, details.Max(detail => detail.Length));
             Console.Write($"┌─{header}{new string('─', Math.Max(0 ,longestLineLength - header.Length))}─┐\n");
@@ -417,7 +370,7 @@ public static class ReservationMenu
 
             Console.Write($"├─{new string('─', Math.Max(0 ,longestLineLength))}─┤\n");
             for(int i = 0; i < Options.Count; i ++)
-            {   
+            {
                 Console.Write("│ ");
                 if (currentSelection == i) { Console.BackgroundColor = ConsoleColor.DarkGray; }
                 Console.Write($"{Options[i]}");
@@ -449,94 +402,6 @@ public static class ReservationMenu
         } while (true);
     }
 
-    public static void ReservationAdminOverview()
-    {
-        ReservationOverviewLogic reservationAcces = new ReservationOverviewLogic();
-        bool running = true;
-        while(running)
-        {
-            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                {"1. View all reservations",()=> {
-                    // lets admin pick from a list of all reservations to see that reservations info.
-                    List<Reservation> allReservations = ReservationAccess.ReadReservations();
-                    Reservation? reservationresult;
-                    while(true){
-                        reservationresult = MenuHelper.SelectFromTable<Reservation>(allReservations, 
-                            new Dictionary<string, Func<Reservation, object>>
-                            {
-                                {"Room Number", item => item.RoomId},
-                                {"Group Size", item => item.GroupSize},
-                                {"Start Date", item => item.StartDate},
-                                {"End Date", item => item.EndDate},
-                                {"Price", item => item.Price}
-                            },
-                            true
-                        ); 
-                        if(reservationresult == null){
-                            return;
-                        }else{
-                            ShowReservationDetails(reservationresult);
-                        }
-                    }
-                }},
-                {"2. View all reservations between time period",()=> {
-                    // For myself. 2 calender 1 startdate 1 enddate look between those days 
-                    DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
-                    DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", startDate, startDate, null);
-                    List<Reservation> weekOfReservations = ReservationAccess.ReadReservationsWeek(startDate, endDate);
-                    Reservation? reservationresult;
-                    while(true){
-                        reservationresult = MenuHelper.SelectFromTable<Reservation>(weekOfReservations, 
-                            new Dictionary<string, Func<Reservation, object>>
-                            {
-                                {"Room Number", item => item.RoomId},
-                                {"Group Size", item => item.GroupSize},
-                                {"Start Date", item => item.StartDate},
-                                {"End Date", item => item.EndDate},
-                                {"Price", item => item.Price}
-                            },
-                            true
-                        ); 
-                        if(reservationresult == null){
-                            return;
-                        }else{
-                            ShowReservationDetails(reservationresult);
-                        }
-                    }
-                }},
-                {"3. Choose date",()=> {
-                    // lets admin pick from a list of all reservations during the date that the admin can choose and shows all that reservations info.
-                    DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
-                    DateOnly? endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", startDate, startDate, null);
-                    List<Reservation> weekOfReservations = ReservationAccess.ReadReservationsWeek(startDate, endDate);
-                    Reservation? reservationresult;
-                    while(true){
-                        reservationresult = MenuHelper.SelectFromTable<Reservation>(weekOfReservations, 
-                            new Dictionary<string, Func<Reservation, object>>
-                            {
-                                {"Room Number", item => item.RoomId},
-                                {"Group Size", item => item.GroupSize},
-                                {"Start Date", item => item.StartDate},
-                                {"End Date", item => item.EndDate},
-                                {"Price", item => item.Price}
-                            },
-                            true
-                        ); 
-                        if(reservationresult == null){
-                            return;
-                        }else{
-                            ShowReservationDetails(reservationresult);
-                        }
-                    }
-                }},
-                {"4. Exit to main menu", ()=>{
-                    running = false;
-                }},
-
-            });
-        }
-    }
-
     public static void Error(){
         Console.CursorVisible = false;
         Console.Clear();
@@ -548,6 +413,13 @@ public static class ReservationMenu
         Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("Your reservation has been saved succesfully.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+
+    public static void NoReservations(){
+        Console.CursorVisible = false;
+        Console.Clear();
+        Console.Write("No reservations found.\n\nPress any key to continue...");
         Console.ReadKey(true);
     }
 }
