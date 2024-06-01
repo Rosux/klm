@@ -317,6 +317,7 @@ public static class MenuHelper{
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
     /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
     /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
     /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
@@ -513,7 +514,17 @@ public static class MenuHelper{
     /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
     /// <returns>An DateOnly object with the date chosen by the user.</returns>
     public static DateOnly? SelectDate(bool canCancel=false, DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
-        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? null;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly? SelectDate(string prefix="", bool canCancel=false){
+        return SelectDate(prefix, "", canCancel, null, null, null) ?? null;
     }
 
     /// <summary>
@@ -1469,11 +1480,11 @@ public static class MenuHelper{
                 }
             }
             if(watchables.Count == 0)
-                {
-                    Console.Write($"{prefix}\n\n");
-                    Console.WriteLine("No Consumptions/Movies/Series were added\n\nPress any key to return");
-                    Console.ReadKey(true);
-
+            {
+                Console.CursorVisible = false;
+                Console.Clear();
+                Console.WriteLine("\nNo Movies/Series were added\n\nPress any key to return");
+                Console.ReadKey(true);
             }else{
                 string Line1 = "";
                 string Line2 = "";
@@ -1614,6 +1625,11 @@ public static class MenuHelper{
             canDelete = false;
             canEdit = false;
             canAdd = false;
+        }
+
+        bool showSelection = true;
+        if(!canSelect && !canEdit && !canAdd && !canDelete){
+            showSelection = false;
         }
 
         // create a list of editable options (like UserName, Email, role etc)
@@ -1845,6 +1861,9 @@ public static class MenuHelper{
                     Console.BackgroundColor = (canAdd && currentPageSelection == chunks[currentPage].Count && i==6+currentPageSelection) ? ConsoleColor.DarkGray : ConsoleColor.Black;
                 }else{
                     Console.BackgroundColor = (i == 5+currentPageSelection && !editing && chunks.Count > 0) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                }
+                if(!showSelection){
+                    Console.BackgroundColor = ConsoleColor.Black;
                 }
                 if(chunks.Count == 0 && i == 7){
                     Console.BackgroundColor = ConsoleColor.DarkGray;
@@ -2120,6 +2139,16 @@ public static class MenuHelper{
     /// <returns>Returns the selected object of type T.</returns>
     public static T SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
         return Table(items, headers, true, false, false, null, null, false, null, false, null);
+    }
+
+    /// <summary>
+    /// Displays a table that holds a list of objects.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects.</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> is a method that gets a type T object and returns an object of any type.</param>
+    public static void ShowInTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
+        Table(items, headers, false, true, false, null, null, false, null, false, null);
     }
     #endregion
 

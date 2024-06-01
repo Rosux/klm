@@ -4,6 +4,12 @@ public static class ReservationMenu
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
     private static ReservationAccess ReservationAccess = new ReservationAccess();
 
+
+    #region Book Reservation
+    /// <summary>
+    /// Asks the user to make a reservation.
+    /// </summary>
+    /// <returns>A reservation object holding the users planned reservation or NULL in case the user cancels the creation.</returns>
     public static Reservation? BookReservation(){
         double totalPrice = 0.0;
         int roomMaxSize = RoomsAccess.GetMaxRoomCapacity();
@@ -280,201 +286,144 @@ public static class ReservationMenu
         }
         return null;
     }
+    #endregion
 
+    #region Show Reservation Details
     /// <summary>
-    /// uses menu helper to gives a list of all reservations to pick one to return
+    /// Displays a table with all the consumptions that are reserved when booking the reservation.
     /// </summary>
-    /// <returns>a object of Reservation</returns>
-    public static void ShowReservation(int loggedUserId)
+    /// <param name="t">A List of TimeLine Items which holds the consumptions for a reservation.</param>
+    public static void ShowConsumptions(List<TimeLine.Item> t)
     {
-        List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
-        if (reservations.Count == 0)
+        List<TimeLine.Item> consumptions = new List<TimeLine.Item>();
+        Console.CursorVisible = false;
+        Console.Clear();
+        foreach (TimeLine.Item item in t)
         {
-            Console.WriteLine("There are no reservations available to show.");
-            return;
-        }
-        else
-        {
-            Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
+            if(item.Action is Consumption)
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
+                consumptions.Add(item);
             }
-
-            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
-            if (selectedReservation != null)
-            {   //This gets reservations and gives all the details in the prefix towards the timeline. 
-                Console.CursorVisible = false;
-                Console.Clear();
-                MenuHelper.PrintTimeLine($"Reservation Details:\nRoom ID: {selectedReservation.RoomId}\nGroup Size: {selectedReservation.GroupSize}\nStart Date: {selectedReservation.StartDate}\nEnd Date: {selectedReservation.EndDate}\nPrice: {selectedReservation.Price}", $"\nPress escape to return to the main menu", selectedReservation.TimeLine.t);  
-            }
-            return;
         }
+        MenuHelper.ShowInTable<TimeLine.Item>(consumptions,
+            new Dictionary<string, Func<TimeLine.Item, object>>
+            {
+                {"Name", item => ((Consumption)item.Action).Name},
+                {"Price", item => ((Consumption)item.Action).Price},
+                {"Order Time", item => item.StartTime},
+            }
+        );
     }
 
     /// <summary>
-    /// uses menu helper to gives a list of all reservations to pick one to return
+    /// Displays a table which holds all the entertainments reserved when booking a reservation.
     /// </summary>
-    /// <returns>a object of Reservation</returns>
-    public static Reservation? GetAllReservation()
-    {
-        List<Reservation> reservations = ReservationAccess.ReadReservations();
-        if (reservations.Count == 0)
-        {
-            Console.WriteLine("There are no reservations available to show.");
-            return null;
-        }
-        else
-        {
-            Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
+    /// <param name="entertainments">A list of entertainments which are linked to the reservation.</param>
+    public static void ShowEntertainments(List<Entertainment> entertainments){
+            MenuHelper.ShowInTable<Entertainment>(entertainments,
+            new Dictionary<string, Func<Entertainment, object>>
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
+                {"Starting Date/Time", item => item.Time},
+                {"Description", item => item.Text},
+                {"Seat Row", item => item.SeatRow + 1},
+                {"Seat Number", item => item.SeatColumn + 1}
             }
-
-            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
-            if (selectedReservation != null)
-            {
-                return selectedReservation;
-            }
-            return null;
-        }
+        );
     }
+
     /// <summary>
-    /// uses menu helper to gives a list of all reservations during the given date to pick one to return
+    /// Displays all the reservation details and has the options to view TimeLine, Consumptions, Entertainments or to return.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns>object of Reservations</returns>
-    public static Reservation? GetSpecificReservation(DateTime date)
-    {
-    List<Reservation> reservations = ReservationAccess.ReadReservationsDate(date);
-    if (reservations.Count == 0)
-    {
-        Console.WriteLine("\nThere are no reservations during this time period.");
-        return null;
-    }
-    else
-    {
-        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
+    /// <param name="selectedReservation">A reservation object which holds all the data of the given reservation.</param>
+    public static void ShowReservationDetails(Reservation selectedReservation){
+        List<string> Options = new List<string>(
+            new string[] { "Timeline", "Consumptions", "Entertainments" }
+        );
+        string header = "Reservation Details";
+        int currentSelection = 0;
+        ConsoleKey key;
+        do
+        {
+            Console.CursorVisible = false;
+            Console.Clear();
+            string[] details = new string[]
             {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
+                $"Room Number: {selectedReservation.RoomId}",
+                $"Group Size: {selectedReservation.GroupSize}",
+                $"Start Date: {selectedReservation.StartDate}",
+                $"End Date: {selectedReservation.EndDate}",
+                $"Price: {selectedReservation.Price}"
+            };
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            int longestLineLength = Math.Max(header.Length, details.Max(detail => detail.Length));
+            Console.Write($"┌─{header}{new string('─', Math.Max(0 ,longestLineLength - header.Length))}─┐\n");
+            foreach (string detail in details)
+            {
+                Console.Write($"│ {detail}{new string(' ', Math.Max(0 ,longestLineLength - detail.Length))} │\n");
             }
 
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
+            Console.Write($"├─{new string('─', Math.Max(0 ,longestLineLength))}─┤\n");
+            for(int i = 0; i < Options.Count; i ++)
             {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
+                Console.Write("│ ");
+                if (currentSelection == i) { Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write($"{Options[i]}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write($"{new String(' ', Math.Max(0, longestLineLength - Options[i].Length))} │\n");
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"└─{new String('─', Math.Max(0, longestLineLength))}─┘\n");
+            Console.WriteLine("Press Escape to return");
+            key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.Enter){
+                if(currentSelection == 0)
                 {
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    return selectedReservation;
-
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
+                    MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.t);
                 }
-            } while (selectedReservation != null);
-            Console.WriteLine("\n No reservation selected.");
-            return null;
-        }
+                if(currentSelection == 1){
+                    ShowConsumptions(selectedReservation.TimeLine.t);
+                }
+                if(currentSelection == 2){
+                    ShowEntertainments(selectedReservation.Entertainments);
+                }
+            }
+            if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
+                currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
+            }
+            currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
+        } while (key != ConsoleKey.Escape);
     }
+    #endregion
+
 
     /// <summary>
-    /// uses menu helper to gives a list of all reservations during the cuurent week to pick one to return
+    /// Notifies the user an error occurred.
     /// </summary>
-    /// <param name="date"></param>
-    /// <returns>object of Reservations</returns>
-    public static Reservation? GetSpecificReservationWeek(DateTime date)
-    {
-    List<Reservation> reservations = ReservationAccess.ReadReservationsWeek(date);
-    if (reservations.Count == 0)
-    {
-        Console.WriteLine("There are no reservations during this time period.");
-        return null;
-    }
-    else
-    {
-        Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
-            {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}, Start: {reservation.StartDate}, End: {reservation.EndDate}", reservation);
-            }
-
-            reservationOptions.Add("Return to menu", null);
-
-            Reservation selectedReservation = null;
-            do
-            {
-                selectedReservation = MenuHelper.SelectFromList("My Reservations", reservationOptions);
-
-                if (selectedReservation != null)
-                {
-                    Console.CursorVisible = false;
-                    Console.Clear();
-                    return selectedReservation;
-
-                    while (true)
-                    {
-                        ConsoleKeyInfo key = Console.ReadKey(true);
-                        if (key.Key == ConsoleKey.Escape)
-                            break;
-                    }
-                }
-            } while (selectedReservation != null);
-            Console.WriteLine("\n No reservation selected.");
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// uses menu helper to gives a list of all the useres reservations to pick one to return
-    /// </summary>
-    /// <returns>a object of Reservations</returns>
-    public static Reservation? GetSpecificReservationUser()
-    {
-        List<Reservation> reservations = ReservationAccess.ReadReservationsUserId(Program.CurrentUser.Id);
-        if (reservations.Count == 0)
-        {
-            Console.WriteLine("You have no reservations.");
-            return null;
-        }
-        else
-        {
-            Dictionary<string, Reservation> reservationOptions = new Dictionary<string, Reservation>();
-            foreach (Reservation reservation in reservations)
-            {
-                reservationOptions.Add($"Reservation Number: {reservation.Id}, Room: {reservation.RoomId}", reservation);
-            }
-
-            Reservation? selectedReservation = MenuHelper.SelectFromList("My Reservations", true, reservationOptions);
-            if (selectedReservation != null)
-            {
-                return selectedReservation;
-            }
-            Console.WriteLine("\nNo reservation selected.");
-            return null;
-        }
-    }
-
     public static void Error(){
         Console.CursorVisible = false;
         Console.Clear();
-        Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
 
+    /// <summary>
+    /// Notifies the user the reservation got saved.
+    /// </summary>
     public static void Saved(){
         Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine("Your reservation has been saved succesfully.\n\nPress any key to continue");
+        Console.ReadKey(true);
+    }
+
+    /// <summary>
+    /// Notifies the user that there are no reservations found.
+    /// </summary>
+    public static void NoReservations(){
+        Console.CursorVisible = false;
+        Console.Clear();
+        Console.Write("No reservations found.\n\nPress any key to continue...");
         Console.ReadKey(true);
     }
 }

@@ -325,7 +325,7 @@ public static class UserMenu{
             Console.WriteLine("The user has successfully been removed.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
@@ -343,7 +343,7 @@ public static class UserMenu{
             Console.WriteLine("The user has successfully been added.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
@@ -361,7 +361,7 @@ public static class UserMenu{
             Console.WriteLine("The user has successfully been updated.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);

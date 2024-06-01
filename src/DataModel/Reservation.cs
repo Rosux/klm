@@ -6,7 +6,12 @@ public class Reservation
     public int GroupSize;
     public DateTime StartDate;
     public DateTime EndDate;
-    public double Price;
+    private double _price;
+    public double Price
+    {
+        get => _price;
+        set => _price = Math.Floor(value*100d)/100d;
+    }
     public TimeLine.Holder TimeLine = new TimeLine.Holder();
     public List<Entertainment> Entertainments = new List<Entertainment>();
 
