@@ -343,7 +343,7 @@ public static class ReservationMenu
     /// Provides a list of entertainments for the ShowEntertainments method.
     public static void ShowReservationDetails(Reservation selectedReservation){
         List<string> Options = new List<string>(
-            new string[] { "Timeline", "Consumptions", "Entertainments", "Return to menu" }
+            new string[] { "Timeline", "Consumptions", "Entertainments" }
         );
         string header = "Reservation Details";
         int currentSelection = 0;
@@ -379,7 +379,8 @@ public static class ReservationMenu
                 Console.Write($"{new String(' ', Math.Max(0, longestLineLength - Options[i].Length))} │\n");
             }
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"└─{new String('─', Math.Max(0, longestLineLength))}─┘");
+            Console.Write($"└─{new String('─', Math.Max(0, longestLineLength))}─┘\n");
+            Console.WriteLine("Press Escape to return");
             key = Console.ReadKey(true).Key;
             if (key == ConsoleKey.Enter){
                 if(currentSelection == 0)
@@ -392,15 +393,12 @@ public static class ReservationMenu
                 if(currentSelection == 2){
                     ShowEntertainments(selectedReservation.Entertainments);
                 }
-                if(currentSelection == 3){
-                    break;
-                }
             }
             if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow){
                 currentSelection += (key == ConsoleKey.DownArrow) ? 1 : -1;
             }
             currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
-        } while (true);
+        } while (key != ConsoleKey.Escape);
     }
     #endregion
 
