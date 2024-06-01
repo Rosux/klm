@@ -513,7 +513,7 @@ public static class MenuHelper{
     /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
     /// <returns>An DateOnly object with the date chosen by the user.</returns>
     public static DateOnly? SelectDate(bool canCancel=false, DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
-        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? null;
     }
 
     /// <summary>
@@ -523,7 +523,7 @@ public static class MenuHelper{
     /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
     /// <returns>An DateOnly object with the date chosen by the user.</returns>
     public static DateOnly? SelectDate(string prefix="", bool canCancel=false){
-        return SelectDate(prefix, "", canCancel, null, null, null) ?? DateOnly.MinValue;
+        return SelectDate(prefix, "", canCancel, null, null, null) ?? null;
     }
 
     /// <summary>

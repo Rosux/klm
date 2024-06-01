@@ -92,7 +92,7 @@ public static class ReservationLogic
 
     private static void ViewReservationMonthAdmin(){
         DateOnly? selectedMonth = MenuHelper.SelectDate("Select at what date you want to search:", true);
-        if(selectedMonth == DateOnly.MinValue){
+        if(selectedMonth == null){
             return;
         }
         (DateOnly startDate, DateOnly endDate) = GetMonthFromDate(selectedMonth ?? DateOnly.MinValue);
@@ -106,7 +106,7 @@ public static class ReservationLogic
 
     private static void ViewReservationWeekAdmin(){
         DateOnly? selectedWeek = MenuHelper.SelectDate("Select at what date you want to search:", true);
-        if(selectedWeek == DateOnly.MinValue){
+        if(selectedWeek == null){
             return;
         }
         (DateOnly startDate, DateOnly endDate) = GetWeekFromDate(selectedWeek ?? DateOnly.MinValue);
@@ -120,7 +120,7 @@ public static class ReservationLogic
 
     private static void ViewReservationDayAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to search:", true);
-        if(startDate == DateOnly.MinValue){
+        if(startDate == null){
             return;
         }
         List<Reservation> ReservationsOfTheDay = ReservationAccess.GetAllReservationsBetweenDates(startDate ?? DateOnly.MinValue);
@@ -133,11 +133,11 @@ public static class ReservationLogic
 
     private static void ViewReservationCustomAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to start your search:", true);
-        if(startDate == DateOnly.MinValue){
+        if(startDate == null){
             return;
         }
         DateOnly? endDate = MenuHelper.SelectDate("Select at what date you want to end your search", "", true, startDate, startDate, null);
-        if(endDate == DateOnly.MinValue){
+        if(endDate == null){
             return;
         }
         List<Reservation> reservationsWithinDates = ReservationAccess.GetAllReservationsBetweenDates(startDate ?? DateOnly.MinValue, endDate ?? DateOnly.MaxValue);
