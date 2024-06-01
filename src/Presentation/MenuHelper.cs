@@ -1480,10 +1480,11 @@ public static class MenuHelper{
                 }
             }
             if(watchables.Count == 0)
-                {
-                    Console.WriteLine("\nNo Movies/Series were added\n\nPress any key to return");
-                    Console.ReadKey(true);
-
+            {
+                Console.CursorVisible = false;
+                Console.Clear();
+                Console.WriteLine("\nNo Movies/Series were added\n\nPress any key to return");
+                Console.ReadKey(true);
             }else{
                 string Line1 = "";
                 string Line2 = "";

@@ -5,9 +5,10 @@ using Newtonsoft.Json.Linq;
 public static class ReservationLogic
 {
     private static ReservationAccess ReservationAccess = new ReservationAccess();
+
     #region Reservation Menu's
     /// <summary>
-    /// Shows the user menu to book or view a reservation.
+    /// Shows the user a menu to book or view a reservation.
     /// </summary>
     public static void ReservationUser(){
         bool running = true;
@@ -24,7 +25,7 @@ public static class ReservationLogic
     }
 
     /// <summary>
-    /// Shows the admin a menu to overview all the reservations.
+    /// Shows the admin a menu to overview reservations.
     /// </summary>
     public static void ReservationAdmin(){
         bool running = true;
@@ -54,9 +55,9 @@ public static class ReservationLogic
     }
     #endregion
 
-    #region BookReservation
+    #region Book Reservation
     /// <summary>
-    /// This method calls the bookreservation and checks if this is done correctly or wrong.
+    /// Asks the user to create a reservation. And notifies the user if the reservation got saved.
     /// </summary>
     private static void BookReservation(){
         Reservation? r = ReservationMenu.BookReservation();
@@ -76,13 +77,10 @@ public static class ReservationLogic
         }
     }
     #endregion
-    
+
+    #region View Reservation At Specific Dates
     /// <summary>
-    /// The following region contains methods to view reservations between certain timeframes.
-    /// </summary>
-    #region ViewReservation
-    /// <summary>
-    /// The following method is used to view the reservations of the logged in user.
+    /// Shows the user all of their reservations.
     /// </summary>
     private static void ViewReservationsUser()
     {
@@ -95,7 +93,7 @@ public static class ReservationLogic
     }
 
     /// <summary>
-    /// The following method is used to view all reservation.
+    /// Shows the admin all of the reservations.
     /// </summary>
     private static void ViewAllReservationsAdmin(){
         List<Reservation> allReservations = ReservationAccess.GetAllReservations();
@@ -105,9 +103,9 @@ public static class ReservationLogic
         }
         ShowReservations(allReservations);
     }
-    
+
     /// <summary>
-    /// The following method is used to view all reservations of the selected month.
+    /// Shows the admin all the reservations of the selected month.
     /// </summary>
     private static void ViewReservationMonthAdmin(){
         DateOnly? selectedMonth = MenuHelper.SelectDate("Select at what date you want to search:", true);
@@ -124,7 +122,7 @@ public static class ReservationLogic
     }
 
     /// <summary>
-    /// The following method is used to view all reservations of the selected week.
+    /// Shows the admin all the reservations of the selected week.
     /// </summary>
     private static void ViewReservationWeekAdmin(){
         DateOnly? selectedWeek = MenuHelper.SelectDate("Select at what date you want to search:", true);
@@ -141,8 +139,8 @@ public static class ReservationLogic
     }
 
     /// <summary>
-    /// The following method is used to view all reservations of the selected day.
-    /// </summary>   
+    /// Shows the admin all the reservations of the selected day.
+    /// </summary>
     private static void ViewReservationDayAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to search:", true);
         if(startDate == null){
@@ -157,7 +155,7 @@ public static class ReservationLogic
     }
 
     /// <summary>
-    /// The following method is used to view all reservations of the selected period.
+    /// Shows the admin all the reservations between the selected period.
     /// </summary>
     private static void ViewReservationCustomAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to start your search:", true);
@@ -203,15 +201,11 @@ public static class ReservationLogic
     }
     #endregion
 
+    #region Show Reservation Table
     /// <summary>
-    /// The following region contains a method used for showing the reservations in a table.
+    /// Gets a list of reservations.
     /// </summary>
-    #region ShowReservation
-    /// <summary>
-    /// Gets a list of reservations
-    /// <param name="reservations"> A list holding all the reservations.</param>
-    /// Also provides the data for the ShowReservationDetails method.
-    /// </summary>
+    /// <param name="reservations">A list holding all the reservations to show.</param>
     private static void ShowReservations(List<Reservation> reservations)
     {
         Reservation? reservationresult;

@@ -4,13 +4,12 @@ public static class ReservationMenu
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
     private static ReservationAccess ReservationAccess = new ReservationAccess();
 
+
+    #region Book Reservation
     /// <summary>
-    /// The following region contains all the code needed to create a reservation.
+    /// Asks the user to make a reservation.
     /// </summary>
-    #region BookReservation
-    /// <summary>
-    /// Asks the user to plan in a reservation. Provides null if cancelled or saves it into the database.
-    /// </summary>
+    /// <returns>A reservation object holding the users planned reservation or NULL in case the user cancels the creation.</returns>
     public static Reservation? BookReservation(){
         double totalPrice = 0.0;
         int roomMaxSize = RoomsAccess.GetMaxRoomCapacity();
@@ -289,14 +288,11 @@ public static class ReservationMenu
     }
     #endregion
 
-    /// <summary>
-    /// The following region contains all the methods used to show reservation/reservation details.
-    /// </summary>
-    #region ShowReservationDetails
+    #region Show Reservation Details
     /// <summary>
     /// Displays a table with all the consumptions that are reserved when booking the reservation.
     /// </summary>
-    /// <param name="t">A TimeLine which holds the consumptions for a reservation</param>
+    /// <param name="t">A List of TimeLine Items which holds the consumptions for a reservation.</param>
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
         List<TimeLine.Item> consumptions = new List<TimeLine.Item>();
@@ -322,9 +318,9 @@ public static class ReservationMenu
     /// <summary>
     /// Displays a table which holds all the entertainments reserved when booking a reservation.
     /// </summary>
-    /// <param name="entertainments">A list of entertainments which are linked to the reservation</param>
+    /// <param name="entertainments">A list of entertainments which are linked to the reservation.</param>
     public static void ShowEntertainments(List<Entertainment> entertainments){
-            MenuHelper.ShowInTable<Entertainment>(entertainments, 
+            MenuHelper.ShowInTable<Entertainment>(entertainments,
             new Dictionary<string, Func<Entertainment, object>>
             {
                 {"Starting Date/Time", item => item.Time},
@@ -336,11 +332,9 @@ public static class ReservationMenu
     }
 
     /// <summary>
-    /// Displays all the reservation details and has the options to view TimeLine, Consumptions, Entertainments or return to the menu.
+    /// Displays all the reservation details and has the options to view TimeLine, Consumptions, Entertainments or to return.
     /// </summary>
-    /// <param name="selectedReservation">A reservation type which holds all the data of the given reservation</param>
-    /// Provides a list of consumptions for the ShowConsumptions method.
-    /// Provides a list of entertainments for the ShowEntertainments method.
+    /// <param name="selectedReservation">A reservation object which holds all the data of the given reservation.</param>
     public static void ShowReservationDetails(Reservation selectedReservation){
         List<string> Options = new List<string>(
             new string[] { "Timeline", "Consumptions", "Entertainments" }
@@ -402,13 +396,20 @@ public static class ReservationMenu
     }
     #endregion
 
+
+    /// <summary>
+    /// Notifies the user an error occurred.
+    /// </summary>
     public static void Error(){
         Console.CursorVisible = false;
         Console.Clear();
-        Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         Console.ReadKey(true);
     }
 
+    /// <summary>
+    /// Notifies the user the reservation got saved.
+    /// </summary>
     public static void Saved(){
         Console.CursorVisible = false;
         Console.Clear();
@@ -416,6 +417,9 @@ public static class ReservationMenu
         Console.ReadKey(true);
     }
 
+    /// <summary>
+    /// Notifies the user that there are no reservations found.
+    /// </summary>
     public static void NoReservations(){
         Console.CursorVisible = false;
         Console.Clear();
