@@ -17,6 +17,7 @@ public class FilmAcesser
         string string_movies = JsonConvert.SerializeObject(list_movies);
         writer.Write(string_movies);
         writer.Close();
+        SearchAccess.UpdateMedia();
     }
     
     //Return a list of string with all genres

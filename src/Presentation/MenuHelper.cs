@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using TimeLine;
@@ -862,7 +863,7 @@ public static class MenuHelper{
             Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"Search by Titles, Genres or Directors seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
             Console.Write($"│ > ");
             string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
             for(int i = 0; i < printedText.Length; i++){
@@ -980,13 +981,13 @@ public static class MenuHelper{
         ConsoleKeyInfo keyInfo;
         do{
             // calculate longest word
-            List<Media> results = searchAccess.SearchFilm(searchString);
+            List<Media> results = searchAccess.Search(searchString, true);
             longestWord = "Start typing to search".Length + 2;
             foreach(Media m in results){
                 if (m is Film && ((Film)m).Title.Length+3 > longestWord){
                     longestWord = ((Film)m).Title.Length + 3;
                 }
-            } 
+            }
             if (searchString.Length + 2 > longestWord){
                 longestWord = searchString.Length + 2;
             }
@@ -995,7 +996,7 @@ public static class MenuHelper{
             Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"Search by Titles, Genres or Directors seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
             Console.Write($"│ > ");
             string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
             for(int i = 0; i < printedText.Length; i++){
@@ -1671,16 +1672,26 @@ public static class MenuHelper{
                 // create the edit table text
                 if(canEdit){
                     foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                        string dataString = editMapping.Value.Accessor(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                        Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
+                        string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
                         if(editing){
+
+                            string propertyName = "";
+                            if(editMapping.Value.Accessor.Body is MemberExpression bodyMember){
+                                propertyName = bodyMember.Member.Name;
+                            }else if(editMapping.Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                propertyName = unaryMember.Member.Name;
+                            }
+
                             foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
-                                if(editMapping.Value.Accessor(editedObject).ToString() == kvp.Value.Item1.ToString()){
+                                if(kvp.Key.Name.ToString() == propertyName){
                                     (object oldData, object newData) = kvp.Value;
                                     if(oldData.ToString() != newData.ToString()){
                                         dataString = $"{oldData} -> {newData}";
                                     }
                                 }
                             }
+
                         }
                         editOptionData.Add(": "+dataString);
                     }
@@ -2022,10 +2033,18 @@ public static class MenuHelper{
                             propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
                         }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
                             if(editedObject != null){
-                                object currentPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.Accessor(editedObject);
+                                Func<T, object> editMappingValueLambda = propertyEditMapping.ElementAt(editSelection).Value.Accessor.Compile();
+
+                                object currentPropertyValue = editMappingValueLambda(editedObject);
                                 object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
                                 foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
-                                    if(member.Value.Item1.ToString() == currentPropertyValue.ToString()){
+                                    string propertyName = "";
+                                    if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is MemberExpression bodyMember){
+                                        propertyName = bodyMember.Member.Name;
+                                    }else if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                        propertyName = unaryMember.Member.Name;
+                                    }
+                                    if(member.Key.Name.ToString() == propertyName.ToString()){
                                         propertyUpdate[member.Key] = (currentPropertyValue, newPropertyValue);
                                     }
                                 }

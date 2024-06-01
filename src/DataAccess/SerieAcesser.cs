@@ -15,6 +15,7 @@ public class SerieAcesser
         string string_series = JsonConvert.SerializeObject(list_series);
         writer.Write(string_series);
         writer.Close();
+        SearchAccess.UpdateMedia();
     }
 
     public List<Genre> Get_Genres()

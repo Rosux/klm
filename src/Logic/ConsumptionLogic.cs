@@ -22,7 +22,7 @@ public static class ConsumptionLogic
                 {"Name", new(c=>c.Name, GetValidName)},
                 {"Price", new(c=>c.Price, GetValidPrice)},
                 {"Start Time", new(c=>c.StartTime, GetValidStartTime)},
-                {"Ebd Time", new(c=>c.EndTime, GetValidEndTime)},
+                {"End Time", new(c=>c.EndTime, GetValidEndTime)},
             },
             SaveEditedConsumption,
             true,
@@ -123,6 +123,6 @@ public static class ConsumptionLogic
     private static object GetValidEndTime(Consumption previousConsumption){
         string prompt = $"Current Name: {previousConsumption.Name}\nCurrent Price: {previousConsumption.Price}\nCurrent StartTime: {previousConsumption.StartTime}\nCurrent EndTime: {previousConsumption.EndTime}\n\n";
         TimeOnly? newEndTime = MenuHelper.SelectTime(prompt+"Enter the new end time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
-        return newEndTime ?? previousConsumption.StartTime;
+        return newEndTime ?? previousConsumption.EndTime;
     }
 }
