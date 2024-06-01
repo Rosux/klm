@@ -73,34 +73,21 @@ public static class ReservationLogic
 
     private static void ViewReservationsUser()
     {
-        Reservation? r = ReservationMenu.ShowReservation(Program.CurrentUser.Id);
-        if (r == null)
-        {
+        List<Reservation> allReservations = ReservationAccess.GetReservationsByUserId(Program.CurrentUser.Id);
+        if(allReservations.Count == 0){
+            ReservationMenu.NoReservations();
             return;
         }
+        ShowReservations(allReservations);
     }
 
     private static void ViewAllReservationsAdmin(){
         List<Reservation> allReservations = ReservationAccess.GetAllReservations();
-        Reservation? reservationresult;
-        while(true){
-            reservationresult = MenuHelper.SelectFromTable<Reservation>(allReservations,
-                new Dictionary<string, Func<Reservation, object>>
-                {
-                    {"Room Number", item => item.RoomId},
-                    {"Group Size", item => item.GroupSize},
-                    {"Start Date", item => item.StartDate},
-                    {"End Date", item => item.EndDate},
-                    {"Price", item => item.Price}
-                },
-                true
-            );
-            if(reservationresult == null){
-                return;
-            }else{
-                ReservationMenu.ShowReservationDetails(reservationresult);
-            }
+        if(allReservations.Count == 0){
+            ReservationMenu.NoReservations();
+            return;
         }
+        ShowReservations(allReservations);
     }
 
     private static void ViewReservationMonthAdmin(){
