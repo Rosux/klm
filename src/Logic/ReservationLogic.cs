@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 public static class ReservationLogic
 {
     private static ReservationAccess ReservationAccess = new ReservationAccess();
-
+    #region Reservation Menu's
     /// <summary>
     /// Shows the user menu to book or view a reservation.
     /// </summary>
@@ -52,7 +52,12 @@ public static class ReservationLogic
             });
         };
     }
+    #endregion
 
+    #region BookReservation
+    /// <summary>
+    /// This method calls the bookreservation and checks if this is done correctly or wrong.
+    /// </summary>
     private static void BookReservation(){
         Reservation? r = ReservationMenu.BookReservation();
         if (r == null)
@@ -70,7 +75,15 @@ public static class ReservationLogic
             }
         }
     }
-
+    #endregion
+    
+    /// <summary>
+    /// The following region contains methods to view reservations between certain timeframes.
+    /// </summary>
+    #region ViewReservation
+    /// <summary>
+    /// The following method is used to view the reservations of the logged in user.
+    /// </summary>
     private static void ViewReservationsUser()
     {
         List<Reservation> allReservations = ReservationAccess.GetReservationsByUserId(Program.CurrentUser.Id);
@@ -81,6 +94,9 @@ public static class ReservationLogic
         ShowReservations(allReservations);
     }
 
+    /// <summary>
+    /// The following method is used to view all reservation.
+    /// </summary>
     private static void ViewAllReservationsAdmin(){
         List<Reservation> allReservations = ReservationAccess.GetAllReservations();
         if(allReservations.Count == 0){
@@ -89,7 +105,10 @@ public static class ReservationLogic
         }
         ShowReservations(allReservations);
     }
-
+    
+    /// <summary>
+    /// The following method is used to view all reservations of the selected month.
+    /// </summary>
     private static void ViewReservationMonthAdmin(){
         DateOnly? selectedMonth = MenuHelper.SelectDate("Select at what date you want to search:", true);
         if(selectedMonth == null){
@@ -104,6 +123,9 @@ public static class ReservationLogic
         ShowReservations(reservationsOfTheMonth);
     }
 
+    /// <summary>
+    /// The following method is used to view all reservations of the selected week.
+    /// </summary>
     private static void ViewReservationWeekAdmin(){
         DateOnly? selectedWeek = MenuHelper.SelectDate("Select at what date you want to search:", true);
         if(selectedWeek == null){
@@ -118,6 +140,9 @@ public static class ReservationLogic
         ShowReservations(reservationsOfTheWeek);
     }
 
+    /// <summary>
+    /// The following method is used to view all reservations of the selected day.
+    /// </summary>   
     private static void ViewReservationDayAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to search:", true);
         if(startDate == null){
@@ -131,6 +156,9 @@ public static class ReservationLogic
         ShowReservations(ReservationsOfTheDay);
     }
 
+    /// <summary>
+    /// The following method is used to view all reservations of the selected period.
+    /// </summary>
     private static void ViewReservationCustomAdmin(){
         DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to start your search:", true);
         if(startDate == null){
@@ -146,34 +174,6 @@ public static class ReservationLogic
             return;
         }
         ShowReservations(reservationsWithinDates);
-    }
-
-    private static void ShowReservations(List<Reservation> reservations)
-    {
-        Reservation? reservationresult;
-        while(true)
-        {
-            reservationresult = MenuHelper.SelectFromTable(
-                reservations,
-                new Dictionary<string, Func<Reservation, object>>
-                {
-                    {"Room Number", item => item.RoomId},
-                    {"Group Size", item => item.GroupSize},
-                    {"Start Date", item => item.StartDate},
-                    {"End Date", item => item.EndDate},
-                    {"Price", item => item.Price}
-                },
-                true
-            );
-            if(reservationresult == null)
-            {
-                return;
-            }
-            else
-            {
-                ReservationMenu.ShowReservationDetails(reservationresult);
-            }
-        }
     }
 
     /// <summary>
@@ -201,4 +201,43 @@ public static class ReservationLogic
         DateOnly endOfMonth = new DateOnly(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
         return (startOfMonth, endOfMonth);
     }
+    #endregion
+
+    /// <summary>
+    /// The following region contains a method used for showing the reservations in a table.
+    /// </summary>
+    #region ShowReservation
+    /// <summary>
+    /// Gets a list of reservations
+    /// <param name="reservations"> A list holding all the reservations.</param>
+    /// Also provides the data for the ShowReservationDetails method.
+    /// </summary>
+    private static void ShowReservations(List<Reservation> reservations)
+    {
+        Reservation? reservationresult;
+        while(true)
+        {
+            reservationresult = MenuHelper.SelectFromTable(
+                reservations,
+                new Dictionary<string, Func<Reservation, object>>
+                {
+                    {"Room Number", item => item.RoomId},
+                    {"Group Size", item => item.GroupSize},
+                    {"Start Date", item => item.StartDate},
+                    {"End Date", item => item.EndDate},
+                    {"Price", item => item.Price}
+                },
+                true
+            );
+            if(reservationresult == null)
+            {
+                return;
+            }
+            else
+            {
+                ReservationMenu.ShowReservationDetails(reservationresult);
+            }
+        }
+    }
+    #endregion
 }

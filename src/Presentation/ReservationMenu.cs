@@ -4,6 +4,13 @@ public static class ReservationMenu
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
     private static ReservationAccess ReservationAccess = new ReservationAccess();
 
+    /// <summary>
+    /// The following region contains all the code needed to create a reservation.
+    /// </summary>
+    #region BookReservation
+    /// <summary>
+    /// Asks the user to plan in a reservation. Provides null if cancelled or saves it into the database.
+    /// </summary>
     public static Reservation? BookReservation(){
         double totalPrice = 0.0;
         int roomMaxSize = RoomsAccess.GetMaxRoomCapacity();
@@ -280,7 +287,12 @@ public static class ReservationMenu
         }
         return null;
     }
+    #endregion
 
+    /// <summary>
+    /// The following region contains all the methods used to show reservation/reservation details.
+    /// </summary>
+    #region ShowReservationDetails
     /// <summary>
     /// Displays a table with all the consumptions that are reserved when booking the reservation.
     /// </summary>
@@ -327,6 +339,8 @@ public static class ReservationMenu
     /// Displays all the reservation details and has the options to view TimeLine, Consumptions, Entertainments or return to the menu.
     /// </summary>
     /// <param name="selectedReservation">A reservation type which holds all the data of the given reservation</param>
+    /// Provides a list of consumptions for the ShowConsumptions method.
+    /// Provides a list of entertainments for the ShowEntertainments method.
     public static void ShowReservationDetails(Reservation selectedReservation){
         List<string> Options = new List<string>(
             new string[] { "Timeline", "Consumptions", "Entertainments", "Return to menu" }
@@ -388,6 +402,7 @@ public static class ReservationMenu
             currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
         } while (true);
     }
+    #endregion
 
     public static void Error(){
         Console.CursorVisible = false;

@@ -6,7 +6,7 @@ public class ReservationAccess : DatabaseHandler
     public ReservationAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
 
     /// <summary>
-    /// Get a list of all reservations. CHANGE NAME TO GETALLRESERVATIONS
+    /// Get a list of all reservations.
     /// </summary>
     /// <returns>A list of all the reservations ever made.</returns>
     public List<Reservation> GetAllReservations(){
