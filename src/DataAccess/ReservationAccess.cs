@@ -9,7 +9,7 @@ public class ReservationAccess : DatabaseHandler
     /// Get a list of all reservations. CHANGE NAME TO GETALLRESERVATIONS
     /// </summary>
     /// <returns>A list of all the reservations ever made.</returns>
-    public List<Reservation> ReadReservations(){
+    public List<Reservation> GetAllReservations(){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
         string NewQuery = @"SELECT * FROM Reservations";
@@ -34,7 +34,6 @@ public class ReservationAccess : DatabaseHandler
         return reservations;
     }
 
-
     /// <summary>
     /// Get a list of all the reservations within the specified dates.
     /// </summary>
@@ -42,17 +41,15 @@ public class ReservationAccess : DatabaseHandler
     /// <param name="endDate">A DateOnly holding the end of the search.</param>
     /// <returns>A list of all reservations during the given dates.</returns>
     public List<Reservation> GetAllReservationsBetweenDates(DateOnly startDate, DateOnly? endDate=null){
+        DateOnly startSearch = startDate;
+        DateOnly endSearch = endDate==null ? startSearch : endDate ?? DateOnly.MaxValue;
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
-        // string NewQuery = @"SELECT * FROM Reservations WHERE StartDate >= @startDate AND StartDate <= @endDate OR EndDate <= @endDate AND EndDate >= @startDate";
-        string NewQuery = @"SELECT * FROM Reservations WHERE StartDate IS @startDate";
+        string NewQuery = @"SELECT * FROM Reservations WHERE date(StartDate) <= date(@endDate) AND date(EndDate) >= date(@startDate)";
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
-            Launch.Parameters.AddWithValue("@startDate", new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0));
-            if(endDate != null){
-                DateOnly x = endDate ?? DateOnly.MaxValue;
-                Launch.Parameters.AddWithValue("@endDate", new DateTime(x.Year, x.Month, x.Day, 0, 0, 0));
-            }
+            Launch.Parameters.AddWithValue("@startDate", new DateTime(startSearch.Year, startSearch.Month, startSearch.Day, 0, 0, 0));
+            Launch.Parameters.AddWithValue("@endDate", new DateTime(endSearch.Year, endSearch.Month, endSearch.Day, 0, 0, 0));
             SQLiteDataReader reader = Launch.ExecuteReader();
             while (reader.Read())
             {
@@ -77,7 +74,7 @@ public class ReservationAccess : DatabaseHandler
     /// </summary>
     /// <param name="id">The id of the user.</param>
     /// <returns>A list of all reservations for the specified user.</returns>
-    public List<Reservation> ReadReservationsUserId(int id){
+    public List<Reservation> GetReservationsByUserId(int id){
         List<Reservation> reservations = new List<Reservation>();
         _Conn.Open();
         string NewQuery = @"SELECT * FROM Reservations WHERE UserId = @UserId";

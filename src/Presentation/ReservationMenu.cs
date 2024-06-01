@@ -283,7 +283,7 @@ public static class ReservationMenu
 
     public static Reservation? ShowReservation(int loggedUserId)
     {
-        List<Reservation> allReservations = ReservationAccess.ReadReservationsUserId(loggedUserId);
+        List<Reservation> allReservations = ReservationAccess.GetReservationsByUserId(loggedUserId);
         Reservation? reservationresult;
         while(true){
             reservationresult = MenuHelper.SelectFromTable<Reservation>(allReservations, 
