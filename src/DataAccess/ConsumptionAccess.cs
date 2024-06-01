@@ -12,18 +12,19 @@ public class ConsumptionAccess : DatabaseHandler
     public bool CreateConsumption(Consumption consumption){
         _Conn.Open();
         string NewQuery = @"INSERT INTO Consumptions(Name, Price, StartTime, EndTime)
-        VALUES (@Name, @Price, @StartTime, @EndTime)";
-        int rowsAffected;
+        VALUES (@Name, @Price, @StartTime, @EndTime); SELECT last_insert_rowid();";
+        int lastId = -1;
         using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
         {
             Launch.Parameters.AddWithValue("@Name", consumption.Name);
             Launch.Parameters.AddWithValue("@Price", consumption.Price);
             Launch.Parameters.AddWithValue("@StartTime", consumption.StartTime.Hour.ToString("00") + ":" + consumption.StartTime.Minute.ToString("00"));
             Launch.Parameters.AddWithValue("@EndTime", consumption.EndTime.Hour.ToString("00") + ":" + consumption.EndTime.Minute.ToString("00"));
-            rowsAffected = Launch.ExecuteNonQuery();
+            lastId = Convert.ToInt32(Launch.ExecuteScalar());
             _Conn.Close();
         }
-        return rowsAffected > 0;
+        consumption.Id = lastId == -1 ? -1 : lastId;
+        return lastId != -1;
     }
 
     /// <summary>
