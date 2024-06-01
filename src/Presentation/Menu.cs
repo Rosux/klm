@@ -47,7 +47,7 @@ class Menu
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
-                            ReservationOverviewAdminMenu.ReservationAdminOverview();
+                            ReservationMenu.ReservationAdminOverview();
                         }},
                         {"Users", ()=>{
                             // starts the userlogic main loop
@@ -83,7 +83,7 @@ class Menu
 
     // used for testing purpose
     public static void TestStart(){
-        Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.USER);
+        Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
         if(Program.CurrentUser.Role == UserRole.ADMIN)
@@ -106,7 +106,7 @@ class Menu
                         }},
                         {"Reservations", ()=>{
                             // takes admin to his reservation menu
-                            ReservationOverviewAdminMenu.ReservationAdminOverview();
+                            ReservationMenu.ReservationAdminOverview();
                         }},
                         {"Users", ()=>{
                             // starts the userlogic main loop
