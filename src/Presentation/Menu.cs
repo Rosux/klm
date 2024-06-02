@@ -83,6 +83,7 @@ class Menu
 
     // used for testing purpose
     public static void TestStart(){
+        Console.WriteLine("TEST START!!!");
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;

@@ -1,7 +1,5 @@
 public class UserAccess : DatabaseHandler{
-    public UserAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
-
-    }
+    public UserAccess(string? DatabasePath=null) : base(DatabasePath){}
 
     /// <summary>
     /// Adds a user to the database if given a user class.

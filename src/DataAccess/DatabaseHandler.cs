@@ -52,13 +52,17 @@ public class DatabaseHandler
     "; // Entertainments is a List<Entertainment> containg all the special entertainments of the reservation
 
     protected SQLiteConnection _Conn = new SQLiteConnection();
-    private string DatabasePath;
-    public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
-        this.DatabasePath = DatabasePath;
-        if (!File.Exists(this.DatabasePath)){
-            SQLiteConnection.CreateFile(this.DatabasePath);
+    public DatabaseHandler(string? DatabasePath=null){
+        if(DatabasePath == null){
+            if(Environment.GetEnvironmentVariable("DATABASE_PATH") == null){
+                throw new Exception($"Environment DATABASE_PATH not set.");
+            }
+            DatabasePath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "";
         }
-        _Conn = new SQLiteConnection($"DATA Source={this.DatabasePath};Version=3");
+        if (!File.Exists(DatabasePath)){
+            SQLiteConnection.CreateFile(DatabasePath);
+        }
+        _Conn = new SQLiteConnection($"DATA Source={DatabasePath};Version=3");
         CreateDatabaseIfNotExist();
     }
 
