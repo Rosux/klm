@@ -151,10 +151,10 @@ public class ReservationAccess : DatabaseHandler
     public static TimeLine.Holder StringToTimeLine(string timeLine){
         List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(timeLine)!;
         TimeLine.Holder TimelineHolder = new TimeLine.Holder();
-        TimelineHolder.t = timeline;
+        TimelineHolder.Items = timeline;
 
         TimeLine.Holder newTimeLine = new TimeLine.Holder();
-        foreach(TimeLine.Item i in TimelineHolder.t){
+        foreach(TimeLine.Item i in TimelineHolder.Items){
             // i.Action;
             JObject x = JObject.Parse(JsonConvert.SerializeObject(i.Action)); // <- is either a film/serie/break/consumption
             object? obj = null;

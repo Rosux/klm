@@ -379,10 +379,10 @@ public static class ReservationMenu
             if (key == ConsoleKey.Enter){
                 if(currentSelection == 0)
                 {
-                    MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.t);
+                    MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.Items);
                 }
                 if(currentSelection == 1){
-                    ShowConsumptions(selectedReservation.TimeLine.t);
+                    ShowConsumptions(selectedReservation.TimeLine.Items);
                 }
                 if(currentSelection == 2){
                     ShowEntertainments(selectedReservation.Entertainments);
