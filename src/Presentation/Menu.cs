@@ -1,13 +1,16 @@
 using System;
 using System.Reflection;
 using TimeLine;
+
 class Menu
 {
+    /// <summary>
+    /// Entry point for the application. Creates a login/register menu.
+    /// </summary>
     public static void Start()
     {
-        Console.Title = "24/7 BINGE WATCH CINEMA!";
+        Console.Title = Environment.GetEnvironmentVariable("CONSOLE_TITLE") ?? "";
         Console.CursorVisible = false;
-        Console.WriteLine("Welcome to 24-7 binge watch cinema!");
         // asks the user to choose either of these options
         while(true){
             if(Program.CurrentUser == null)
@@ -81,8 +84,11 @@ class Menu
         }
     }
 
-    // used for testing purpose
+    /// <summary>
+    /// Used for testing purposes.
+    /// </summary>
     public static void TestStart(){
+        Console.WriteLine("TEST START!!!");
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
