@@ -17,10 +17,11 @@ public class RoomAccess : DatabaseHandler {
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
             Command.ExecuteNonQuery();
-            // SQLiteDataReader reader = Command.ExecuteReader();
-            // if(reader.Read()){
-            //     newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
-            // }
+            SQLiteDataReader reader = Command.ExecuteReader();
+            if(reader.Read()){
+                room.Id = reader.GetInt32(0);
+                newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
+            }
         }
         _Conn.Close();
         return newRoom;
