@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 
 public class RoomAccess : DatabaseHandler {
-    public RoomAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){}
+    public RoomAccess(string? DatabasePath=null) : base(DatabasePath){}
 
     /// <summary>
     /// Create a new room.
