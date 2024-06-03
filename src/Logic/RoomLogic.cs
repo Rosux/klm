@@ -3,7 +3,7 @@
 /// </summary>
 public static class RoomLogic
 {
-    private static RoomAccess r = new RoomAccess();
+    private static RoomAccess _RoomAccess = new RoomAccess();
 
     /// <summary>
     /// Creates a menu of 4 options to choose from and a back option. Options are: "Show room", "Add room", "Remove room", "Edit room".
@@ -40,7 +40,7 @@ public static class RoomLogic
     public static void ShowAllRooms()
     {
         ///count all the rooms. if there are none show a "No rooms found" text otherwise print the rooms
-        if(r.GetAllRooms().Count == 0){
+        if(_RoomAccess.GetAllRooms().Count == 0){
             RoomMenu.NoRoomsFoundNotification();
         }else{
             Room? chosenroom = ChooseRoom("choose a room to see");
@@ -58,15 +58,15 @@ public static class RoomLogic
     public static void RemoveRoom()
     {
         // convert all rooms to a dictionary
-        Dictionary<string, Room> rooms = new Dictionary<string, Room>();
-        foreach(Room room in RoomLogic.r.GetAllRooms()){
-            rooms.Add($"{room.Id}: {room.Capacity}", room);
-        }
-        // if there are no rooms show the user a "No rooms found" text
-        if(rooms.Count == 0){
-            RoomMenu.NoRoomsFoundNotification();
-            return;
-        }
+        // Dictionary<string, Room> rooms = new Dictionary<string, Room>();
+        // foreach(Room room in RoomLogic._RoomAccess.GetAllRooms()){
+        //     rooms.Add($"{room.Id}: {room.Capacity}", room);
+        // }
+        // // if there are no rooms show the user a "No rooms found" text
+        // if(rooms.Count == 0){
+        //     RoomMenu.NoRoomsFoundNotification();
+        //     return;
+        // }
         // ask the user to select a room for deletion
         Room? selectedRoom = ChooseRoom("Select a room to delete");
         if(selectedRoom == null){
@@ -77,7 +77,7 @@ public static class RoomLogic
             bool deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
             if(deletion){
                 // if the user answered yes remove the room and show the user if it worked or not
-                bool success = r.RemoveRoom(selectedRoom.Id);
+                bool success = _RoomAccess.RemoveRoom(selectedRoom.Id);
                 RoomMenu.RoomDeletedNotification(success);
             }else{
                 // user answered no so dont delete anything and return to the menu
@@ -168,7 +168,7 @@ public static class RoomLogic
                     if(conformation)
                     {
                         /// if conformation is given it adds the room to the database
-                        r.AddRoom(room_finished);
+                        _RoomAccess.AddRoom(room_finished);
                         Console.WriteLine("\nRoom added sucessfully.");
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey(true);
@@ -230,7 +230,7 @@ public static class RoomLogic
                 if(conformation)
                 {
                     /// edits room
-                    r.EditRoom(edited_room);
+                    _RoomAccess.EditRoom(edited_room);
                     Console.WriteLine("\nRoom changed sucessfully.");
                     Console.Write($"\n\nPress any key to continue...");
                     Console.ReadKey(true);
@@ -263,7 +263,7 @@ public static class RoomLogic
         /// holds the pages
         List<List<Room>> allroomlist = new List<List<Room>>();
         /// holds all rooms
-        List<Room> roomlist_room = r.GetAllRooms();
+        List<Room> roomlist_room = _RoomAccess.GetAllRooms();
         /// is a list that gets filled with all rooms per page and then added to allroomlist
         List<Room> roomlist_p = new List<Room>();
         /// holds longest sting per page
