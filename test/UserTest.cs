@@ -88,7 +88,6 @@ public class UserTest
             command.Parameters.AddWithValue("@Email", User.Email);
             command.Parameters.AddWithValue("@Password", User.Password);
             command.Parameters.AddWithValue("@Role", User.Role.ToString());
-            
             object result = command.ExecuteScalar();
             if (result != null && int.TryParse(result.ToString(), out lastInsertedId)){
                 User.Id = lastInsertedId;
@@ -102,7 +101,6 @@ public class UserTest
         using (SQLiteCommand command = new SQLiteCommand(query, _Conn))
         {
             SQLiteDataReader reader = command.ExecuteReader();
-            
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -140,7 +138,7 @@ public class UserTest
         );
 
         var UpdatedUser = new User(
-            Id: 1, 
+            Id: 1,
             FirstName: "Upatedname",
             LastName: "Updatedlast",
             Email: "update@mail.com",
