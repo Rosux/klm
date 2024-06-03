@@ -17,11 +17,6 @@ public class RoomAccess : DatabaseHandler {
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
             Command.ExecuteNonQuery();
-            SQLiteDataReader reader = Command.ExecuteReader();
-            if(reader.Read()){
-                room.Id = reader.GetInt32(0);
-                newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
-            }
         }
         _Conn.Close();
         return newRoom;
@@ -56,7 +51,7 @@ public class RoomAccess : DatabaseHandler {
     {
         int rowsAffected;
         _Conn.Open();
-        string query = "DELETE FROM Rooms WHERE ID=@id";
+        string query = "DELETE FROM Rooms WHERE ID=@id;DELETE FROM Reservations WHERE RoomId = @id";
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@id", id);
             rowsAffected = Command.ExecuteNonQuery();
