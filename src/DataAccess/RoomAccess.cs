@@ -16,12 +16,12 @@ public class RoomAccess : DatabaseHandler {
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
-            Command.ExecuteNonQuery();
-            // SQLiteDataReader reader = Command.ExecuteReader();
-            // if(reader.Read()){
-            //     room.Id = reader.GetInt32(0);
-            //     newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
-            // }
+            //Command.ExecuteNonQuery();
+            SQLiteDataReader reader = Command.ExecuteReader();
+            while(reader.Read()){
+                room.Id = reader.GetInt32(0);
+                newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
+            }
         }
         _Conn.Close();
         return newRoom;

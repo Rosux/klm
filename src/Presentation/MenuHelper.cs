@@ -2249,7 +2249,7 @@ public static class MenuHelper{
     /// <returns> a string that  is the room layout</returns>
     public static string PrintSeats(Room r)
     {
-        int WhiteSpace = 0;
+        int WhiteSpace = 1;
         string layout = "";
         Console.CursorVisible = false;
         Console.Clear();
@@ -2260,9 +2260,9 @@ public static class MenuHelper{
         // checks if header is longer than seats
         if(header.Length > (widestSeats*4)+1)
         {
-            WhiteSpace = 1;
+            WhiteSpace = 2;
         }
-        for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
+        for(int i=0;i<(widestSeats*4) -2 - "Screen".Length;i++)
         {
             header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
             // header
@@ -2277,13 +2277,12 @@ public static class MenuHelper{
                 {
                     // print box (based on line print the top or bottom)
                     layout = layout + (j < r.Seats[i].Length && r.Seats[i][j] ? (line==0 ? "╔═╗" : "╚═╝") : "   ");
-                    layout = layout + " ";
                 }
                 layout = layout + $"{new string(' ', WhiteSpace)}│\n";
             }
         }
         // print bottom surounding line
-        layout = layout + $"└{new string('─', (widestSeats*4)+WhiteSpace+1)}┘\n\n";
+        layout = layout + $"└{new string('─', (widestSeats*3)+WhiteSpace+1)}┘\n\n";
         return layout;
     }
 
