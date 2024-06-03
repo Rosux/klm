@@ -463,6 +463,7 @@ class FilmSerieMenu
             Console.WriteLine("There are no films to remove.");
         }
     }
+    
     private static void movie_change(FilmLogic filmlogic_obj)
     {
         if(filmlogic_obj.Check_films_exist())
