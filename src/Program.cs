@@ -4,6 +4,10 @@ using System.ComponentModel;
 class Program
 {
     public static User? CurrentUser = null;
+
+    /// <summary>
+    /// Entry point for the application. Loads environment variables and starts the main menu.
+    /// </summary>
     public static void Main()
     {
         LoadEnvironment();
@@ -15,6 +19,9 @@ class Program
         }
     }
 
+    /// <summary>
+    /// Tries to load the .env file from the current working directory and sets the programs environment variables.
+    /// </summary>
     private static void LoadEnvironment()
     {
         // get the current working directory .env file path

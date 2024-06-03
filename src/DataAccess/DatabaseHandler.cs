@@ -4,6 +4,9 @@ global using System.Data.SQLite.Generic;
 using System;
 using System.Data;
 
+/// <summary>
+/// Creates a database handle and connection. Creates the tables if they do not exist.
+/// </summary>
 public class DatabaseHandler
 {
     private static readonly string _CreateUserString = @"
@@ -52,6 +55,11 @@ public class DatabaseHandler
     "; // Entertainments is a List<Entertainment> containg all the special entertainments of the reservation
 
     protected SQLiteConnection _Conn = new SQLiteConnection();
+
+    /// <summary>
+    /// Creates a new connection to the database and sets up the database if needed.
+    /// </summary>
+    /// <param name="DatabasePath">A string containing the database filepath.</param>
     public DatabaseHandler(string? DatabasePath=null){
         if(DatabasePath == null){
             if(Environment.GetEnvironmentVariable("DATABASE_PATH") == null){
@@ -66,6 +74,9 @@ public class DatabaseHandler
         CreateDatabaseIfNotExist();
     }
 
+    /// <summary>
+    /// Creates the database tables if they do not exist.
+    /// </summary>
     private void CreateDatabaseIfNotExist(){
         _Conn.Open();
         List<SQLiteCommand> Tables = new List<SQLiteCommand>(){
