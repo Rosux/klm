@@ -1,5 +1,7 @@
 public class ConsumptionAccess : DatabaseHandler
 {
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
+
     public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){}
 
     /// <summary>
@@ -63,8 +65,24 @@ public class ConsumptionAccess : DatabaseHandler
             Remove.Parameters.AddWithValue("@Id", consumption.Id);
             int rowsAffected = Remove.ExecuteNonQuery();
             _Conn.Close();
-            return rowsAffected > 0;
         }
+        bool changed = false;
+        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+        foreach(Reservation Reservation in Reservations)
+        {
+            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            {
+                if(TimelineObject.Action is Consumption)
+                {
+                    if(((Consumption)TimelineObject.Action).Id == consumption.Id)
+                    {
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                    }
+                }
+            }
+            changed = _reservationAccess.EditReservation(Reservation);
+        }
+        return changed;
     }
 
     /// <summary>
