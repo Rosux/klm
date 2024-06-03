@@ -19,6 +19,7 @@ public class RoomAccess : DatabaseHandler {
             Command.ExecuteNonQuery();
             // SQLiteDataReader reader = Command.ExecuteReader();
             // if(reader.Read()){
+            //     room.Id = reader.GetInt32(0);
             //     newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
             // }
         }

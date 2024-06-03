@@ -49,6 +49,7 @@ public static class UserMenu{
     {
         string Email = "";
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -67,6 +68,7 @@ public static class UserMenu{
         }while(true);
         string Password = "";
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
@@ -103,6 +105,7 @@ public static class UserMenu{
         string error= "";
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -153,6 +156,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -170,6 +174,7 @@ public static class UserMenu{
         string error= "";
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -206,6 +211,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -229,6 +235,7 @@ public static class UserMenu{
             {
                 error += $"Email already exists.\n";
             }
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -272,6 +279,7 @@ public static class UserMenu{
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -297,6 +305,7 @@ public static class UserMenu{
     /// Notifies the user about their password/email not being valid or not matching.
     /// </summary>
     public static void WrongLogin(){
+        Console.CursorVisible = false;
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Invalid Email or password.\n\nPress any key to continue");
@@ -309,13 +318,14 @@ public static class UserMenu{
     /// </summary>
     /// <param name="success">A boolean indicating if the removal was successfull.</param>
     public static void UserRemoved(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("The user has successfully been removed.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
@@ -326,13 +336,14 @@ public static class UserMenu{
     /// </summary>
     /// <param name="success">A boolean indicating if the adition was successfull.</param>
     public static void UserAdded(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("The user has successfully been added.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
@@ -343,13 +354,14 @@ public static class UserMenu{
     /// </summary>
     /// <param name="success">A boolean indicating if the updating was successfull.</param>
     public static void UserUpdated(bool success){
+        Console.CursorVisible = false;
         Console.Clear();
         if(success){
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("The user has successfully been updated.\n\nPress any key to continue");
         }else{
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+            Console.WriteLine("An error occurred. Please try again later.\n\nPress any key to continue");
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);

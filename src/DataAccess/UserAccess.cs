@@ -161,8 +161,8 @@ public class UserAccess : DatabaseHandler{
     /// </summary>
     /// <param name="id">This is the id you provide that your going to search in the database with.</param>
     /// <returns>Returns the user if it has been found if not returns null.</returns>
-    public User GetUsers(int id){
-        User users = null;
+    public User? GetUser(int id){
+        User? user = null;
         _Conn.Open();
         string NewQuery = @"SELECT * FROM Users WHERE ID = @id";
         using (SQLiteCommand Show = new SQLiteCommand(NewQuery, _Conn))
@@ -178,12 +178,11 @@ public class UserAccess : DatabaseHandler{
                 string lastname = reader.GetString(2);
                 string email = reader.GetString(3);
                 string password = reader.GetString(4);
-                string Role = reader.GetString(5);
-                users = new User(userId, name, lastname, email, password, r);
+                user = new User(userId, name, lastname, email, password, r);
             }
         }
         _Conn.Close();
-        return users;
+        return user;
     }
 
     /// <summary>

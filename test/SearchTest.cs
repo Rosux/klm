@@ -31,8 +31,35 @@ public class SearchTest
         }
         using (StreamWriter ff = new StreamWriter("./DataSource/Films.json"))
         {
-            ff.Write(@"[{""Title"":""Beekeeper"",""Genre"":""Action"",""Id"":0,""Duration"":105},{""Title"":""Mudrunner"",""Genre"":""Adventure"",""Id"":1,""Duration"":180}]");
-            // ff.Close();
+            var films = new List<Film>
+            {
+                new Film(
+                    id: 0,
+                    genres: new List<string> { "Action" },
+                    original_language: "English",
+                    overview: "A beekeeper embarks on an adventure",
+                    release_date: "2023-05-29",
+                    runtime: 105,
+                    title: "Beekeeper",
+                    voteaverage: 7.5,
+                    certification: "PG-13",
+                    directors: new List<string> { "John Doe" }
+                ),
+                new Film(
+                    id: 1,
+                    genres: new List<string> { "Adventure" },
+                    original_language: "English",
+                    overview: "A journey through mud",
+                    release_date: "2023-05-29",
+                    runtime: 180,
+                    title: "Mudrunner",
+                    voteaverage: 8.2,
+                    certification: "R",
+                    directors: new List<string> { "Jane Smith" }
+                )
+            };
+
+            ff.Write(JsonConvert.SerializeObject(films));
         }
         sa = new SearchAccess();
     }

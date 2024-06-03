@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using TimeLine;
@@ -39,6 +40,7 @@ public static class MenuHelper{
                 error = "";
             }
 
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
@@ -85,6 +87,7 @@ public static class MenuHelper{
                 return null;
             }
         } while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return num;
     }
@@ -176,6 +179,7 @@ public static class MenuHelper{
             {
                 errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
             }
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{input}\n");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -201,10 +205,12 @@ public static class MenuHelper{
             }
             if (canCancel && key == ConsoleKey.Escape)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return input;
     }
@@ -311,6 +317,7 @@ public static class MenuHelper{
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
     /// <param name="defaultTime">A DateOnly object holding the default date shown to the user.</param>
     /// <param name="minDate">The minimum allowed value of the DateOnly.</param>
     /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
@@ -331,6 +338,7 @@ public static class MenuHelper{
             // some needed calulations
             int startDay = ((int)new DateOnly(SelectedDate.Year, SelectedDate.Month, 1).DayOfWeek - 1 + 7) % 7;
             // print callender
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"{prefix}");
@@ -506,7 +514,17 @@ public static class MenuHelper{
     /// <param name="maxDate">The maximum allowed value of the DateOnly.</param>
     /// <returns>An DateOnly object with the date chosen by the user.</returns>
     public static DateOnly? SelectDate(bool canCancel=false, DateOnly? defaultTime = null, DateOnly? minDate = null, DateOnly? maxDate = null){
-        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? DateOnly.MinValue;
+        return SelectDate("", "", canCancel, defaultTime, minDate, maxDate) ?? null;
+    }
+
+    /// <summary>
+    /// Ask the user to select a date between specified values and returns the chosen date.
+    /// </summary>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="canCancel">A boolean indicating if the user can cancel the selection.</param>
+    /// <returns>An DateOnly object with the date chosen by the user.</returns>
+    public static DateOnly? SelectDate(string prefix="", bool canCancel=false){
+        return SelectDate(prefix, "", canCancel, null, null, null) ?? null;
     }
 
     /// <summary>
@@ -541,6 +559,7 @@ public static class MenuHelper{
         bool hour = true;
         ConsoleKey key;
         do{
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"{prefix}\n\n");
@@ -555,6 +574,7 @@ public static class MenuHelper{
             key = Console.ReadKey(true).Key;
             if (key == ConsoleKey.Escape && CanCancel)
             {
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
@@ -583,6 +603,7 @@ public static class MenuHelper{
                 }
             }
         } while (key != ConsoleKey.Enter || time > MaxTime || time < MinTime);
+        Console.CursorVisible = false;
         Console.Clear();
         return time;
     }
@@ -656,6 +677,7 @@ public static class MenuHelper{
         ConsoleKey key;
         do{
             // print menu with options
+            Console.CursorVisible = false;
             Console.Clear();
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
@@ -689,6 +711,7 @@ public static class MenuHelper{
             currentSelection = Math.Clamp(currentSelection, 0, Options.Count-1);
 
         } while (key != ConsoleKey.Enter);
+        Console.CursorVisible = false;
         Console.Clear();
         // call callback method based on the users choice
         Options.Values.ElementAt(currentSelection).Invoke();
@@ -744,6 +767,7 @@ public static class MenuHelper{
             pageArrows = (currentPage > 0 ? "<-" : "  ") + pageArrows + (currentPage < chunks.Count-1 ? "->" : "  ");
 
             // print menu with options
+            Console.CursorVisible = false;
             Console.Clear();
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
@@ -836,9 +860,10 @@ public static class MenuHelper{
             }
 
             // print the search box thing
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"Search by Titles, Genres or Directors seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
             Console.Write($"│ > ");
             string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
             for(int i = 0; i < printedText.Length; i++){
@@ -920,6 +945,7 @@ public static class MenuHelper{
                             int episode = Convert.ToInt32(allSelectedEpisodes[i].Split('.')[1]);
                             uwu[(Serie)selectedMedia].Add(((Serie)selectedMedia).Seasons[season].Episodes[episode]);
                         }
+                        Console.CursorVisible = false;
                         Console.Clear();
                         return uwu;
                     }
@@ -928,12 +954,14 @@ public static class MenuHelper{
                 }
             }
             if(key == ConsoleKey.Escape){
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
             selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
             cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return selectedMedia;
     }
@@ -953,21 +981,22 @@ public static class MenuHelper{
         ConsoleKeyInfo keyInfo;
         do{
             // calculate longest word
-            List<Media> results = searchAccess.SearchFilm(searchString);
+            List<Media> results = searchAccess.Search(searchString, true);
             longestWord = "Start typing to search".Length + 2;
             foreach(Media m in results){
                 if (m is Film && ((Film)m).Title.Length+3 > longestWord){
                     longestWord = ((Film)m).Title.Length + 3;
                 }
-            } 
+            }
             if (searchString.Length + 2 > longestWord){
                 longestWord = searchString.Length + 2;
             }
 
             // print the search box thing
+            Console.CursorVisible = false;
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write($"Search by Titles or Genres seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
+            Console.Write($"Search by Titles, Genres or Directors seperated by commas.\nPress escape to cancel.\n\n┌─Start typing to search{new string('─', Math.Max(0, longestWord-22))}─┐\n");
             Console.Write($"│ > ");
             string printedText = searchString.Substring(Math.Max(0, searchString.Length-longestWord));
             for(int i = 0; i < printedText.Length; i++){
@@ -1040,12 +1069,14 @@ public static class MenuHelper{
                 break;
             }
             if(key == ConsoleKey.Escape){
+                Console.CursorVisible = false;
                 Console.Clear();
                 return null;
             }
             selectedResult = Math.Clamp(selectedResult, 0, Math.Max(0, Math.Min(results.Count(), 5)-1));
             cursorPosition = Math.Clamp(cursorPosition, 0, Math.Max(0, searchString.Length));
         }while(true);
+        Console.CursorVisible = false;
         Console.Clear();
         return (Film)selectedMedia;
     }
@@ -1095,7 +1126,7 @@ public static class MenuHelper{
                     if(add && !seasons.Contains($"{i+1}")){seasons.Add($"{i+1}");}
                 }
             }
-
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Series: {serie.Title}\nSeasons: ");
             for(int i=0;i<seasons.Count;i++){
@@ -1263,8 +1294,65 @@ public static class MenuHelper{
         ConsoleKeyInfo RawKey;
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prefix}\n\n{input}\n\n{keybinds}\n{suffix}");
+            RawKey = Console.ReadKey(true);
+            key = RawKey.Key;
+
+            if(key == ConsoleKey.Backspace && input.Length > 0){
+                input = input.Remove(input.Length-1);
+            }
+            if(key == ConsoleKey.Escape && canCancel){
+                Console.CursorVisible = false;
+                Console.Clear();
+                return null;
+            }
+            if(key == ConsoleKey.Enter && double.TryParse(input, out price)){
+                break;
+            }
+            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
+                if(input.Length == 0){
+                    input += "0,";
+                }else{
+                    input += ",";
+                }
+            }
+            if(char.IsDigit(RawKey.KeyChar)){
+                if(input.Contains(',') && input.Length >= 3 && input[input.Length-3] == ','){
+                    continue;
+                }
+                input += RawKey.KeyChar.ToString();
+            }
+
+        }while(true);
+        Console.CursorVisible = false;
+        Console.Clear();
+        return price;
+    }
+
+    public static double? SelectPrice(string prefix="", string suffix="", bool canCancel=false, double minimumPrice=double.MinValue, double maximumPrice=double.MaxValue)
+    {
+        string input = "";
+        string error = "";
+        double price = minimumPrice;
+        string keybinds = "Press Enter to confirm";
+        if(canCancel){keybinds += "\nPress Escape to cancel";}
+
+        ConsoleKey key;
+        ConsoleKeyInfo RawKey;
+        do
+        {
+            if (price < minimumPrice || price > maximumPrice)
+            {
+                error = $"Please select a value between {minimumPrice} and {maximumPrice}";
+            }
+            else
+            {
+                error = "";
+            }
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{input}\n{error}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
             key = RawKey.Key;
 
@@ -1275,7 +1363,7 @@ public static class MenuHelper{
                 Console.Clear();
                 return null;
             }
-            if(key == ConsoleKey.Enter && double.TryParse(input, out price)){
+            if(key == ConsoleKey.Enter && double.TryParse(input, out price) && price >= minimumPrice && price <= maximumPrice){
                 break;
             }
             if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
@@ -1309,6 +1397,7 @@ public static class MenuHelper{
         ConsoleKey key;
         do
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n\n");
             Console.BackgroundColor = selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
@@ -1391,17 +1480,17 @@ public static class MenuHelper{
                 }
             }
             if(watchables.Count == 0)
-                {
-                    Console.Write($"{prefix}\n\n");
-                    Console.WriteLine("No Consumptions/Movies/Series were added\n\nPress any key to return");
-                    Console.ReadKey(true);
-
+            {
+                Console.CursorVisible = false;
+                Console.Clear();
+                Console.WriteLine("\nNo Movies/Series were added\n\nPress any key to return");
+                Console.ReadKey(true);
             }else{
                 string Line1 = "";
                 string Line2 = "";
                 string Line3 = "";
                 string Line4 = "";
-
+                Console.CursorVisible = false;
                 Console.Clear();
                 Line1 += ($"  ");
                 for(int i=0;i<Dates.Count;i++){
@@ -1457,6 +1546,7 @@ public static class MenuHelper{
                 string[] Lines = {Line1, Line2, Line3, Line4};
                 ConsoleKey key;
                 do{
+                    Console.CursorVisible = false;
                     Console.Clear();
                     Console.Write($"{prefix}\n\n");
                     foreach(string Line in Lines){
@@ -1537,6 +1627,11 @@ public static class MenuHelper{
             canAdd = false;
         }
 
+        bool showSelection = true;
+        if(!canSelect && !canEdit && !canAdd && !canDelete){
+            showSelection = false;
+        }
+
         // create a list of editable options (like UserName, Email, role etc)
         List<string> editOptions = new List<string>();
         if(canEdit){
@@ -1578,16 +1673,26 @@ public static class MenuHelper{
                 // create the edit table text
                 if(canEdit){
                     foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                        string dataString = editMapping.Value.Accessor(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                        Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
+                        string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
                         if(editing){
+
+                            string propertyName = "";
+                            if(editMapping.Value.Accessor.Body is MemberExpression bodyMember){
+                                propertyName = bodyMember.Member.Name;
+                            }else if(editMapping.Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                propertyName = unaryMember.Member.Name;
+                            }
+
                             foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
-                                if(editMapping.Value.Accessor(editedObject).ToString() == kvp.Value.Item1.ToString()){
+                                if(kvp.Key.Name.ToString() == propertyName){
                                     (object oldData, object newData) = kvp.Value;
                                     if(oldData.ToString() != newData.ToString()){
                                         dataString = $"{oldData} -> {newData}";
                                     }
                                 }
                             }
+
                         }
                         editOptionData.Add(": "+dataString);
                     }
@@ -1747,6 +1852,7 @@ public static class MenuHelper{
 
             #region Print table
             // clear the screen and print the table
+            Console.CursorVisible = false;
             Console.Clear();
             for(int i=0;i<Math.Max(editStringLines.Count, tableStringLines.Count);i++){
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -1755,6 +1861,9 @@ public static class MenuHelper{
                     Console.BackgroundColor = (canAdd && currentPageSelection == chunks[currentPage].Count && i==6+currentPageSelection) ? ConsoleColor.DarkGray : ConsoleColor.Black;
                 }else{
                     Console.BackgroundColor = (i == 5+currentPageSelection && !editing && chunks.Count > 0) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                }
+                if(!showSelection){
+                    Console.BackgroundColor = ConsoleColor.Black;
                 }
                 if(chunks.Count == 0 && i == 7){
                     Console.BackgroundColor = ConsoleColor.DarkGray;
@@ -1925,10 +2034,18 @@ public static class MenuHelper{
                             propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
                         }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
                             if(editedObject != null){
-                                object currentPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.Accessor(editedObject);
+                                Func<T, object> editMappingValueLambda = propertyEditMapping.ElementAt(editSelection).Value.Accessor.Compile();
+
+                                object currentPropertyValue = editMappingValueLambda(editedObject);
                                 object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
                                 foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
-                                    if(member.Value.Item1.ToString() == currentPropertyValue.ToString()){
+                                    string propertyName = "";
+                                    if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is MemberExpression bodyMember){
+                                        propertyName = bodyMember.Member.Name;
+                                    }else if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                        propertyName = unaryMember.Member.Name;
+                                    }
+                                    if(member.Key.Name.ToString() == propertyName.ToString()){
                                         propertyUpdate[member.Key] = (currentPropertyValue, newPropertyValue);
                                     }
                                 }
@@ -2023,6 +2140,16 @@ public static class MenuHelper{
     public static T SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
         return Table(items, headers, true, false, false, null, null, false, null, false, null);
     }
+
+    /// <summary>
+    /// Displays a table that holds a list of objects.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects.</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> is a method that gets a type T object and returns an object of any type.</param>
+    public static void ShowInTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers){
+        Table(items, headers, false, true, false, null, null, false, null, false, null);
+    }
     #endregion
 
     #region String Helpers
@@ -2073,7 +2200,8 @@ public static class MenuHelper{
     /// <param name="x">The Row coordinates of a seat.</param>
     /// <param name="y">The Column coordinates of a seat.</param>
     public static void PrintSeats(Room r,List<Entertainment> entertainments, int x, int y)
-    {   
+    {
+        Console.CursorVisible = false;
         Console.Clear();
         // calculate the longest row of seats
         int widestSeats = r.Seats.OrderByDescending(arr => arr.Length).First().Length;

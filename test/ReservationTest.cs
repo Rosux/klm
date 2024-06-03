@@ -177,7 +177,7 @@ public class ReservationTest
             rowsAffected = Launch.ExecuteNonQuery();
         }
         _Conn.Close();
-        List<Reservation> readResult = r.ReadReservations();
+        List<Reservation> readResult = r.GetAllReservations();
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
@@ -200,7 +200,7 @@ public class ReservationTest
             DateTime.Parse("2024-04-24 02:00:00")
         );
         Timeline.Add(
-            (object)(new Film(-1, new List<string>() , "Test language", "test plot", "11-07-2023", 193, "Test movie", 4.6, "Test Certification", new List<Dictionary<string, string>>())),
+            (object)(new Film(-1, new List<string>() , "Test language", "test plot", "11-07-2023", 193, "Test movie", 4.6, "Test Certification", new List<string>())),
             DateTime.Parse("2024-04-24 02:00:00"),
             DateTime.Parse("2024-04-24 02:00:00")
         );
@@ -228,25 +228,25 @@ public class ReservationTest
         r.CreateReservation(x);
 
         // tests start here
-        List<Reservation> a = r.ReadReservationsUserId(2);
+        List<Reservation> a = r.GetReservationsByUserId(2);
         if(a.Count == 1){
             Assert.Pass("Reservation exists in list");
             Assert.AreEqual(TestTimeLine(a[0].TimeLine), 4);
         }
 
-        List<Reservation> b = r.ReadReservationsWeek(DateTime.Parse("2024-04-23 00:00:00"));
+        List<Reservation> b = r.GetAllReservationsBetweenDates(DateOnly.Parse("2024-04-23"), DateOnly.Parse("2024-05-23"));
         if(b.Count == 1){
             Assert.Pass("Reservation exists in list");
             Assert.AreEqual(TestTimeLine(b[0].TimeLine), 4);
         }
 
-        List<Reservation> c = r.ReadReservationsDate(DateTime.Parse("2024-04-23 00:00:00"));
+        List<Reservation> c = r.GetAllReservationsBetweenDates(DateOnly.Parse("2024-04-23"));
         if(c.Count == 1){
             Assert.Pass("Reservation exists in list");
             Assert.AreEqual(TestTimeLine(c[0].TimeLine), 4);
         }
 
-        List<Reservation> d = r.ReadReservations();
+        List<Reservation> d = r.GetAllReservations();
         if(d.Count == 1){
             Assert.Pass("Reservation exists in list");
             Assert.AreEqual(TestTimeLine(d[0].TimeLine), 4);

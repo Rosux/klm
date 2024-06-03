@@ -25,6 +25,108 @@ public class UserTest
     }
 
     [Test]
+    public void AddTest()
+    {
+        var User = new User(
+            FirstName: "Testname",
+            LastName: "Testlast",
+            Email: "Test@mail.com",
+            Password: "123",
+            Role: UserRole.USER
+        );
+        bool Added = u.AddUser(User);
+        Assert.IsTrue(Added, "USER not added");
+        User retrievedUser = null;
+        _Conn.Open();
+        string query = $"SELECT * FROM Users WHERE Id = {User.Id}";
+        using (SQLiteCommand command = new SQLiteCommand(query, _Conn))
+        {
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                retrievedUser = new User(
+                        Id: Convert.ToInt32(reader["Id"]),
+                        FirstName: reader["FirstName"].ToString(),
+                        LastName: reader["LastName"].ToString(),
+                        Email: reader["Email"].ToString(),
+                        Password: reader["Password"].ToString(),
+                        Role: (UserRole)Enum.Parse(typeof(UserRole), reader["Role"].ToString())
+                    );
+            }
+        }
+        _Conn.Close();
+        if (retrievedUser.Id == User.Id && retrievedUser.FirstName == User.FirstName && retrievedUser.LastName == User.LastName && retrievedUser.Email == User.Email && retrievedUser.Password == User.Password && retrievedUser.Role == User.Role)
+        {
+            Assert.Pass("Inserted User found in the list.");
+        }else
+        {
+            Assert.Fail("Inserted User not found in the list.");
+        }
+    }
+
+    [Test]
+    public void DeleteTest()
+    {
+        var User = new User(
+            FirstName: "Testname",
+            LastName: "Testlast",
+            Email: "Test@mail.com",
+            Password: "123",
+            Role: UserRole.USER
+        );
+        string insertSql = @"
+            INSERT INTO Users (FirstName, LastName, Email, Password, Role)
+            VALUES (@FirstName, @LastName, @Email, @Password, @Role);
+            SELECT last_insert_rowid();
+        ";
+        _Conn.Open();
+        int lastInsertedId = 0;
+        using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
+        {
+            command.Parameters.AddWithValue("@FirstName", User.FirstName);
+            command.Parameters.AddWithValue("@LastName", User.LastName);
+            command.Parameters.AddWithValue("@Email", User.Email);
+            command.Parameters.AddWithValue("@Password", User.Password);
+            command.Parameters.AddWithValue("@Role", User.Role.ToString());
+            object result = command.ExecuteScalar();
+            if (result != null && int.TryParse(result.ToString(), out lastInsertedId)){
+                User.Id = lastInsertedId;
+            }
+        }
+        bool Deleted = u.DeleteUser(User);
+        Assert.IsTrue(Deleted);
+        User retrievedUser = null;
+        string query = $"SELECT * FROM Users WHERE Id = {User.Id}";
+
+        using (SQLiteCommand command = new SQLiteCommand(query, _Conn))
+        {
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    retrievedUser = new User(
+                            Id: Convert.ToInt32(reader["Id"]),
+                            FirstName: reader["FirstName"].ToString(),
+                            LastName: reader["LastName"].ToString(),
+                            Email: reader["Email"].ToString(),
+                            Password: reader["Password"].ToString(),
+                            Role: (UserRole)Enum.Parse(typeof(UserRole), reader["Role"].ToString())
+                        );
+                }
+            }
+        }
+        _Conn.Close();
+        if (retrievedUser == null)
+        {
+            Assert.Pass("Deleted User not found.");
+        }else
+        {
+            Assert.Fail("Deleted User found. So not deleted");
+        }
+    }
+
+    [Test]
     public void EditTesting()
     {
         var User = new User(
@@ -36,22 +138,19 @@ public class UserTest
         );
 
         var UpdatedUser = new User(
-            Id: 1, 
+            Id: 1,
             FirstName: "Upatedname",
             LastName: "Updatedlast",
             Email: "update@mail.com",
             Password: "1234",
             Role: UserRole.ADMIN
         );
-
         string insertSql = @"
             INSERT INTO Users (FirstName, LastName, Email, Password, Role)
             VALUES (@FirstName, @LastName, @Email, @Password, @Role);
             SELECT last_insert_rowid();
         ";
-
         int lastInsertedId = 0;
-
         using (SQLiteCommand command = new SQLiteCommand(insertSql, _Conn))
         {
             command.Parameters.AddWithValue("@FirstName", User.FirstName);
@@ -59,21 +158,16 @@ public class UserTest
             command.Parameters.AddWithValue("@Email", User.Email);
             command.Parameters.AddWithValue("@Password", User.Password);
             command.Parameters.AddWithValue("@Role", User.Role.ToString());
-
             _Conn.Open();
             lastInsertedId = unchecked((int)((long)command.ExecuteScalar()));
-            
         }
         UpdatedUser.Id = lastInsertedId;
         bool answer = u.UpdateUser(UpdatedUser);
-
         User retrievedUser = null;
         string selectUserSql = "SELECT * FROM Users WHERE Id = @Id";
-
         using (SQLiteCommand selectCommand = new SQLiteCommand(selectUserSql, _Conn))
         {
             selectCommand.Parameters.AddWithValue("@Id", UpdatedUser.Id);
-
             using (SQLiteDataReader reader = selectCommand.ExecuteReader())
             {
                 if (reader.Read())
@@ -89,7 +183,7 @@ public class UserTest
                 }
             }
         }
-
+        _Conn.Close();
         Assert.NotNull(retrievedUser);
         Assert.IsTrue(answer);
         Assert.AreEqual(retrievedUser.FirstName, UpdatedUser.FirstName);

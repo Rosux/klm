@@ -13,8 +13,8 @@ public class FilmLogic
         {
             foreach(Film film in list_films)
             {
-                all_info = all_info + $"film Id: {film.Id}\ntitle: {film.Title}\ngenres: {string.Join(", ", film.Genres)}\nduration: {film.Runtime}\n";
-                all_info = all_info + $"_________________________________________\n";
+                all_info = all_info + $"film Id: {film.Id}\ntitle: {film.Title}";
+                all_info = all_info + $"\n_______________________________________\n";
             }
             return all_info;
         }
@@ -106,7 +106,9 @@ public class FilmLogic
     {
         string info = "";
         FilmAcesser filmacesser = new();
+        //get list of all films
         List<Film> list_films = filmacesser.Get_info();
+        //loop through all films to change the part
         foreach(Film film in list_films)
         {
             if(film.Id == id)
@@ -115,6 +117,7 @@ public class FilmLogic
                 film.Title = new_title;
             }
         }
+        //write new list to the json
         filmacesser.Return_info(list_films);
         return info;
     }
@@ -161,8 +164,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed language from {film.Original_language} min to {language}";
-                film.Original_language = language;
+                info = $"you sucesfully changed language from {film.OriginalLanguage} min to {language}";
+                film.OriginalLanguage = language;
             }
         }
         filmacesser.Return_info(list_films);
@@ -178,8 +181,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed language from {film.Release_date} min to {releasedate}";
-                film.Release_date = releasedate;
+                info = $"you sucesfully changed language from {film.ReleaseDate} min to {releasedate}";
+                film.ReleaseDate = releasedate;
             }
         }
         filmacesser.Return_info(list_films);
@@ -195,8 +198,8 @@ public class FilmLogic
         {
             if(film.Id == id)
             {
-                info = $"you sucesfully changed vote average from {film.Vote_average} min to {new_vote_average}";
-                film.Vote_average = new_vote_average;
+                info = $"you sucesfully changed vote average from {film.VoteAverage} min to {new_vote_average}";
+                film.VoteAverage = new_vote_average;
             }
         }
         filmacesser.Return_info(list_films);
@@ -218,6 +221,7 @@ public class FilmLogic
         filmacesser.Return_info(list_films);
         return info;
     }
+    // change age certification of given film (id)
     public string change_certification(int id, string new_certification)
     {
         string info = "";
@@ -234,7 +238,9 @@ public class FilmLogic
         filmacesser.Return_info(list_films);
         return info;
     }
-    public string change_director(int id, List<Dictionary<string, string>> directorsList)
+
+    //Changes the director of a given film (id)
+    public string change_director(int id, List<string> directorsList)
     {
         string info = "";
         FilmAcesser filmacesser = new();
