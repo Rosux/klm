@@ -151,10 +151,10 @@ public class RoomTest
         {
             if (roomcheck.Id == roomId && roomcheck.Seats.Length == room.Seats.Length)
             {
-                Assert.Pass("Inserted Consumption found in the list.");
+                Assert.Pass("Inserted Room found in the list.");
             }
         }
 
-        Assert.Fail("Inserted Consumption not found in the list.");
+        Assert.Fail("Inserted Room not found in the list.");
     }
 }
