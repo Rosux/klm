@@ -40,11 +40,11 @@ public static class RoomLogic
         if(_RoomAccess.GetAllRooms().Count == 0){
             RoomMenu.NoRoomsFoundNotification();
         }else{
-            Room? ChosenRoom = ChooseRoom("choose a room to see");
-            if(ChosenRoom != null){
+            Room? chosenRoom = ChooseRoom("choose a room to see");
+            if(chosenRoom != null){
                 Console.CursorVisible = false;
                 Console.Clear();
-                Console.WriteLine(MenuHelper.PrintSeats(ChosenRoom));
+                Console.WriteLine(MenuHelper.PrintSeats(chosenRoom));
                 Console.ReadKey(true);
             }
         }
@@ -85,35 +85,35 @@ public static class RoomLogic
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int given_rows = 0, int seat = 0)
     {
-        int? GivenRows = null;
+        int? givenRows = null;
         if(given_rows == 0)
         {
-            GivenRows = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 10);
+            givenRows = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 10);
         }
         else
         {
-            GivenRows = given_rows;
+            givenRows = given_rows;
         }
-        if (GivenRows != null)
+        if (givenRows != null)
         {
-            int rows = (int)GivenRows;
-            int? GivenSeats = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 10);
+            int rows = (int)givenRows;
+            int? givenSeats = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 10);
             /// makes the layout for the room
-            if (GivenSeats  != null)
+            if (givenSeats  != null)
             {
-                int capacity = rows * (int)GivenSeats;
+                int capacity = rows * (int)givenSeats;
                 int i = 0;
                 bool[][] seats = new bool[rows][];
                 while(i < rows)
                 {
-                    List<bool> seats_row = new List<bool>();
+                    List<bool> seatsRow = new List<bool>();
                     int j = 0;
-                    while(j < GivenSeats)
+                    while(j < givenSeats)
                     {
-                        seats_row.Add(true);
+                        seatsRow.Add(true);
                         j++;
                     }
-                    bool[] row = seats_row.ToArray();
+                    bool[] row = seatsRow.ToArray();
                     seats[i] = row;
                     i++;
                 }
@@ -121,15 +121,15 @@ public static class RoomLogic
                 string prefix = "This is the current room layout:";
                 string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
                 /// lets admin remove or reinsate seats
-                Room RoomFinished = RoomLayoutManager(room, prefix, suffix);
-                if(RoomFinished != null)
+                Room roomFinished = RoomLayoutManager(room, prefix, suffix);
+                if(roomFinished != null)
                 {
                     /// asks for conformation
-                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{MenuHelper.PrintSeats(RoomFinished)}\nAre you sure you want to add this room? ");
+                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{MenuHelper.PrintSeats(roomFinished)}\nAre you sure you want to add this room? ");
                     if(conformation)
                     {
                         /// if conformation is given it adds the room to the database
-                        _RoomAccess.AddRoom(RoomFinished);
+                        _RoomAccess.AddRoom(roomFinished);
                         Console.WriteLine("\nRoom added sucessfully.");
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey(true);
@@ -175,23 +175,23 @@ public static class RoomLogic
         int j = 0;
         int choice = 0;
         /// holds the pages
-        List<List<Room>> allroomlist = new List<List<Room>>();
+        List<List<Room>> allRoomList = new List<List<Room>>();
         /// holds all rooms
-        List<Room> roomlist_room = _RoomAccess.GetAllRooms();
-        /// is a list that gets filled with all rooms per page and then added to allroomlist
-        List<Room> roomlist_p = new List<Room>();
+        List<Room> roomListRoom = _RoomAccess.GetAllRooms();
+        /// is a list that gets filled with all rooms per page and then added to allRoomList
+        List<Room> roomList = new List<Room>();
         /// holds longest sting per page
-        List<int> alllength = new List<int>();
+        List<int> allLength = new List<int>();
         int longest = 0;
-        /// checks for longest string per page and adds it to list alllength
-        if (roomlist_room.Count == 0)
+        /// checks for longest string per page and adds it to list allLength
+        if (roomListRoom.Count == 0)
         {
             Console.WriteLine("No rooms have been found\n");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey(true);
             return null;
         }
-        foreach(Room room in roomlist_room)
+        foreach(Room room in roomListRoom)
         {
             bool check = true;
             string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
@@ -203,7 +203,7 @@ public static class RoomLogic
             {
                 if(longest < prefix.Length)
                 {
-                    alllength.Add(prefix.Length);
+                    allLength.Add(prefix.Length);
                     longest = 0;
                     i = 0;
                     check = false;
@@ -211,7 +211,7 @@ public static class RoomLogic
                 }
                 else
                 {
-                    alllength.Add(longest);
+                    allLength.Add(longest);
                     longest = 0;
                     i = 0;
                     check = false;
@@ -226,29 +226,29 @@ public static class RoomLogic
         {
             if(longest < prefix.Length)
             {
-                alllength.Add(prefix.Length);
+                allLength.Add(prefix.Length);
             }
             else
             {
-                alllength.Add(longest);
+                allLength.Add(longest);
             }
         }
         i = 0;
-        /// makes and adds all pages to allroomlist
-        foreach(Room room in roomlist_room)
+        /// makes and adds all pages to allRoomList
+        foreach(Room room in roomListRoom)
         {
-            roomlist_p.Add(room);
+            roomList.Add(room);
             i++;
             if (i == 10)
             {
-                allroomlist.Add(roomlist_p);
-                roomlist_p = new List<Room>();
+                allRoomList.Add(roomList);
+                roomList = new List<Room>();
                 i = 0;
             }
         }
-        if(roomlist_p.Count != 0)
+        if(roomList.Count != 0)
         {
-            allroomlist.Add(roomlist_p);
+            allRoomList.Add(roomList);
         }
         /// prints the UI
         ConsoleKey key;
@@ -258,7 +258,7 @@ public static class RoomLogic
             Console.Clear();
             Console.WriteLine("Press escape to exit.\n");
             /// checks if the longest string is even or odd so the printing of the UI is corect
-            if(alllength[page] % 2 == 0)
+            if(allLength[page] % 2 == 0)
             {
                 j = 2;
             }
@@ -267,11 +267,11 @@ public static class RoomLogic
                 j = 1;
             }
             ///prints header
-            Console.WriteLine($"┌─{prefix}{new String('─', Math.Max(0, alllength[page] - prefix.Length))}─┐");
+            Console.WriteLine($"┌─{prefix}{new String('─', Math.Max(0, allLength[page] - prefix.Length))}─┐");
             /// makes sure that if pages are switched the top room is selected first
             i = 0 +10 * page;
             /// prints all info
-            foreach(Room room in allroomlist[page])
+            foreach(Room room in allRoomList[page])
             {
                 string zin = $"Id: {room.Id}, capacity: {room.Capacity}";
                 Console.Write("│ ");
@@ -279,22 +279,22 @@ public static class RoomLogic
                 if (i == choice){ Console.BackgroundColor = ConsoleColor.DarkGray; }
                 Console.Write(zin);
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"{new String(' ', Math.Max(0, alllength[page] - zin.Length))} │\n");
+                Console.Write($"{new String(' ', Math.Max(0, allLength[page] - zin.Length))} │\n");
                 i++;
             }
 
-            Console.Write($"├─{new string('─', Math.Max(0, alllength[page] ))}─┤\n");
-            string pageNumber = $"{page+1}/{allroomlist.Count}";
+            Console.Write($"├─{new string('─', Math.Max(0, allLength[page] ))}─┤\n");
+            string pageNumber = $"{page+1}/{allRoomList.Count}";
             string pageArrows = $"{pageNumber}";
             // add spaces on each side of the page number
-            for (int ii=1;ii<=Math.Max(2, alllength[page]-pageNumber.Length-4);ii++){
+            for (int ii=1;ii<=Math.Max(2, allLength[page]-pageNumber.Length-4);ii++){
                 pageArrows = ((ii % 2 == 1) ? " " : "") + pageArrows + ((ii % 2 == 0) ? " " : "");
             }
             // add arrows on the correct sides of the page number
-            pageArrows = (page > 0 ? "<-" : "  ") + pageArrows + (page < allroomlist.Count-1 ? "->" : "  ");
+            pageArrows = (page > 0 ? "<-" : "  ") + pageArrows + (page < allRoomList.Count-1 ? "->" : "  ");
             /// prints the arrows under the page
             Console.Write($"│ {pageArrows} │\n");
-            Console.Write($"└─{new string('─', Math.Max(0, alllength[page] ))}─┘\n");
+            Console.Write($"└─{new string('─', Math.Max(0, allLength[page] ))}─┘\n");
             
             key = Console.ReadKey(true).Key;
              /// lets user go up and down page to selcect a room
@@ -304,14 +304,14 @@ public static class RoomLogic
                 Console.Clear();
                 choice --;
             }
-            else if (key == ConsoleKey.DownArrow && choice < 10 + 10 * page-1 && choice < roomlist_room.Count -1)
+            else if (key == ConsoleKey.DownArrow && choice < 10 + 10 * page-1 && choice < roomListRoom.Count -1)
             {  
                 Console.CursorVisible = false;
                 Console.Clear();
                 choice ++;
             }
              /// lets user go through pages
-            if (key == ConsoleKey.RightArrow && page != allroomlist.Count-1)
+            if (key == ConsoleKey.RightArrow && page != allRoomList.Count-1)
             {  
                 Console.CursorVisible = false;
                 Console.Clear();
@@ -328,7 +328,7 @@ public static class RoomLogic
             /// returns chosen room
             else if (key == ConsoleKey.Enter)
             {  
-                return roomlist_room[choice];
+                return roomListRoom[choice];
                 break;
             }
         } while (key != ConsoleKey.Escape);   
@@ -345,11 +345,11 @@ public static class RoomLogic
     public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
     {
         ConsoleKey key;
-        int ChoiceSeat = 0;
+        int choiceSeat = 0;
         string header = "Screen";
-        int WhiteSpace = 1;
+        int whiteSpace = 1;
         int longest = 0;
-        int SeatPerRow = room.Seats[0].Length;
+        int seatPerRow = room.Seats[0].Length;
         bool[][] seats = room.Seats;
 
         foreach(bool[] row in seats)
@@ -363,7 +363,7 @@ public static class RoomLogic
         if(header.Length > longest)
         {
             longest = header.Length;
-            WhiteSpace = 2;
+            whiteSpace = 2;
         }
         for(int i=0;i<longest - "Screen".Length;i++)
         {
@@ -373,68 +373,68 @@ public static class RoomLogic
 
         do
         {
-            List<List<string>> AllRowTop = new List<List<string>>();
-            List<List<string>> AllRowBottom = new List<List<string>>();
+            List<List<string>> allRowTop = new List<List<string>>();
+            List<List<string>> allRowBottom = new List<List<string>>();
             foreach(bool[] row in seats)
             {
-                List<string> RowTop = new List<string>();
-                List<string> RowBottom = new List<string>();
+                List<string> rowTop = new List<string>();
+                List<string> rowBottom = new List<string>();
                 foreach(bool seat in row)
                 {         
                     if (seat)
                     {
-                        RowTop.Add("╔═╗");
-                        RowBottom.Add("╚═╝");
+                        rowTop.Add("╔═╗");
+                        rowBottom.Add("╚═╝");
                     }
                     else
                     {
-                        RowTop.Add("   ");
-                        RowBottom.Add("   ");
+                        rowTop.Add("   ");
+                        rowBottom.Add("   ");
                     }
                 }
-                AllRowTop.Add(RowTop);
-                AllRowBottom.Add(RowBottom);
+                allRowTop.Add(rowTop);
+                allRowBottom.Add(rowBottom);
             }
-            bool NotEmptyCheck = false;
+            bool notEmptyCheck = false;
             foreach(bool[] row in seats)
             {
                 foreach(bool seat in row)
                 {
                     if (seat)
                     {
-                        NotEmptyCheck = true;
+                        notEmptyCheck = true;
                     }
                 }
             }
-            var zip = AllRowTop.Zip(AllRowBottom, (i,j) => (i,j));
+            var zip = allRowTop.Zip(allRowBottom, (i,j) => (i,j));
             Console.CursorVisible = false;
             Console.Clear();
             Console.WriteLine(prefix + "\n");
             Console.Write($"┌{header}┐\n");
             int i = 0;
             int ii = 0;
-            foreach(var (RowTop, RowBottom) in zip)
+            foreach(var (rowTop, rowBottom) in zip)
             {
                 Console.Write("│ ");
-                foreach(string SeatTop in RowTop)
+                foreach(string seatTop in rowTop)
                 {
                     
-                    if (i == ChoiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    Console.Write(SeatTop);
+                    if (i == choiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.Write(seatTop);
                     Console.BackgroundColor = ConsoleColor.Black;
                     i++;
                 }
-                Console.Write($"{new string(' ', WhiteSpace)}│");
+                Console.Write($"{new string(' ', whiteSpace)}│");
                 Console.WriteLine();
                 Console.Write("│ ");
-                foreach(string SeatBottom in RowBottom)
+                foreach(string seatBottom in rowBottom)
                 {
-                    if (ii == ChoiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    Console.Write(SeatBottom);
+                    if (ii == choiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                    Console.Write(seatBottom);
                     Console.BackgroundColor = ConsoleColor.Black;
                     ii++;
                 }
-                Console.Write($"{new string(' ', WhiteSpace)}│");
+                Console.Write($"{new string(' ', whiteSpace)}│");
                 Console.WriteLine();         
             }
             Console.Write($"└{new string('─', longest)}┘\n\n");
@@ -444,39 +444,39 @@ public static class RoomLogic
             {
                 break;
             }
-            else if(key == ConsoleKey.RightArrow && ChoiceSeat < i - 1)
+            else if(key == ConsoleKey.RightArrow && choiceSeat < i - 1)
             {
-                ChoiceSeat++;
+                choiceSeat++;
             }
-            else if(key == ConsoleKey.LeftArrow && ChoiceSeat != 0)
+            else if(key == ConsoleKey.LeftArrow && choiceSeat != 0)
             {
-                ChoiceSeat--;
+                choiceSeat--;
             }
-            else if(key == ConsoleKey.UpArrow && ChoiceSeat >= SeatPerRow)
+            else if(key == ConsoleKey.UpArrow && choiceSeat >= seatPerRow)
             {
-                ChoiceSeat = ChoiceSeat - SeatPerRow;
+                choiceSeat = choiceSeat - seatPerRow;
             }
-            else if(key == ConsoleKey.DownArrow&& ChoiceSeat < i - SeatPerRow)
+            else if(key == ConsoleKey.DownArrow&& choiceSeat < i - seatPerRow)
             {
-                ChoiceSeat = ChoiceSeat + SeatPerRow;
+                choiceSeat = choiceSeat + seatPerRow;
             }
             else if(key == ConsoleKey.Spacebar)
             {
-                int SelctedRow = ChoiceSeat/SeatPerRow;
-                int SelctedSeat = ChoiceSeat%SeatPerRow;
-                if(seats[SelctedRow][SelctedSeat])
+                int selectedRow = choiceSeat/seatPerRow;
+                int selectedSeat = choiceSeat%seatPerRow;
+                if(seats[selectedRow][selectedSeat])
                 {
-                    seats[SelctedRow][SelctedSeat] = false;
+                    seats[selectedRow][selectedSeat] = false;
                 }
                 else
                 {
-                    seats[SelctedRow][SelctedSeat] = true;
+                    seats[selectedRow][selectedSeat] = true;
                 }
             }
-            else if(key == ConsoleKey.Enter && NotEmptyCheck)
+            else if(key == ConsoleKey.Enter && notEmptyCheck)
             {
-                Room room_finisehed = new(room.Id, seats);
-                return room_finisehed;
+                Room roomFinisehed = new(room.Id, seats);
+                return roomFinisehed;
             }
         }while(key != ConsoleKey.Escape);
         return null;
