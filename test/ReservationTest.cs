@@ -273,4 +273,65 @@ public class ReservationTest
         }
         return u;
     }
+    [Test]
+    public void EditTest()
+    {
+        TimeLine.Holder Timeline = new TimeLine.Holder();
+        Timeline.Add(
+            (object)(new Consumption("Test Consumption #1", 40.20, TimeOnly.MinValue, TimeOnly.MinValue)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+
+        TimeLine.Holder TimelineChange = new TimeLine.Holder();
+        Timeline.Add(
+            (object)(new Consumption("Test Consumption #3", 40.20, TimeOnly.MinValue, TimeOnly.MinValue)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+
+        var reservation = new Reservation(
+            Id: 1,
+            RoomId: 1,
+            UserId: 2,
+            GroupSize: 10,
+            StartDate: DateTime.Parse("2024-04-24 02:00:00"),
+            EndDate: DateTime.Parse("2024-04-27 02:00:00"),
+            Price: 99.99,
+            TimeLine: Timeline,
+            Entertainments: new List<Entertainment>()
+        );
+        var reservation2 = new Reservation(
+            Id: 1,
+            RoomId: 1,
+            UserId: 2,
+            GroupSize: 10,
+            StartDate: DateTime.Parse("2024-04-24 02:00:00"),
+            EndDate: DateTime.Parse("2024-04-27 02:00:00"),
+            Price: 99.99,
+            TimeLine: TimelineChange,
+            Entertainments: new List<Entertainment>()
+        );
+        
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine, Entertainments)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine, @Entertainments)";
+        int rowsAffected;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
+            Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
+            Launch.Parameters.AddWithValue("@GroupSize", reservation.GroupSize);
+            Launch.Parameters.AddWithValue("@StartDate", reservation.StartDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@EndDate", reservation.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@Price", reservation.Price);
+            Launch.Parameters.AddWithValue("@TimeLine", reservation.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(reservation.Entertainments));
+            rowsAffected = Launch.ExecuteNonQuery();
+        }
+        _Conn.Close();
+
+        bool returns = r.EditReservation(reservation2);
+        Assert.IsTrue(returns);
+    }
 }
