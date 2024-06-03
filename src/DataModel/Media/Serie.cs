@@ -1,5 +1,5 @@
 /// <summary>
-///  Model class for a serie.
+/// Model class for a serie.
 /// </summary>
 public class Serie : Media
 {
