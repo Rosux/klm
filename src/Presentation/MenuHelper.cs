@@ -650,9 +650,9 @@ public static class MenuHelper{
     /// For example, this:
     /// <code>
     /// Options("Select an action", new Dictionary<string, Action>(){
-    ///     {"Login", ()=>{SomeLoginMethod();}}, 
-    ///     {"Register", ()=>{SomeRegisterMethod();}}, 
-    ///     {"Exit", ()=>{SomeExitMethod();}}, 
+    ///     {"Login", ()=>{SomeLoginMethod();}},
+    ///     {"Register", ()=>{SomeRegisterMethod();}},
+    ///     {"Exit", ()=>{SomeExitMethod();}},
     /// });
     /// </code>
     /// Would result in this being shown to the user:
@@ -672,7 +672,7 @@ public static class MenuHelper{
 
         // selection variables
         int currentSelection = 0;
-        
+
         // draw loop
         ConsoleKey key;
         do{
@@ -682,7 +682,7 @@ public static class MenuHelper{
             // write header
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write($"┌─{Header}{new String('─', Math.Max(0, longestWord-Header.Length))}─┐\n");
-            
+
             // loop over options and print them
             for (int i = 0; i < Options.Keys.Count; i++){
                 string word = Options.Keys.ElementAt(i);
@@ -2211,7 +2211,6 @@ public static class MenuHelper{
         for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
         {
             header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
-            // header
         }
         Console.Write($"┌{header}┐\n");
         for(int i=0;i<r.Seats.Length;i++)

@@ -1,8 +1,6 @@
 public class ConsumptionAccess : DatabaseHandler
 {
-    public ConsumptionAccess(string DatabasePath="./DataSource/CINEMA.db") : base(DatabasePath){
-
-    }
+    public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){}
 
     /// <summary>
     /// Creates a new consumption item.

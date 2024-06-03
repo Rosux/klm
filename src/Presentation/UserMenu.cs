@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using BCrypt.Net;
 
 public static class UserMenu{
-    private static UserAccess u = new UserAccess();
+    private static UserAccess _userAccess = new UserAccess();
 
     /// <summary>
     /// Asks the user to fill in fields and return a new User object with the field data.
@@ -230,7 +230,7 @@ public static class UserMenu{
         do
         {
             error = "";
-            User? user = u.VerifyUser(input);
+            User? user = _userAccess.VerifyUser(input);
             if (user != null)
             {
                 error += $"Email already exists.\n";

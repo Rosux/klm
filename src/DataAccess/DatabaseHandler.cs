@@ -4,6 +4,9 @@ global using System.Data.SQLite.Generic;
 using System;
 using System.Data;
 
+/// <summary>
+/// Creates a database handle and connection. Creates the tables if they do not exist.
+/// </summary>
 public class DatabaseHandler
 {
     private static readonly string _CreateUserString = @"
@@ -52,16 +55,28 @@ public class DatabaseHandler
     "; // Entertainments is a List<Entertainment> containg all the special entertainments of the reservation
 
     protected SQLiteConnection _Conn = new SQLiteConnection();
-    private string DatabasePath;
-    public DatabaseHandler(string DatabasePath="./DataSource/CINEMA.db"){
-        this.DatabasePath = DatabasePath;
-        if (!File.Exists(this.DatabasePath)){
-            SQLiteConnection.CreateFile(this.DatabasePath);
+
+    /// <summary>
+    /// Creates a new connection to the database and sets up the database if needed.
+    /// </summary>
+    /// <param name="DatabasePath">A string containing the database filepath.</param>
+    public DatabaseHandler(string? DatabasePath=null){
+        if(DatabasePath == null){
+            if(Environment.GetEnvironmentVariable("DATABASE_PATH") == null){
+                throw new Exception($"Environment DATABASE_PATH not set.");
+            }
+            DatabasePath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "";
         }
-        _Conn = new SQLiteConnection($"DATA Source={this.DatabasePath};Version=3");
+        if (!File.Exists(DatabasePath)){
+            SQLiteConnection.CreateFile(DatabasePath);
+        }
+        _Conn = new SQLiteConnection($"DATA Source={DatabasePath};Version=3");
         CreateDatabaseIfNotExist();
     }
 
+    /// <summary>
+    /// Creates the database tables if they do not exist.
+    /// </summary>
     private void CreateDatabaseIfNotExist(){
         _Conn.Open();
         List<SQLiteCommand> Tables = new List<SQLiteCommand>(){

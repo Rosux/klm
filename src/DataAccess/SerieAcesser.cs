@@ -3,7 +3,10 @@ public class SerieAcesser
 {
     public List<Serie> Get_info()
     {
-        string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(Environment.CurrentDirectory, @"DataSource\Series.json"));
+        if(Environment.GetEnvironmentVariable("SERIE_PATH") == null){
+            throw new Exception("Environment SERIE_PATH not set.");
+        }
+        string path = Environment.GetEnvironmentVariable("SERIE_PATH");
         string string_series = File.ReadAllText(path);
         List<Serie> list_series = JsonConvert.DeserializeObject<List<Serie>>(string_series)!;
         return list_series;
@@ -11,7 +14,10 @@ public class SerieAcesser
 
     public void Return_info(List<Serie> list_series)
     {
-        StreamWriter writer = new(@"DataSource\Series.json");
+        if(Environment.GetEnvironmentVariable("SERIE_PATH") == null){
+            throw new Exception("Environment SERIE_PATH not set.");
+        }
+        StreamWriter writer = new(Environment.GetEnvironmentVariable("SERIE_PATH"));
         string string_series = JsonConvert.SerializeObject(list_series);
         writer.Write(string_series);
         writer.Close();
@@ -20,7 +26,10 @@ public class SerieAcesser
 
     public List<Genre> Get_Genres()
     {
-        string path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"DataSource\Series.json"));
+        if(Environment.GetEnvironmentVariable("SERIE_PATH") == null){
+            throw new Exception("Environment SERIE_PATH not set.");
+        }
+        string path = Environment.GetEnvironmentVariable("SERIE_PATH");
         string string_series = File.ReadAllText(path);
         List<Serie> list_series = JsonConvert.DeserializeObject<List<Serie>>(string_series);
         List<Genre> genres = list_series
