@@ -1,8 +1,11 @@
+using System.Data.Entity.Core.Objects;
+
 public static class ReservationMenu
 {
     private static RoomAccess RoomsAccess = new RoomAccess();
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
     private static ReservationAccess ReservationAccess = new ReservationAccess();
+    private static UserAccess UserAccess = new UserAccess();
 
 
     #region Book Reservation
@@ -296,8 +299,6 @@ public static class ReservationMenu
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
         List<TimeLine.Item> consumptions = new List<TimeLine.Item>();
-        Console.CursorVisible = false;
-        Console.Clear();
         foreach (TimeLine.Item item in t)
         {
             if(item.Action is Consumption)
@@ -309,7 +310,7 @@ public static class ReservationMenu
             new Dictionary<string, Func<TimeLine.Item, object>>
             {
                 {"Name", item => ((Consumption)item.Action).Name},
-                {"Price", item => ((Consumption)item.Action).Price},
+                {"Price €", item => ((Consumption)item.Action).Price},
                 {"Order Time", item => item.StartTime},
             }
         );
@@ -352,9 +353,22 @@ public static class ReservationMenu
                 $"Group Size: {selectedReservation.GroupSize}",
                 $"Start Date: {selectedReservation.StartDate}",
                 $"End Date: {selectedReservation.EndDate}",
-                $"Price: {selectedReservation.Price}"
+                $"Price: €{selectedReservation.Price}"
             };
-
+            //For adminOverview there is a extra username field
+            if(Program.CurrentUser.Role == UserRole.ADMIN)
+            {
+                User? reservationUser = UserAccess.GetUser(selectedReservation.UserId);
+                details = new string[]
+                {
+                    $"User Name: {reservationUser.FirstName} {reservationUser.LastName}",
+                    $"Room Number: {selectedReservation.RoomId}",
+                    $"Group Size: {selectedReservation.GroupSize}",
+                    $"Start Date: {selectedReservation.StartDate}",
+                    $"End Date: {selectedReservation.EndDate}",
+                    $"Price: €{selectedReservation.Price}"
+                };
+            }
             Console.BackgroundColor = ConsoleColor.Black;
             int longestLineLength = Math.Max(header.Length, details.Max(detail => detail.Length));
             Console.Write($"┌─{header}{new string('─', Math.Max(0 ,longestLineLength - header.Length))}─┐\n");
@@ -379,10 +393,10 @@ public static class ReservationMenu
             if (key == ConsoleKey.Enter){
                 if(currentSelection == 0)
                 {
-                    MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.t);
+                    MenuHelper.PrintTimeLine("Press Escape to return", "",  selectedReservation.TimeLine.Items);
                 }
                 if(currentSelection == 1){
-                    ShowConsumptions(selectedReservation.TimeLine.t);
+                    ShowConsumptions(selectedReservation.TimeLine.Items);
                 }
                 if(currentSelection == 2){
                     ShowEntertainments(selectedReservation.Entertainments);
