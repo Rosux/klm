@@ -296,8 +296,6 @@ public static class ReservationMenu
     public static void ShowConsumptions(List<TimeLine.Item> t)
     {
         List<TimeLine.Item> consumptions = new List<TimeLine.Item>();
-        Console.CursorVisible = false;
-        Console.Clear();
         foreach (TimeLine.Item item in t)
         {
             if(item.Action is Consumption)
