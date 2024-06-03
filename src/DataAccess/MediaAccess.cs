@@ -10,7 +10,8 @@ public static class MediaAccess
     /// <param name="media">The Film/Serie object to save.</param>
     /// <typeparam name="T">Can either be Film or Serie.</typeparam>
     /// <returns>A boolean indicating if the media got saved.</returns>
-    public static bool SaveMedia<T>(T media){
+    public static bool AddMedia<T>(T media)
+    {
         // if environment is not set throw an exception
         if(Environment.GetEnvironmentVariable("MEDIA_PATH") == null){
             throw new Exception("Environment MEDIA_PATH not set.");
@@ -46,12 +47,40 @@ public static class MediaAccess
         return true;
     }
 
-    private static MediaJsonStruct GetMedia(){
+    /// <summary>
+    /// Gets all the films.
+    /// </summary>
+    /// <returns>A list of all the films.</returns>
+    public static List<Film> GetAllFilms()
+    {
+        return GetMedia().Films;
+    }
+
+    /// <summary>
+    /// Gets all the series.
+    /// </summary>
+    /// <returns>A list of all the series.</returns>
+    public static List<Serie> GetAllSeries()
+    {
+        return GetMedia().Series;
+    }
+
+    /// <summary>
+    /// Returns a MediaJsonStruct holding the films/series and the current film/serie id.
+    /// </summary>
+    /// <returns>A MediaJsonStruct holding the films/series data.</returns>
+    private static MediaJsonStruct GetMedia()
+    {
         string mediaJsonString = File.ReadAllText(_mediaPath);
         return JsonConvert.DeserializeObject<MediaJsonStruct>(mediaJsonString);
     }
 
-    private static void SetMedia(MediaJsonStruct mediaStructure){
+    /// <summary>
+    /// Saves the given MediaJsonStruct to a json file.
+    /// </summary>
+    /// <param name="mediaStructure">A MediaJsonStruct holding the new data.</param>
+    private static void SetMedia(MediaJsonStruct mediaStructure)
+    {
         StreamWriter jsonWriter = new StreamWriter(_mediaPath);
         jsonWriter.Write(JsonConvert.SerializeObject(mediaStructure));
         jsonWriter.Close();
