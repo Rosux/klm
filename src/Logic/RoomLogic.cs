@@ -24,10 +24,7 @@ public static class RoomLogic
                 {"3. Remove a room", ()=>{
                     RemoveRoom();
                 }},
-                {"4. Edit a room", ()=>{
-                    EditRoom();
-                }},
-                {"5. Exit to main menu", ()=>{
+                {"4. Exit to main menu", ()=>{
                     running = false;
                 }},
             });
@@ -47,7 +44,7 @@ public static class RoomLogic
             if(ChosenRoom != null){
                 Console.CursorVisible = false;
                 Console.Clear();
-                Console.WriteLine(RoomLayoutPrinter(ChosenRoom));
+                Console.WriteLine(MenuHelper.PrintSeats(ChosenRoom));
                 Console.ReadKey(true);
             }
         }
@@ -76,7 +73,7 @@ public static class RoomLogic
             }
         }
     }
-
+    
     /// <summary>
     /// lets the admin add a room by using the following steps:
     /// 1. asks how much rows he wants using menuhelper.selectinterger
@@ -128,7 +125,7 @@ public static class RoomLogic
                 if(RoomFinished != null)
                 {
                     /// asks for conformation
-                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{RoomLayoutPrinter(RoomFinished)}\nAre you sure you want to add this room? ");
+                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{MenuHelper.PrintSeats(RoomFinished)}\nAre you sure you want to add this room? ");
                     if(conformation)
                     {
                         /// if conformation is given it adds the room to the database
@@ -163,53 +160,6 @@ public static class RoomLogic
             Console.WriteLine("Action cancelled.");
             Console.Write($"\n\nPress any key to continue...");
             Console.ReadKey(true);
-        }
-    }
-
-    /// <summary>
-    /// lets the admin edit a room by taking these steps:
-    /// 1. lets the admin select a room using ChooseRoom
-    /// 2. lets admin edit the selcted room by using RoomLayouManager
-    /// 3. asks if the admin wants to save changes
-    /// 4. either cancels action or submits changes
-    /// </summary>
-    /// <param name="ChosenRoom"> takes a room object you want to edit (is only used for loop)</param>
-    public static void EditRoom(Room ChosenRoom = null)
-    {
-        if(ChosenRoom == null)
-        {
-            /// kets user choose a room
-            ChosenRoom = ChooseRoom("choose a room to edit");
-        }
-        if (ChosenRoom != null)
-        {
-            string prefix = "This is the current room layout:";
-            string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
-            /// lets user edit the room
-            Room? EditedRoom = RoomLayoutManager(ChosenRoom, prefix, suffix);
-            if (EditedRoom != null)
-            {
-                /// asks if he wants to save changes
-                bool conformation = MenuHelper.Confirm($"new room layout:\n{RoomLayoutPrinter(EditedRoom)}\nAre you sure you want to make these changes ");
-                if(conformation)
-                {
-                    /// edits room
-                    _RoomAccess.EditRoom(EditedRoom);
-                    Console.WriteLine("\nRoom changed sucessfully.");
-                    Console.Write($"\n\nPress any key to continue...");
-                    Console.ReadKey(true);
-                }
-                else
-                {
-                    Console.WriteLine("\nAction cancelled.");
-                    Console.Write($"\n\nPress any key to continue...");
-                    Console.ReadKey(true);
-                }
-            }
-            else
-            {
-                EditRoom();
-            }
         }
     }
 
@@ -386,101 +336,10 @@ public static class RoomLogic
     }
 
     /// <summary>
-    /// this method takes a room object and returns a string of its layout
-    /// </summary>
-    /// <param name="room">takes a room object to make the layout of</param>
-    /// <returns>a string that is the room layout</returns>
-    public static string RoomLayoutPrinter(Room room)
-    {
-        string layout = "";
-        int ChoiceSeat = 0;
-        int ii = 0;
-        int iii = 0;
-        string header = "Screen";
-        int h = 1;
-        int longest = 2;
-        int SeatPerRow = room.Seats[0].Length;
-        bool[][] seats = room.Seats;
-        foreach(bool[] row in seats)
-        {
-            longest = 2;
-            foreach(bool seat in row)
-            { 
-                longest = longest + 3;
-            }
-        }
-        if(header.Length > longest)
-        {
-            longest = header.Length;
-            h = 2;
-        }
-        for(int k=0;k<longest - "Screen".Length;k++)
-        {
-            header = ((k % 2 == 1) ? "─" : "") + header + ((k % 2 == 0) ? "─" : "");
-            // header
-        }
-            List<List<string>> AllRowTop = new List<List<string>>();
-            List<List<string>> AllRowBottom = new List<List<string>>();
-            foreach(bool[] row in seats)
-            {
-                List<string> RowTop = new List<string>();
-                List<string> RowBottom = new List<string>();
-                foreach(bool seat in row)
-                {         
-                    if (seat)
-                    {
-                        RowTop.Add("╔═╗");
-                        RowBottom.Add("╚═╝");
-                    }
-                    else
-                    {
-                        RowTop.Add("   ");
-                        RowBottom.Add("   ");
-                    }
-                }
-                AllRowTop.Add(RowTop);
-                AllRowBottom.Add(RowBottom);
-            }
-            var zip = AllRowTop.Zip(AllRowBottom, (i,j) => (i,j));
-            Console.CursorVisible = false;
-            Console.Clear();
-            //Console.WriteLine(prefix + "\n");
-            layout = layout + $"┌{header}┐\n";
-            ii = 0;
-            iii = 0;
-            foreach(var (RowTop, RowBottom) in zip)
-            {
-                layout = layout + "│ ";
-                foreach(string SeatTop in RowTop)
-                {
-                    
-                    if (ii == ChoiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    layout = layout + SeatTop;
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    ii++;
-                }
-                layout = layout + $"{new string(' ', h)}│";
-                layout = layout + "\n";
-                layout = layout + "│ ";
-                foreach(string SeatBottom in RowBottom)
-                {
-                    if (iii == ChoiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                    layout = layout + SeatBottom;
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    iii++;
-                }
-                layout = layout + $"{new string(' ', h)}│";
-                layout = layout + "\n";         
-            }
-                layout = layout + $"└{new string('─', longest)}┘\n\n";
-            //Console.Write(suffix);
-            return layout;
-    }
-    /// <summary>
     /// this maethode takes a room and lets the admin edit this rooms layout
     /// </summary>
     /// <param name="room"> a room object it uses to manage its layout</param>
-   /// <param name="prefix">A string of text printed before the selected value.</param>
+    /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
     /// <returns></returns>
     public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
