@@ -219,7 +219,7 @@ public static class ReservationLogic
                     {"Group Size", item => item.GroupSize},
                     {"Start Date", item => item.StartDate},
                     {"End Date", item => item.EndDate},
-                    {"Price", item => item.Price}
+                    {"Price €", item => item.Price}
                 },
                 true
             );

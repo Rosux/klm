@@ -1,8 +1,11 @@
+using System.Data.Entity.Core.Objects;
+
 public static class ReservationMenu
 {
     private static RoomAccess RoomsAccess = new RoomAccess();
     private static ConsumptionAccess Consumptions = new ConsumptionAccess();
     private static ReservationAccess ReservationAccess = new ReservationAccess();
+    private static UserAccess UserAccess = new UserAccess();
 
 
     #region Book Reservation
@@ -307,7 +310,7 @@ public static class ReservationMenu
             new Dictionary<string, Func<TimeLine.Item, object>>
             {
                 {"Name", item => ((Consumption)item.Action).Name},
-                {"Price", item => ((Consumption)item.Action).Price},
+                {"Price €", item => ((Consumption)item.Action).Price},
                 {"Order Time", item => item.StartTime},
             }
         );
@@ -350,9 +353,22 @@ public static class ReservationMenu
                 $"Group Size: {selectedReservation.GroupSize}",
                 $"Start Date: {selectedReservation.StartDate}",
                 $"End Date: {selectedReservation.EndDate}",
-                $"Price: {selectedReservation.Price}"
+                $"Price: €{selectedReservation.Price}"
             };
-
+            //For adminOverview there is a extra username field
+            if(Program.CurrentUser.Role == UserRole.ADMIN)
+            {
+                User? reservationUser = UserAccess.GetUser(selectedReservation.UserId);
+                details = new string[]
+                {
+                    $"User Name: {reservationUser.FirstName} {reservationUser.LastName}",
+                    $"Room Number: {selectedReservation.RoomId}",
+                    $"Group Size: {selectedReservation.GroupSize}",
+                    $"Start Date: {selectedReservation.StartDate}",
+                    $"End Date: {selectedReservation.EndDate}",
+                    $"Price: €{selectedReservation.Price}"
+                };
+            }
             Console.BackgroundColor = ConsoleColor.Black;
             int longestLineLength = Math.Max(header.Length, details.Max(detail => detail.Length));
             Console.Write($"┌─{header}{new string('─', Math.Max(0 ,longestLineLength - header.Length))}─┐\n");
