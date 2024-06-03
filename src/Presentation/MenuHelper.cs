@@ -2191,7 +2191,7 @@ public static class MenuHelper{
         }
         return m;
     }
-    #region PrintSeats
+    #region Print Seats
     /// <summary>
     /// PrintSeats gets the selectedroom, a list of entertainments on seats and the coordinates of those seats.
     /// </summary>
@@ -2242,11 +2242,11 @@ public static class MenuHelper{
         Console.Write($"└{new string('─', (widestSeats*4)+1)}┘\n\n");
     }
 
-// <summary>
-    /// takes a room object and returns a string of the room layout
+    /// <summary>
+    /// Takes a room object and returns a string of the room layout.
     /// </summary>
-    /// <param name="r"> a room object</param>
-    /// <returns> a string that  is the room layout</returns>
+    /// <param name="r">A room object.</param>
+    /// <returns>A string that  is the room layout.</returns>
     public static string PrintSeats(Room r)
     {
         int whiteSpace = 0;
@@ -2286,9 +2286,6 @@ public static class MenuHelper{
         return layout;
     }
 
-
-
-    
     #endregion
 }
 #endregion
