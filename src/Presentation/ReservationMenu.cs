@@ -98,12 +98,12 @@ public static class ReservationMenu
                             timeline.Add(
                                 episode,
                                 new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
+                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Runtime)
                             );
                             if(i == 0){
-                                serieTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length);
+                                serieTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Runtime);
                             }else{
-                                serieTime = serieTime.AddMinutes(episode.Length);
+                                serieTime = serieTime.AddMinutes(episode.Runtime);
                             }
                         }
                     }

@@ -38,7 +38,7 @@ class Menu
                     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Manage movies/series", ()=>{
                             // takes admin to movie editor
-                            FilmSerieMenu.UI();
+                            // FilmSerieMenu.UI();
                         }},
                         {"Consumptions", ()=>{
                             // consumption editor
@@ -92,5 +92,25 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
+        // MediaAccess.AddMedia(
+        //     new Film(
+        //         "Title",
+        //         69,
+        //         "Description",
+        //         2.5f,
+        //         "Language",
+        //         new List<Genre>() { Genre.HORROR, Genre.ACTION },
+        //         new DateOnly(2003, 9, 4),
+        //         Certification.PG,
+        //         new List<string>() { "Director1", "Director2" },
+        //         new List<string>() { "Actor1", "Actor2" },
+        //         new List<string>() { "Writer1", "Writer2" }
+        //     )
+        // );
+        Console.WriteLine(MediaAccess.GetAllFilms().Count);
+        Console.WriteLine("\n\n");
+        Console.WriteLine(MediaAccess.GetAllSeries().Count);
+        Console.WriteLine("\n\n");
+        Console.WriteLine(MediaAccess.GetAllMedia().Count);
     }
 }

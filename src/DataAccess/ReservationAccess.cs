@@ -159,30 +159,32 @@ public class ReservationAccess : DatabaseHandler
             JObject x = JObject.Parse(JsonConvert.SerializeObject(i.Action)); // <- is either a film/serie/break/consumption
             object? obj = null;
 
-            if(x.Property("Id") != null && x.Property("Genres") != null && x.Property("Original_language") != null && x.Property("Overview") != null && x.Property("Release_date") != null && x.Property("Runtime") != null && x.Property("Title") != null && x.Property("Vote_average") != null && x.Property("Certification") != null && x.Property("Directors") != null)
-            {
-                obj = (object)new Film(
-                    (int)(x.Property("Id").Value),
-                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Genres").Value.ToString()),
-                    (string)(x.Property("Original_language").Value),
-                    (string)(x.Property("Overview").Value),
-                    (string)(x.Property("Release_date").Value),
-                    (int)(x.Property("Runtime").Value),
-                    (string)(x.Property("Title").Value),
-                    (double)(x.Property("Vote_average").Value),
-                    (string)(x.Property("Certification").Value),
-                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Directors").Value.ToString())
-                );
-            }
-            else if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
-            {
-                obj = (object)new Episode(
-                    (int)(x.Property("Id").Value),
-                    (string)(x.Property("Title").Value),
-                    (int)(x.Property("Length").Value)
-                );
-            }
-            else if(x.Property("Id") != null && x.Property("Name") != null && x.Property("Price") != null && x.Property("StartTime") != null && x.Property("EndTime") != null)
+            // if(x.Property("Id") != null && x.Property("Genres") != null && x.Property("Original_language") != null && x.Property("Overview") != null && x.Property("Release_date") != null && x.Property("Runtime") != null && x.Property("Title") != null && x.Property("Vote_average") != null && x.Property("Certification") != null && x.Property("Directors") != null)
+            // {
+            //     obj = (object)new Film(
+            //         (int)(x.Property("Id").Value),
+            //         (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Genres").Value.ToString()),
+            //         (string)(x.Property("Original_language").Value),
+            //         (string)(x.Property("Overview").Value),
+            //         (string)(x.Property("Release_date").Value),
+            //         (int)(x.Property("Runtime").Value),
+            //         (string)(x.Property("Title").Value),
+            //         (double)(x.Property("Vote_average").Value),
+            //         (string)(x.Property("Certification").Value),
+            //         (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Directors").Value.ToString())
+            //     );
+            // }
+            // else
+            // if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
+            // {
+            //     obj = (object)new Episode(
+            //         (int)(x.Property("Id").Value),
+            //         (string)(x.Property("Title").Value),
+            //         (int)(x.Property("Length").Value)
+            //     );
+            // }
+            // else
+            if(x.Property("Id") != null && x.Property("Name") != null && x.Property("Price") != null && x.Property("StartTime") != null && x.Property("EndTime") != null)
             {
                 obj = (object)new Consumption(
                     (int)(x.Property("Id").Value),

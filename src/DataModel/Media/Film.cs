@@ -1,9 +1,12 @@
+using Newtonsoft.Json;
+
 /// <summary>
 /// Model class for a film.
 /// </summary>
 public class Film : Media
 {
     public List<string> Actors = new List<string>();
+
     public List<string> Writers = new List<string>();
 
     /// <summary>
@@ -22,6 +25,7 @@ public class Film : Media
     /// <param name="actors">A list of actors.</param>
     /// <param name="writers">A list of writers.</param>
     /// <returns>The created film.</returns>
+    [JsonConstructor]
     public Film(int id, string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors, List<string> actors, List<string> writers) : base(id, title, runtime, description, rating, language, genres, releaseDate, certification, directors)
     {
         this.Actors = actors;
