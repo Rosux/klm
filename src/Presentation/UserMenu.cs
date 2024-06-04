@@ -48,7 +48,7 @@ public static class UserMenu{
     public static User? GetLoginCredentials()
     {
         string Email = "";
-        int place = 0;
+        int placeEmail = 0;
         do{
             Console.CursorVisible = false;
             Console.Clear();
@@ -56,12 +56,12 @@ public static class UserMenu{
             int i = 0;
             foreach (char c in Email)
             {
-                if(i == place){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                if(i == placeEmail){ Console.BackgroundColor = ConsoleColor.DarkGray; }
                 Console.Write(c);
                 Console.BackgroundColor = ConsoleColor.Black;
                 i++;
             }
-            if(place == Email.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            if(placeEmail == Email.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
             Console.Write($" \n");
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write("Password: \n\nPress Escape to cancel");
@@ -69,33 +69,39 @@ public static class UserMenu{
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0 && place > 0){
-                Email = Email.Remove(place-1, 1);
-                place -= 1;
+            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0 && placeEmail > 0){
+                Email = Email.Remove(placeEmail-1, 1);
+                placeEmail -= 1;
             }
             if(!char.IsControl(keyInfo.KeyChar)){
-                //Email += keyInfo.KeyChar;
-                Email = Email.Insert(place, $"{keyInfo.KeyChar}");
-                place += 1;
-                //keyInfo.KeyChar
+                Email = Email.Insert(placeEmail, $"{keyInfo.KeyChar}");
+                placeEmail += 1;
             }
-            if(keyInfo.Key == ConsoleKey.LeftArrow && place > 0){
-                place -= 1;
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placeEmail > 0){
+                placeEmail -= 1;
             }
-            if(keyInfo.Key == ConsoleKey.RightArrow && place < Email.Length){
-                place += 1;
+            if(keyInfo.Key == ConsoleKey.RightArrow && placeEmail < Email.Length){
+                placeEmail += 1;
             }
             if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
             }
         }while(true);
         string Password = "";
+        int placePassword = 0;
         do{
+            int i = 0;
             Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"Email: {Email}\nPassword: ");
-            Console.Write($"{new string('*', Password.Length)}");
-            Console.BackgroundColor = ConsoleColor.DarkGray;
+            foreach(char c in Password)
+            {
+                if(i == placePassword){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write("*");
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placePassword == Password.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
             Console.Write($" \n");
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write("\nPress Escape to cancel");
@@ -103,11 +109,19 @@ public static class UserMenu{
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0){
-                Password = Password.Remove(Password.Length-1);
+            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0 && placePassword > 0){
+                Password = Password.Remove(placePassword-1, 1);
+                placePassword -= 1;
             }
             if(!char.IsControl(keyInfo.KeyChar)){
-                Password += keyInfo.KeyChar;
+                Password = Password.Insert(placePassword, $"{keyInfo.KeyChar}");
+                placePassword += 1;
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placePassword > 0){
+                placePassword -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placePassword < Password.Length){
+                placePassword += 1;
             }
             if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
