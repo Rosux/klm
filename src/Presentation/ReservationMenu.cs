@@ -22,10 +22,9 @@ public static class ReservationMenu
         Dictionary<string, Room> rooms = new Dictionary<string, Room>();
         int RoomCounter = 1;
         foreach(Room room in RoomsAccess.GetAllRooms(GroupSize)){
-            rooms.Add($"Room {RoomCounter} (Maximum size: {room.Capacity})", room);
+            rooms.Add($"{room.RoomName} (Maximum size: {room.Capacity})", room);
             RoomCounter++;
         }
-        Room SelectedRoom  = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
         DateOnly startDate = MenuHelper.SelectDate("Select at what date you want to start your reservation:", null, DateOnly.FromDateTime(DateTime.Now), null);
         TimeOnly startTime = MenuHelper.SelectTime("Select at what time you want to start your reservation:", "", new TimeOnly(), null, null);
         DateOnly endDate = MenuHelper.SelectDate("Select at what date you want to end your reservation:", startDate, startDate, null);
@@ -35,6 +34,23 @@ public static class ReservationMenu
         }else{
             endTime = MenuHelper.SelectTime("Select at what time you want to end your reservation:");
         }
+        // Create a list to hold the keys of rooms that are not available
+        List<string> roomsToRemove = new List<string>();
+
+        // Check availability and add the keys of unavailable rooms to the list
+        foreach(var kvp in rooms)
+        {
+            if (!ReservationAccess.RoomAvailable(kvp.Value.Id, startDate, endDate))
+            {
+                roomsToRemove.Add(kvp.Key);
+            }
+        }
+        //remove non-available rooms from rooms list and ask user to select a room.
+        foreach(string key in roomsToRemove)
+        {
+            rooms.Remove(key);
+        }
+        Room SelectedRoom  = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
 
         TimeLine.Holder timeline = new TimeLine.Holder();
         List<Entertainment> entertainments = new List<Entertainment>();

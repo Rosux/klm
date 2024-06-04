@@ -85,6 +85,7 @@ public static class RoomLogic
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int given_rows = 0, int seat = 0)
     {
+        string RoomName = MenuHelper.SelectText("Give a room name", "", false, 0, 100, @"([A-z]|\d| )");
         int? givenRows = null;
         if(given_rows == 0)
         {
@@ -117,11 +118,11 @@ public static class RoomLogic
                     seats[i] = row;
                     i++;
                 }
-                Room room = new(seats);
+                Room room = new(seats, RoomName);
                 string prefix = "This is the current room layout:";
                 string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
                 /// lets admin remove or reinsate seats
-                Room roomFinished = RoomLayoutManager(room, prefix, suffix);
+                Room roomFinished = RoomLayoutManager(room, prefix, suffix, RoomName);
                 if(roomFinished != null)
                 {
                     /// asks for conformation
@@ -194,7 +195,7 @@ public static class RoomLogic
         foreach(Room room in roomListRoom)
         {
             bool check = true;
-            string room_str = $"Id: {room.Id}, capacity: {room.Capacity}";
+            string room_str = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
             if(room_str.Length > longest)
             {
                 longest = room_str.Length;
@@ -273,7 +274,7 @@ public static class RoomLogic
             /// prints all info
             foreach(Room room in allRoomList[page])
             {
-                string zin = $"Id: {room.Id}, capacity: {room.Capacity}";
+                string zin = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
                 Console.Write("│ ");
                 /// if currently selected make the background darkgray instead of black
                 if (i == choice){ Console.BackgroundColor = ConsoleColor.DarkGray; }
@@ -342,7 +343,7 @@ public static class RoomLogic
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
     /// <returns></returns>
-    public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
+    public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "", string RoomName = "")
     {
         ConsoleKey key;
         int choiceSeat = 0;
@@ -475,7 +476,7 @@ public static class RoomLogic
             }
             else if(key == ConsoleKey.Enter && notEmptyCheck)
             {
-                Room roomFinisehed = new(room.Id, seats);
+                Room roomFinisehed = new(room.Id, seats, RoomName);
                 return roomFinisehed;
             }
         }while(key != ConsoleKey.Escape);
