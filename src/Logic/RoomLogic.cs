@@ -3,7 +3,7 @@
 /// </summary>
 public static class RoomLogic
 {
-    private static RoomAccess _RoomAccess = new RoomAccess();
+    private static RoomAccess _roomAccess = new RoomAccess();
 
     /// <summary>
     /// Creates a menu of 4 options to choose from and a back option. Options are: "Show room", "Add room", "Remove room", "Edit room".
@@ -37,7 +37,7 @@ public static class RoomLogic
     public static void ShowAllRooms()
     {
         ///count all the rooms. if there are none show a "No rooms found" text otherwise print the rooms
-        if(_RoomAccess.GetAllRooms().Count == 0){
+        if(_roomAccess.GetAllRooms().Count == 0){
             RoomMenu.NoRoomsFoundNotification();
         }else{
             Room? chosenRoom = ChooseRoom("choose a room to see");
@@ -65,7 +65,7 @@ public static class RoomLogic
             bool deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
             if(deletion){
                 // if the user answered yes remove the room and show the user if it worked or not
-                bool success = _RoomAccess.RemoveRoom(selectedRoom.Id);
+                bool success = _roomAccess.RemoveRoom(selectedRoom.Id);
                 RoomMenu.RoomDeletedNotification(success);
             }else{
                 // user answered no so dont delete anything and return to the menu
@@ -73,7 +73,7 @@ public static class RoomLogic
             }
         }
     }
-    
+
     /// <summary>
     /// lets the admin add a room by using the following steps:
     /// 1. asks how much rows he wants using menuhelper.selectinterger
@@ -129,7 +129,7 @@ public static class RoomLogic
                     if(conformation)
                     {
                         /// if conformation is given it adds the room to the database
-                        _RoomAccess.AddRoom(roomFinished);
+                        _roomAccess.AddRoom(roomFinished);
                         Console.WriteLine("\nRoom added sucessfully.");
                         Console.Write($"\n\nPress any key to continue...");
                         Console.ReadKey(true);
@@ -177,7 +177,7 @@ public static class RoomLogic
         /// holds the pages
         List<List<Room>> allRoomList = new List<List<Room>>();
         /// holds all rooms
-        List<Room> roomListRoom = _RoomAccess.GetAllRooms();
+        List<Room> roomListRoom = _roomAccess.GetAllRooms();
         /// is a list that gets filled with all rooms per page and then added to allRoomList
         List<Room> roomList = new List<Room>();
         /// holds longest sting per page
