@@ -36,11 +36,12 @@ public static class ReservationMenu
         }
         // Create a list to hold the keys of rooms that are not available
         List<string> roomsToRemove = new List<string>();
-
+        DateTime StartDateTime = new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0);
+        DateTime EndDateTime = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0);
         // Check availability and add the keys of unavailable rooms to the list
         foreach(var kvp in rooms)
         {
-            if (!ReservationAccess.RoomAvailable(kvp.Value.Id, startDate, endDate))
+            if (!ReservationAccess.RoomAvailable(kvp.Value.Id, StartDateTime, EndDateTime))
             {
                 roomsToRemove.Add(kvp.Key);
             }
@@ -50,7 +51,16 @@ public static class ReservationMenu
         {
             rooms.Remove(key);
         }
-        Room SelectedRoom  = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
+
+        Room SelectedRoom = null;
+        if(rooms.Count > 0) {
+            SelectedRoom  = MenuHelper.SelectFromList("Choose the room you want to reserve:", rooms);
+        }
+        else {
+            Console.WriteLine("There are no rooms available for the selected date\nReservation has not been added\n\nReturning to main menu, press enter to continue...");
+            Console.ReadKey(true);
+            return null;
+        }
 
         TimeLine.Holder timeline = new TimeLine.Holder();
         List<Entertainment> entertainments = new List<Entertainment>();
