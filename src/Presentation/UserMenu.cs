@@ -277,6 +277,10 @@ public static class UserMenu{
             {
                 error += $"Email already exists.\n";
             }
+            if (!MailAddress.TryCreate(input, out MailAddress? _))
+            {
+                error += $"email is not valid";
+            }
             Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
@@ -293,10 +297,6 @@ public static class UserMenu{
             if (!char.IsControl(keyInfo.KeyChar))
             {
                 input += keyInfo.KeyChar;
-            }
-            if (!MailAddress.TryCreate(input, out b))
-            {
-                error += $"email is not valid";
             }
             if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
             {
