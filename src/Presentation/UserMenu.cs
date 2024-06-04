@@ -48,19 +48,42 @@ public static class UserMenu{
     public static User? GetLoginCredentials()
     {
         string Email = "";
+        int place = 0;
         do{
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
+            Console.Write("Email: ");
+            int i = 0;
+            foreach (char c in Email)
+            {
+                if(i == place){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(place == Email.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("Password: \n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0){
-                Email = Email.Remove(Email.Length-1);
+            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0 && place > 0){
+                Email = Email.Remove(place-1, 1);
+                place -= 1;
             }
             if(!char.IsControl(keyInfo.KeyChar)){
-                Email += keyInfo.KeyChar;
+                //Email += keyInfo.KeyChar;
+                Email = Email.Insert(place, $"{keyInfo.KeyChar}");
+                place += 1;
+                //keyInfo.KeyChar
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && place > 0){
+                place -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && place < Email.Length){
+                place += 1;
             }
             if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
@@ -70,7 +93,12 @@ public static class UserMenu{
         do{
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
+            Console.Write($"Email: {Email}\nPassword: ");
+            Console.Write($"{new string('*', Password.Length)}");
+            Console.BackgroundColor = ConsoleColor.DarkGray;
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
