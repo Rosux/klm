@@ -39,7 +39,7 @@ public class FilmLogic
             int new_Id = CreateID();
             film.Id = new_Id;
             list_films.Add(film);
-            filmacesser.Return_info(list_films);
+            filmacesser.Return_info(list_films, null);
             return $"you succesfully added the movie {film.Title}.";
         }
         else
@@ -69,7 +69,7 @@ public class FilmLogic
             film.Id = i;
             i++;
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, r_film);
         return info;
     }
 
@@ -118,7 +118,7 @@ public class FilmLogic
             }
         }
         //write new list to the json
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 
@@ -135,7 +135,7 @@ public class FilmLogic
                 film.Genres = new_genres;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 
@@ -152,7 +152,7 @@ public class FilmLogic
                 film.Runtime = new_duration;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
     public string change_language(int id, string language)
@@ -168,7 +168,7 @@ public class FilmLogic
                 film.OriginalLanguage = language;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 
@@ -185,7 +185,7 @@ public class FilmLogic
                 film.ReleaseDate = releasedate;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 
@@ -202,7 +202,7 @@ public class FilmLogic
                 film.VoteAverage = new_vote_average;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
     public string change_overview(int id, string new_overview)
@@ -218,7 +218,7 @@ public class FilmLogic
                 film.Overview = new_overview;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
     // change age certification of given film (id)
@@ -235,7 +235,7 @@ public class FilmLogic
                 film.Certification = new_certification;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 
@@ -253,7 +253,7 @@ public class FilmLogic
                 film.Directors = directorsList;
             }
         }
-        filmacesser.Return_info(list_films);
+        filmacesser.Return_info(list_films, null);
         return info;
     }
 }

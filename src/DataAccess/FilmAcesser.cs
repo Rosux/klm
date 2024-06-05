@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 public class FilmAcesser
 {
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
     //Get list of all movies
     public List<Film> Get_info()
     {
@@ -14,7 +15,7 @@ public class FilmAcesser
     }
 
     //Write all movies to the JSON
-    public void Return_info(List<Film> list_movies)
+    public void Return_info(List<Film> list_movies, Film removedFilm)
     {
         if(Environment.GetEnvironmentVariable("FILM_PATH") == null){
             throw new Exception("Environment FILM_PATH not set.");
@@ -24,6 +25,21 @@ public class FilmAcesser
         writer.Write(string_movies);
         writer.Close();
         SearchAccess.UpdateMedia();
+        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+        foreach(Reservation Reservation in Reservations)
+        {
+            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            {
+                if(TimelineObject.Action is Film)
+                {
+                    if(((Film)TimelineObject.Action).Id == removedFilm.Id)
+                    {
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                    }
+                }
+            }
+            _reservationAccess.EditReservation(Reservation);
+        }
     }
     
     //Return a list of string with all genres
