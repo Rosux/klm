@@ -16,7 +16,10 @@ public class SearchTest
             File.SetAttributes("./DataSource/Films.json", FileAttributes.Normal);
             File.Delete("./DataSource/Films.json");
         }
-        Directory.Delete("./DataSource");
+        if (Directory.Exists("./DataSource"))
+        {
+            Directory.Delete("./DataSource", true); // Recursive 
+        }
     }
 
     [SetUp]
@@ -61,6 +64,10 @@ public class SearchTest
 
             ff.Write(JsonConvert.SerializeObject(films));
         }
+
+        // Set the FILM_PATH environment variable
+        Environment.SetEnvironmentVariable("FILM_PATH", "./DataSource/Series.json");
+        Environment.SetEnvironmentVariable("SERIE_PATH", "./DataSource/Films.json");
         sa = new SearchAccess();
     }
 
