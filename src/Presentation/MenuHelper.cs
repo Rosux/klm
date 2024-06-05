@@ -1592,35 +1592,37 @@ public static class MenuHelper{
 
             #region Create edit table values (": oldData -> newData")
             List<string> editOptionData = new List<string>();
-            if(showEditTable && chunks.Count > 0){
-                // create the edit table text
-                if(canEdit){
-                    foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                        Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
-                        string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
-                        if(editing){
+            if(currentPageSelection != -1){
+                if(showEditTable && chunks.Count > 0){
+                    // create the edit table text
+                    if(canEdit){
+                        foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
+                            Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
+                            string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                            if(editing){
 
-                            string propertyName = "";
-                            if(editMapping.Value.Accessor.Body is MemberExpression bodyMember){
-                                propertyName = bodyMember.Member.Name;
-                            }else if(editMapping.Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
-                                propertyName = unaryMember.Member.Name;
-                            }
+                                string propertyName = "";
+                                if(editMapping.Value.Accessor.Body is MemberExpression bodyMember){
+                                    propertyName = bodyMember.Member.Name;
+                                }else if(editMapping.Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                    propertyName = unaryMember.Member.Name;
+                                }
 
-                            foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
-                                if(kvp.Key.Name.ToString() == propertyName){
-                                    (object oldData, object newData) = kvp.Value;
-                                    if(oldData.ToString() != newData.ToString()){
-                                        dataString = $"{oldData} -> {newData}";
+                                foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
+                                    if(kvp.Key.Name.ToString() == propertyName){
+                                        (object oldData, object newData) = kvp.Value;
+                                        if(oldData.ToString() != newData.ToString()){
+                                            dataString = $"{oldData} -> {newData}";
+                                        }
                                     }
                                 }
+
                             }
-
+                            editOptionData.Add(": "+dataString);
                         }
-                        editOptionData.Add(": "+dataString);
                     }
-                }
 
+                }
             }
             #endregion
 
@@ -1639,16 +1641,18 @@ public static class MenuHelper{
 
             // calculate the longest edit table options
             int longestEditOption = 0;
-            if(showEditTable && chunks.Count > 0){
-                for(int i=0;i<editOptions.Count;i++){
-                    if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+            if(currentPageSelection != -1){
+                if(showEditTable && chunks.Count > 0){
+                    for(int i=0;i<editOptions.Count;i++){
+                        if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+                    }
+                    if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
+                    if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
+                    if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
                 }
-                if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
-                if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
-                if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
-            }
-            if(canDelete){
-                if($"Delete {typeof(T)}".Length > longestEditOption){longestEditOption = $"Delete {typeof(T)}".Length;}
+                if(canDelete){
+                    if($"Delete {typeof(T)}".Length > longestEditOption){longestEditOption = $"Delete {typeof(T)}".Length;}
+                }
             }
             #endregion
 
@@ -1767,26 +1771,29 @@ public static class MenuHelper{
 
             #region Edit string list
             List<string> editStringLines = new List<string>();
-            if(showEditTable && canEdit && chunks.Count > 0){
-                editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
-                for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
-                    string editLine = editOptions[i];
-                    string editDataLine = editOptionData[i];
-                    editStringLines.Add($"│ {editLine}{editDataLine}{new string(' ', Math.Max(0, longestEditOption-(editLine.Length+editDataLine.Length)))} │");
-                }
-                editStringLines.Add($"├─{new string('─', Math.Max(0, longestEditOption))}─┤");
-                editStringLines.Add($"│ Save changes{new string(' ', Math.Max(0, longestEditOption-"Save changes".Length))} │");
-                editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
-                if(canDelete){
-                    editStringLines.Add($"├{Format('─', longestEditOption+2)}┤");
+            if(currentPageSelection != -1)
+            {
+                if(showEditTable && canEdit && chunks.Count > 0){
+                    editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
+                    for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
+                        string editLine = editOptions[i];
+                        string editDataLine = editOptionData[i];
+                        editStringLines.Add($"│ {editLine}{editDataLine}{new string(' ', Math.Max(0, longestEditOption-(editLine.Length+editDataLine.Length)))} │");
+                    }
+                    editStringLines.Add($"├─{new string('─', Math.Max(0, longestEditOption))}─┤");
+                    editStringLines.Add($"│ Save changes{new string(' ', Math.Max(0, longestEditOption-"Save changes".Length))} │");
+                    editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
+                    if(canDelete){
+                        editStringLines.Add($"├{Format('─', longestEditOption+2)}┤");
+                        editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
+                    }
+                    editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
+                }else if(showEditTable && canDelete){
+                    editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
                     editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
-                }
-                editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
-            }else if(showEditTable && canDelete){
-                editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
-                editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
-                editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
+                    editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
 
+                }
             }
             #endregion
 
@@ -1865,7 +1872,7 @@ public static class MenuHelper{
                     Console.Write("\n");
                     continue;
                 }
-                Console.Write($" {(i==5+currentPageSelection ? "->" : "  ")} ");
+                Console.Write($" {((i+tableSearchSelectionOffset==5+currentPageSelection && currentPageSelection != -1) ? "->" : "  ")} ");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(0, 2) : "")}");
 

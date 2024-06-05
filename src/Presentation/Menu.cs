@@ -36,7 +36,7 @@ class Menu
                 while(uwu)
                 {
                     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                        {"Manage movies/series", ()=>{
+                        {"Manage Media", ()=>{
                             // takes admin to movie editor
                             MediaLogic.Media();
                         }},
@@ -92,6 +92,11 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
+
+
+        MediaLogic.Media();
+
+
         // MediaAccess.AddMedia(
         //     new Film(
         //         "Title",
