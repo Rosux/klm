@@ -48,38 +48,80 @@ public static class UserMenu{
     public static User? GetLoginCredentials()
     {
         string Email = "";
+        int placeEmail = 0;
         do{
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: \n\nPress Escape to cancel");
+            Console.Write("Email: ");
+            int i = 0;
+            foreach (char c in Email)
+            {
+                if(i == placeEmail){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placeEmail == Email.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("Password: \n\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0){
-                Email = Email.Remove(Email.Length-1);
+            if(keyInfo.Key == ConsoleKey.Backspace && Email.Length > 0 && placeEmail > 0){
+                Email = Email.Remove(placeEmail-1, 1);
+                placeEmail -= 1;
             }
             if(!char.IsControl(keyInfo.KeyChar)){
-                Email += keyInfo.KeyChar;
+                Email = Email.Insert(placeEmail, $"{keyInfo.KeyChar}");
+                placeEmail += 1;
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placeEmail > 0){
+                placeEmail -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placeEmail < Email.Length){
+                placeEmail += 1;
             }
             if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
             }
         }while(true);
         string Password = "";
+        int placePassword = 0;
         do{
+            int i = 0;
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"Email: {Email}\nPassword: {new string('*', Password.Length)}\n\nPress Escape to cancel");
+            Console.Write($"Email: {Email}\nPassword: ");
+            foreach(char c in Password)
+            {
+                if(i == placePassword){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write("*");
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placePassword == Password.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\nPress Escape to cancel");
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             if(keyInfo.Key == ConsoleKey.Enter){
                 break;
             }
-            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0){
-                Password = Password.Remove(Password.Length-1);
+            if(keyInfo.Key == ConsoleKey.Backspace && Password.Length > 0 && placePassword > 0){
+                Password = Password.Remove(placePassword-1, 1);
+                placePassword -= 1;
             }
             if(!char.IsControl(keyInfo.KeyChar)){
-                Password += keyInfo.KeyChar;
+                Password = Password.Insert(placePassword, $"{keyInfo.KeyChar}");
+                placePassword += 1;
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placePassword > 0){
+                placePassword -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placePassword < Password.Length){
+                placePassword += 1;
             }
             if(keyInfo.Key == ConsoleKey.Escape){
                 return null;
@@ -235,6 +277,10 @@ public static class UserMenu{
             {
                 error += $"Email already exists.\n";
             }
+            if (!MailAddress.TryCreate(input, out MailAddress? _))
+            {
+                error += $"email is not valid";
+            }
             Console.CursorVisible = false;
             Console.Clear();
             Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
@@ -251,10 +297,6 @@ public static class UserMenu{
             if (!char.IsControl(keyInfo.KeyChar))
             {
                 input += keyInfo.KeyChar;
-            }
-            if (!MailAddress.TryCreate(input, out b))
-            {
-                error += $"email is not valid";
             }
             if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
             {
