@@ -1603,6 +1603,7 @@ public static class MenuHelper{
     /// <param name="canSelect">A boolean indicating if the user is able to select a row. The item on this row will be returned.</param>
     /// <param name="canCancel">A boolean indicating if the user can press escape to cancel everything and return back.</param>
     /// <param name="canEdit">A boolean indicating if the user is able to edit properties of the items.</param>
+    /// <param name="canSearch">A boolean indicating if the user is able to search the rows by value.</param>
     /// <param name="propertyEditMapping">A Dictionary where the key is the editing text and the value being a PropertyEditMapping instance of type T that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the user object and returns an object being the new member of type T.</param>
     /// <param name="saveEditedUserMethod">A Func<T, bool> that takes in the newly edited T object and returns a boolean indicating if it saved or not.</param>
     /// <param name="canAdd">A boolean indicating if the user can add a new object of type T. If the user chooses to make a new object of type T it will call the addMethod.</param>
@@ -1610,7 +1611,7 @@ public static class MenuHelper{
     /// <param name="canDelete">A boolean indicating if the user can delete the item in the list. Uses the deleteMethod to delete the instance.</param>
     /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
     /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
-    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod)
+    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, bool canSearch, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod)
     {
         if(propertyEditMapping == null || saveEditedUserMethod == null){
             canEdit = false;
@@ -1652,14 +1653,51 @@ public static class MenuHelper{
         int editSelection = 0;
         int currentPageSelection = 0;
         int currentPage = 0;
+        // search
+        string searchString = "";
+        int searchHeight = 1;
+        int searchCursor = 0;
+        bool searching = false;
         ConsoleKey key;
+        ConsoleKeyInfo rawKey;
         do
         {
             #region Generate pages
-            List<List<T>> chunks = new List<List<T>>();
-            for (int i=0;i<items.Count;i+=10)
+
+            string[] tokens = searchString.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries);
+            List<T> sortedItems = new List<T>();
+            if(searchString == "")
             {
-                chunks.Add(items.Skip(i).Take(10).ToList());
+                sortedItems = items;
+            }
+            else
+            {
+                for(int i=0;i<items.Count;i++)
+                {
+                    bool added = false;
+                    foreach(KeyValuePair<string, Func<T, object>> header in headers){
+                        foreach(string token in tokens)
+                        {
+                            if(header.Value.Invoke(items[i]).ToString().ToLower().Contains(token.ToLower())){
+                                sortedItems.Add(items[i]);
+                                added = true;
+                            }
+                            if(added){
+                                break;
+                            }
+                        }
+                        if(added){
+                            break;
+                        }
+                    }
+                }
+            }
+
+            List<List<T>> chunks = new List<List<T>>();
+            for (int i=0;i<sortedItems.Count;i+=10)
+            {
+                chunks.Add(sortedItems.Skip(i).Take(10).ToList());
+                searchHeight++;
             }
             int maxPage = chunks.Count-1;
             if(currentPage > maxPage){
@@ -1745,6 +1783,23 @@ public static class MenuHelper{
 
             // prints the <- pagenumber ->
             tableStringLines.Add($"{pageArrows}");
+
+            int tableSearchSelectionOffset = 0;
+
+            #region Search
+            if(canSearch){
+                tableSearchSelectionOffset--;
+                string printableSearchString = $"Search: {searchString}";
+                tableStringLines.Add($"├{Format('─', totalWidth-2)}┤");
+
+                for (int i=0;i<printableSearchString.Length;i+=totalWidth-4)
+                {
+                    tableStringLines.Add($"│ {Format(printableSearchString.Substring(i, Math.Min(totalWidth-4, printableSearchString.Length - i)), totalWidth-4, ' ')} │");
+                    tableSearchSelectionOffset--;
+                }
+
+            }
+            #endregion
 
             // prints the seperator between page number and headers
             string seperatorLine1 = "";
@@ -1857,18 +1912,47 @@ public static class MenuHelper{
             for(int i=0;i<Math.Max(editStringLines.Count, tableStringLines.Count);i++){
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(0, 2) : new string(' ', 2))}");
-                if(chunks.Count > 0 && currentPageSelection == chunks[currentPage].Count){
-                    Console.BackgroundColor = (canAdd && currentPageSelection == chunks[currentPage].Count && i==6+currentPageSelection) ? ConsoleColor.DarkGray : ConsoleColor.Black;
-                }else{
-                    Console.BackgroundColor = (i == 5+currentPageSelection && !editing && chunks.Count > 0) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+
+                if(canSearch && currentPageSelection == -1 && i+tableSearchSelectionOffset <= 1 && i >= 3)
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                }
+                else
+                {
+                    if(chunks.Count > 0 && currentPageSelection == chunks[currentPage].Count){
+                        Console.BackgroundColor = (canAdd && currentPageSelection == chunks[currentPage].Count && i+tableSearchSelectionOffset==6+currentPageSelection) ? ConsoleColor.DarkGray : ConsoleColor.Black;
+                    }else{
+                        Console.BackgroundColor = (i+tableSearchSelectionOffset == 5+currentPageSelection && !editing && chunks.Count > 0) ? ((canSearch && currentPageSelection == -1) ? ConsoleColor.Black : ConsoleColor.DarkGray) : ConsoleColor.Black;
+                    }
+                    if(chunks.Count == 0 && i+tableSearchSelectionOffset == 7){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }
                 }
                 if(!showSelection){
                     Console.BackgroundColor = ConsoleColor.Black;
                 }
-                if(chunks.Count == 0 && i == 7){
-                    Console.BackgroundColor = ConsoleColor.DarkGray;
+
+                // TODO fix cursor :(
+                if(canSearch && currentPageSelection == -1 && i+tableSearchSelectionOffset <= 1 && i >= 3)
+                {
+                    for(int j=0;j<tableStringLines[i].Length-4;j++)
+                    {
+                        if(j == searchCursor+"Search: ".Length)
+                        {
+                            Console.BackgroundColor = ConsoleColor.DarkGray;
+                        }
+                        else
+                        {
+                            Console.BackgroundColor = ConsoleColor.Black;
+                        }
+                        Console.Write($"{tableStringLines[i].Substring(2+j, 1)}");
+                    }
                 }
-                Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(2, tableStringLines[i].Length-4) : new string(' ', totalWidth-4))}");
+                else
+                {
+                    Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(2, tableStringLines[i].Length-4) : new string(' ', totalWidth-4))}");
+                }
+
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(tableStringLines[i].Length-2, 2) : new string(' ', 2))}");
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -1911,13 +1995,14 @@ public static class MenuHelper{
             #endregion
 
             #region Input
-            key = Console.ReadKey(true).Key;
+            rawKey = Console.ReadKey(true);
+            key = rawKey.Key;
 
-            if(!editing && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)){
+            if(!searching && !editing && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow)){
                 currentPage += (key == ConsoleKey.LeftArrow) ? -1 : 1;
                 currentPageSelection = 0;
             }
-            if(key == ConsoleKey.Escape){
+            if(!searching && key == ConsoleKey.Escape){
                 if(canCancel && !editing){
                     break;
                 }
@@ -1926,19 +2011,19 @@ public static class MenuHelper{
                     editSelection = 0;
                 }
             }
-            if(key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow){
+            if(!searching && key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow){
                 if(!editing){
                     currentPageSelection += key == ConsoleKey.UpArrow ? -1 : 1;
                 }else{
                     editSelection += key == ConsoleKey.UpArrow ? -1 : 1;
                 }
             }
-            if(key == ConsoleKey.Enter && canSelect){
+            if(!searching && key == ConsoleKey.Enter && canSelect && currentPageSelection >= 0){
                 #region Select
                 return chunks[currentPage][currentPageSelection];
                 #endregion
             }
-            if(key == ConsoleKey.Enter && !editing && (canEdit || canDelete)){
+            if(!searching && key == ConsoleKey.Enter && !editing && (canEdit || canDelete) && currentPageSelection >= 0){
                 bool adding = false;
                 if(chunks.Count > 0){
                     if(currentPageSelection == chunks[currentPage].Count){
@@ -2081,18 +2166,45 @@ public static class MenuHelper{
                 }
 
             }
+            #region Search
+            if((key == ConsoleKey.DownArrow || key == ConsoleKey.Enter || key == ConsoleKey.Escape) && searching)
+            {
+                searching = false;
+                currentPageSelection = 0;
+            }
+            if(canSearch && currentPageSelection == -1 && !searching)
+            {
+                searching = true;
+            }
+
+            if(searching && Regex.IsMatch(rawKey.KeyChar.ToString(), @"([a-zA-Z]|\-|[0-9]|\@|\ |\,|\.|\:)"))
+            {
+                searchString = searchString.Insert(searchCursor, rawKey.KeyChar.ToString());
+                searchCursor++;
+            }
+            if(searching && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow))
+            {
+                searchCursor += key == ConsoleKey.LeftArrow ? -1 : 1;
+            }
+            if(searching && key == ConsoleKey.Backspace && searchCursor > 0)
+            {
+                searchString = searchString.Remove(searchCursor - 1, 1);
+                searchCursor--;
+            }
+            #endregion
             #endregion
 
             #region Clamping Values
+            searchCursor = Math.Clamp(searchCursor, 0, Math.Max(0, searchString.Length));
             currentPage = Math.Clamp(currentPage, 0, Math.Max(0, chunks.Count-1));
             if(chunks.Count > 0){
                 if(canAdd){
-                    currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count);
+                    currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, chunks[currentPage].Count);
                 }else{
-                    currentPageSelection = Math.Clamp(currentPageSelection, 0, chunks[currentPage].Count-1);
+                    currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, chunks[currentPage].Count-1);
                 }
             }else{
-                currentPageSelection = 0;
+                currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, 0);
             }
             if(canEdit && canDelete){
                 editSelection = Math.Clamp(editSelection, 0, 3+editOptions.Count-1);
@@ -2118,6 +2230,27 @@ public static class MenuHelper{
         return default(T);
     }
 
+
+    /// <summary>
+    /// Creates a table that holds a list of objects.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> being a method that gets a type T object and returns an object of any type.</param>
+    /// <param name="canSelect">A boolean indicating if the user is able to select a row. The item on this row will be returned.</param>
+    /// <param name="canCancel">A boolean indicating if the user can press escape to cancel everything and return back.</param>
+    /// <param name="canEdit">A boolean indicating if the user is able to edit properties of the items.</param>
+    /// <param name="propertyEditMapping">A Dictionary where the key is the editing text and the value being a PropertyEditMapping instance of type T that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the user object and returns an object being the new member of type T.</param>
+    /// <param name="saveEditedUserMethod">A Func<T, bool> that takes in the newly edited T object and returns a boolean indicating if it saved or not.</param>
+    /// <param name="canAdd">A boolean indicating if the user can add a new object of type T. If the user chooses to make a new object of type T it will call the addMethod.</param>
+    /// <param name="addMethod">A Func<T?> that creates a new instance of object T or NULL and returns it. If the result is NULL the new instance wont get saved. If the result is the new object it gets added to the table.</param>
+    /// <param name="canDelete">A boolean indicating if the user can delete the item in the list. Uses the deleteMethod to delete the instance.</param>
+    /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
+    /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
+    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod){
+        return Table(items, headers, canSelect, canCancel, canEdit, false, propertyEditMapping, saveEditedUserMethod, canAdd, addMethod, canDelete, deleteMethod);
+    }
+
     /// <summary>
     /// Displays a table that holds a list of objects and allows the user to select an item.
     /// </summary>
@@ -2128,6 +2261,19 @@ public static class MenuHelper{
     /// <returns>Returns the selected object of type T, or NULL if the selection is cancelled by pressing escape.</returns>
     public static T? SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canCancel){
         return Table(items, headers, true, canCancel, false, null, null, false, null, false, null);
+    }
+
+    /// <summary>
+    /// Displays a table that holds a list of objects and allows the user to select an item.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects.</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> is a method that gets a type T object and returns an object of any type.</param>
+    /// <param name="canCancel">A boolean indicating if the user can press escape to cancel the selection
+    /// <param name="canSearch">A boolean indicating if the user is able to search the rows by value.</param> and return back.</param>
+    /// <returns>Returns the selected object of type T, or NULL if the selection is cancelled by pressing escape.</returns>
+    public static T? SelectFromTable<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canCancel, bool canSearch = true){
+        return Table(items, headers, true, canCancel, false, canSearch, null, null, false, null, false, null);
     }
 
     /// <summary>
@@ -2287,8 +2433,8 @@ public static class MenuHelper{
     }
 
     #endregion
+    #endregion
 }
-#endregion
 // ┌─┬┐
 // │ ││
 // ├─┼┤
