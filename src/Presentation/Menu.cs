@@ -107,10 +107,36 @@ class Menu
         //         new List<string>() { "Writer1", "Writer2" }
         //     )
         // );
-        Console.WriteLine(MediaAccess.GetAllFilms().Count);
-        Console.WriteLine("\n\n");
-        Console.WriteLine(MediaAccess.GetAllSeries().Count);
-        Console.WriteLine("\n\n");
-        Console.WriteLine(MediaAccess.GetAllMedia().Count);
+        // Console.WriteLine(MediaAccess.GetAllFilms().Count);
+        // Console.WriteLine("\n\n");
+        // Console.WriteLine(MediaAccess.GetAllSeries().Count);
+        // Console.WriteLine("\n\n");
+        // Console.WriteLine(MediaAccess.GetAllMedia().Count);
+
+        // ConsumptionAccess c = new ConsumptionAccess();
+        // var x = MenuHelper.SelectFromTable(
+        //     c.ReadConsumption(),
+        //     new Dictionary<string, Func<Consumption, object>>(){
+        //         { "Id", (x)=>x.Id },
+        //         { "Name", (x)=>x.Name },
+        //         { "Price", (x)=>x.Price },
+        //         { "StartTime", (x)=>x.StartTime },
+        //     },
+        //     true,
+        //     true
+        // );
+        // var y = MenuHelper.SelectFromTable(
+        //     c.ReadConsumption(),
+        //     new Dictionary<string, Func<Consumption, object>>(){
+        //         { "Id", (x)=>x.Id },
+        //         { "Name", (x)=>x.Name },
+        //         { "Price", (x)=>x.Price },
+        //         { "StartTime", (x)=>x.StartTime },
+        //     },
+        //     true
+        // );
+        // Console.WriteLine(x?.Name);
+        // Console.WriteLine(y?.Name);
+
     }
 }

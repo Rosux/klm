@@ -67,7 +67,7 @@ public class ReservationTest
                 double price = reader.GetDouble(6);
                 List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
                 TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
+                TimelineHolder.Items = timeline;
                 List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
                 readResult.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder, entertainments));
             }
@@ -78,7 +78,7 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.Items.ToString())
             {
                 Assert.Pass("Inserted Consumption found in the list.");
             }
@@ -181,7 +181,7 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.Items.ToString())
             {
                 Assert.Pass("Inserted reservation found in the list.");
             }
@@ -255,7 +255,7 @@ public class ReservationTest
 
     private int TestTimeLine(TimeLine.Holder t){
         int u = 0;
-        List<TimeLine.Item> timelineItems = t.t;
+        List<TimeLine.Item> timelineItems = t.Items;
         if(timelineItems.Count == 4){
             Assert.Pass("Reservation timeline holds all the objects in the list");
             if(timelineItems[0].Action is Break && (Break)(timelineItems[0].Action) != null){

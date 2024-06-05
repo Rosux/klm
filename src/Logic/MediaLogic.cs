@@ -27,15 +27,17 @@ public class MediaLogic
             true,
             CreateNewMedia
         );
-    }
-
-    private static Media CreateNewMedia(){
-        
-    }
-
-    private static string GetValidTitle(Media previousMedia){
-        string prompt = $"Current Title: {previousMedia.Title}\nCurrent Language: {previousMedia.Language}\nCurrent Genres: {previousMedia.Genres}\nCurrent Release Date: {previousMedia.ReleaseDate}\nCurrent Certification: {previousMedia.Certification}";
-        string? newTitle = MenuHelper.SelectText(prompt+"Enter the new name of the product:", "", true, 2, 30);
-        return newTitle ?? previousMedia.Title;
+        MenuHelper.SelectFromTable(
+            MediaAccess.GetAllMedia(),
+            new Dictionary<string, Func<Media, object>>(){
+                {"Id", m=>m.Id},
+                {"Title", m=>m.Title},
+                {"Language", m=>m.Language},
+                {"Genres", m=>string.Join(", ", m.Genres)},
+                {"Release Date", m=>m.ReleaseDate},
+                {"Certification", m=>m.Certification},
+            },
+            true
+        )
     }
 }
