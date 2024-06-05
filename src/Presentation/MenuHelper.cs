@@ -2228,7 +2228,7 @@ public static class MenuHelper{
         Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
         // create the top surounding bar with the word Screen centered
         string header = "Screen";
-        for(int i=0;i<(widestSeats*2)+1 - "Screen".Length;i++)
+        for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
         {
             header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
         }
