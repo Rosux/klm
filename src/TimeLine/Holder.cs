@@ -33,6 +33,28 @@ namespace TimeLine{
         public void Add(object action, DateTime startTime, DateTime endTime){
             Add(new Item(action, startTime, endTime));
         }
+        
+        /// <summary>
+        /// Checks if there is a conflict with the given time range.
+        /// </summary>
+        /// <param name="startTime">Start time of the new item.</param>
+        /// <param name="endTime">End time of the new item.</param>
+        /// <returns>True if there is a conflict, otherwise false.</returns>
+        public bool HasConflict(DateTime startTime, DateTime endTime)
+        {
+            foreach (var item in Items)
+            {
+                if (item.Action is Film)
+                {
+                    // Check if the new time range is also within any already added film 
+                    if (startTime < item.EndTime && endTime > item.StartTime)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public override string ToString()
         {
