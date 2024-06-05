@@ -38,7 +38,7 @@ class Menu
                     MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Manage movies/series", ()=>{
                             // takes admin to movie editor
-                            // FilmSerieMenu.UI();
+                            MediaLogic.Media();
                         }},
                         {"Consumptions", ()=>{
                             // consumption editor

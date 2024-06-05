@@ -106,4 +106,25 @@ public static class MediaAccess
             File.WriteAllText(_mediaPath, JsonConvert.SerializeObject(new MediaJsonStruct()));
         }
     }
+    public static bool MediaExists<T>(T media)
+    {
+        MediaJsonStruct mediaStructure = GetMedia();
+
+        if (media is Film film)
+        {
+            return mediaStructure.Films.Any(existingFilm =>
+                existingFilm.Title == film.Title &&
+                existingFilm.Directors.SequenceEqual(film.Directors) &&
+                existingFilm.ReleaseDate == film.ReleaseDate);
+        }
+        else if (media is Serie serie)
+        {
+            return mediaStructure.Series.Any(existingSerie =>
+                existingSerie.Title == serie.Title &&
+                existingSerie.Seasons.Count == serie.Seasons.Count &&
+                existingSerie.ReleaseDate == serie.ReleaseDate);
+        }
+
+        return false;
+    }
 }

@@ -2127,6 +2127,163 @@ public static class MenuHelper{
         Console.Write($"└{new string('─', (widestSeats*4)+1)}┘\n\n");
     }
     #endregion
+
+    #region Float
+    public static float? SelectFloat(string prefix = "", string suffix = "", bool canCancel = false, float defaultFloat = 0.0f, float min = float.MinValue, float max = float.MaxValue)
+    {
+        float num = defaultFloat;
+        string error = "";
+        string inputNum = defaultFloat.ToString();
+        string keybinds = "Press Enter to confirm";
+        if (canCancel)
+        {
+            keybinds += "\nPress Escape to cancel";
+        }
+        ConsoleKey key;
+        ConsoleKeyInfo rawKey;
+        do
+        {
+            // set error message
+            if (num < min || num > max)
+            {
+                error = $"Please select a value between {min} and {max}";
+            }
+            else
+            {
+                error = "";
+            }
+
+            Console.CursorVisible = false;
+            Console.Clear();
+            Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
+            rawKey = Console.ReadKey(true);
+            key = rawKey.Key;
+
+            // add number to string
+            if (char.IsDigit(rawKey.KeyChar) || rawKey.KeyChar == '.' && float.TryParse(inputNum + rawKey.KeyChar, out float x))
+            {
+                inputNum += rawKey.KeyChar;
+            }
+            // remove last from string
+            if (key == ConsoleKey.Backspace)
+            {
+                if (inputNum.Length > 0)
+                {
+                    inputNum = inputNum.Remove(inputNum.Length - 1);
+                }
+                if (inputNum.Length == 0)
+                {
+                    inputNum = "0";
+                }
+            }
+
+            // set num to inputNum
+            if (!float.TryParse(inputNum, out num))
+            {
+                continue;
+            }
+
+            // up/down arrow increases/decreases number
+            if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
+            {
+                num += key == ConsoleKey.DownArrow ? -1 : 1;
+                inputNum = num.ToString();
+            }
+            // enter tries to see if the number is between the min/max and if not sets an suggestive error message
+            if (key == ConsoleKey.Enter)
+            {
+                if (num >= min && num <= max)
+                {
+                    break;
+                }
+            }
+            if (canCancel && key == ConsoleKey.Escape)
+            {
+                return null;
+            }
+        } while (true);
+        Console.CursorVisible = false;
+        Console.Clear();
+        return num;
+    }
+    #endregion
+
+    #region SelectFromEnum
+    public static T? SelectFromEnum<T>(string prompt = "", string suffix = "", bool canCancel = false, int minimumLength = 0, int maximumLength = int.MaxValue, string allowedRegexPattern = "([A-z]| )", List<T> options = null) where T : struct, Enum
+    {
+        string input = "";
+        string errorMessage = "";
+        string keybinds = "Press Enter to confirm";
+        if (canCancel) { keybinds += "\nPress Escape to cancel"; }
+        ConsoleKey key;
+        char keyChar;
+        do
+        {
+            errorMessage = "";
+            if (input.Length < minimumLength || input.Length > maximumLength)
+            {
+                errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
+            }
+
+            Console.CursorVisible = false;
+            Console.Clear();
+            Console.Write($"{prompt}\n\n{input}\n");
+
+            if (options != null && options.Count > 0)
+            {
+                Console.WriteLine("\nOptions:");
+                foreach (T option in options)
+                {
+                    Console.WriteLine($"{option}: {option}");
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"{errorMessage}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\n\n{keybinds}\n{suffix}");
+
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            key = keyInfo.Key;
+            keyChar = keyInfo.KeyChar;
+
+            if (Regex.IsMatch(keyChar.ToString(), allowedRegexPattern))
+            {
+                input += keyChar;
+            }
+
+            if (key == ConsoleKey.Backspace && input.Length > 0)
+            {
+                input = input.Remove(input.Length - 1);
+            }
+
+            if (key == ConsoleKey.Enter)
+            {
+                if (input.Length >= minimumLength && input.Length <= maximumLength)
+                {
+                    break;
+                }
+            }
+
+            if (canCancel && key == ConsoleKey.Escape)
+            {
+                Console.CursorVisible = false;
+                Console.Clear();
+                return null;
+            }
+        } while (true);
+
+        Console.CursorVisible = false;
+        Console.Clear();
+        if (Enum.TryParse(input, out T result))
+        {
+            return result;
+        }
+        return null;
+    }
+
+
+    #endregion
 }
 #endregion
 // ┌─┬┐
