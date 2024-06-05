@@ -2250,7 +2250,6 @@ public static class MenuHelper{
         return default(T);
     }
 
-
     /// <summary>
     /// Creates a table that holds a list of objects.
     /// </summary>
