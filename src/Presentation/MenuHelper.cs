@@ -23,6 +23,7 @@ public static class MenuHelper{
         string error = "";
         string inputNum = defaultInt.ToString();
         string keybinds = "Press Enter to confirm";
+        int placeInputNum = 0;
         if (canCancel)
         {
             keybinds += "\nPress Escape to cancel";
@@ -30,6 +31,7 @@ public static class MenuHelper{
         ConsoleKey key;
         ConsoleKeyInfo RawKey;
         do{
+            int i = 0;
             // set error message
             if (num < min || num > max)
             {
@@ -42,20 +44,33 @@ public static class MenuHelper{
 
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prefix}\n\n{num}\n{error}\n\n{keybinds}\n{suffix}");
+            Console.Write($"{prefix}\n\n");
+            foreach (char c in inputNum)
+            {
+                if(i == placeInputNum){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+             if(placeInputNum == inputNum.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"{error}\n\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
             key = RawKey.Key;
 
             // add number to string
             if (char.IsDigit(RawKey.KeyChar) && int.TryParse(inputNum+RawKey.KeyChar, out int x))
             {
-                inputNum += RawKey.KeyChar;
+                inputNum = inputNum.Insert(placeInputNum, $"{RawKey.KeyChar}");
+                placeInputNum += 1;
             }
-            // remove last from string
+            // remove interger from string
             if (key == ConsoleKey.Backspace){
-                if (inputNum.Length > 0)
+                if (inputNum.Length > 0 && placeInputNum > 0)
                 {
-                    inputNum = inputNum.Remove(inputNum.Length-1);
+                    inputNum = inputNum.Remove(placeInputNum-1, 1);
+                    placeInputNum -= 1;
                 }
                 if (inputNum.Length == 0)
                 {
@@ -69,12 +84,18 @@ public static class MenuHelper{
             }
 
             // up/down arrow increases/decreases number
-            if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
+            if (key == ConsoleKey.UpArrow && placeInputNum !=  inputNum.Length || key == ConsoleKey.DownArrow && placeInputNum !=  inputNum.Length )
             {
-                num += key == ConsoleKey.DownArrow ? -1 : 1;
+                num += key == ConsoleKey.DownArrow ? -(int)Math.Pow(10, inputNum.Length - placeInputNum -1) : (int)Math.Pow(10, inputNum.Length - placeInputNum -1);
                 inputNum = num.ToString();
             }
             // enter tries to see if the number is between the min/max and if not sets an suggestive error message
+            if(key == ConsoleKey.LeftArrow && placeInputNum > 0){
+                placeInputNum -= 1;
+            }
+            if(key == ConsoleKey.RightArrow && placeInputNum < inputNum.Length){
+                placeInputNum += 1;
+            }
             if (key == ConsoleKey.Enter)
             {
                 if (num >= min && num <= max)
@@ -162,9 +183,9 @@ public static class MenuHelper{
     /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
     /// <param name="minimumLength">The minimum amount of characters required.</param>
     /// <param name="maximumLength">The maximum amount of characters required.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
-    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    public static string? SelectText(string prefix="", string suffix="", bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([a-zA-Z]| )")
     {
         string input = "";
         string errorMessage = "";
@@ -240,9 +261,9 @@ public static class MenuHelper{
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
-    public static string? SelectText(string prefix="", bool canCancel=false, string allowedRegexPattern="([A-z]| )")
+    public static string? SelectText(string prefix="", bool canCancel=false, string allowedRegexPattern="([a-zA-Z]| )")
     {
         return SelectText(prefix, "", canCancel, 0, int.MaxValue, allowedRegexPattern);
     }
@@ -253,9 +274,9 @@ public static class MenuHelper{
     /// <param name="canCancel">A boolean indicating if the user can cancel the process; Returns null if canceled.</param>
     /// <param name="minimumLength">The minimum amount of characters required.</param>
     /// <param name="maximumLength">The maximum amount of characters required.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user or null if the user canceled the process.</returns>
-    public static string? SelectText(bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    public static string? SelectText(bool canCancel=false, int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([a-zA-Z]| )")
     {
         return SelectText("", "", canCancel, minimumLength, maximumLength, allowedRegexPattern);
     }
@@ -287,9 +308,9 @@ public static class MenuHelper{
     /// Asks the user to type in a string and returns that value.
     /// </summary>
     /// <param name="prefix">A string of text printed before the selected value.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user.</returns>
-    public static string SelectText(string prefix="", string allowedRegexPattern="([A-z]| )")
+    public static string SelectText(string prefix="", string allowedRegexPattern="([a-zA-Z]| )")
     {
         return SelectText(prefix, "", false, 0, int.MaxValue, allowedRegexPattern);
     }
@@ -300,9 +321,9 @@ public static class MenuHelper{
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="minimumLength">The minimum amount of characters required.</param>
     /// <param name="maximumLength">The maximum amount of characters required.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user.</returns>
-    public static string SelectText(string prefix="", int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    public static string SelectText(string prefix="", int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([a-zA-Z]| )")
     {
         return SelectText(prefix, "", false, minimumLength, maximumLength, allowedRegexPattern);
     }
@@ -323,9 +344,9 @@ public static class MenuHelper{
     /// </summary>
     /// <param name="minimumLength">The minimum amount of characters required.</param>
     /// <param name="maximumLength">The maximum amount of characters required.</param>
-    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([A-z]| )" making it accept all letters and spaces.</param>
+    /// <param name="allowedRegexPattern">A string containing a regex pattern of allowed characters the user is allowed to use. The default is "([a-zA-Z]| )" making it accept all letters and spaces.</param>
     /// <returns>A string chosen by the user.</returns>
-    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([A-z]| )")
+    public static string SelectText(int minimumLength=0, int maximumLength=int.MaxValue, string allowedRegexPattern="([a-zA-Z]| )")
     {
         return SelectText("", "", false, minimumLength, maximumLength, allowedRegexPattern);
     }
