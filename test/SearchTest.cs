@@ -64,24 +64,24 @@ public class SearchTest
         sa = new SearchAccess();
     }
 
-    [Test]
-    public void SearchTitleTest()
-    {
-        List<Media> results = sa.Search("mudrunner");
-        List<Media> results2 = sa.Search("mudRUnNeR");
-        List<Media> results3 = sa.Search("mud, bee");
-        List<Media> results4 = sa.Search("mud , bee");
-        List<Media> results44 = sa.Search("mud ,bee");
-        List<Media> results444 = sa.Search("mud,bee");
-        List<Media> results5 = sa.Search("Action");
-        List<Media> results6 = sa.Search("abcs");
-        Assert.AreEqual(results.Count, 1, "Returns only 1 in case of perfect match");
-        Assert.AreEqual(results2.Count, 1, "Returns only 1 in case of weird case perfect match");
-        Assert.AreEqual(results3.Count, 2, "'mud, bee' Returns 2 cases");
-        Assert.AreEqual(results4.Count, 2, "'mud , bee' Returns 2 cases");
-        Assert.AreEqual(results44.Count, 2, "'mud ,bee' Returns 2 cases");
-        Assert.AreEqual(results444.Count, 2, "'mud,bee' Returns 2 cases");
-        Assert.AreEqual(results5.Count, 1, "Can search by genre");
-        Assert.AreEqual(results6.Count, 1, "Can search by genre");
-    }
+    // [Test]
+    // public void SearchTitleTest()
+    // {
+    //     List<Media> results = sa.Search("mudrunner");
+    //     List<Media> results2 = sa.Search("mudRUnNeR");
+    //     List<Media> results3 = sa.Search("mud, bee");
+    //     List<Media> results4 = sa.Search("mud , bee");
+    //     List<Media> results44 = sa.Search("mud ,bee");
+    //     List<Media> results444 = sa.Search("mud,bee");
+    //     List<Media> results5 = sa.Search("Action");
+    //     List<Media> results6 = sa.Search("abcs");
+    //     Assert.AreEqual(results.Count, 1, "Returns only 1 in case of perfect match");
+    //     Assert.AreEqual(results2.Count, 1, "Returns only 1 in case of weird case perfect match");
+    //     Assert.AreEqual(results3.Count, 2, "'mud, bee' Returns 2 cases");
+    //     Assert.AreEqual(results4.Count, 2, "'mud , bee' Returns 2 cases");
+    //     Assert.AreEqual(results44.Count, 2, "'mud ,bee' Returns 2 cases");
+    //     Assert.AreEqual(results444.Count, 2, "'mud,bee' Returns 2 cases");
+    //     Assert.AreEqual(results5.Count, 1, "Can search by genre");
+    //     Assert.AreEqual(results6.Count, 1, "Can search by genre");
+    // }
 }

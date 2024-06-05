@@ -67,7 +67,7 @@ public class ReservationTest
                 double price = reader.GetDouble(6);
                 List<TimeLine.Item> timeline = JsonConvert.DeserializeObject<List<TimeLine.Item>>(reader.GetString(7));
                 TimeLine.Holder TimelineHolder  = new TimeLine.Holder();
-                TimelineHolder.t = timeline;
+                TimelineHolder.Items = timeline;
                 List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
                 readResult.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, TimelineHolder, entertainments));
             }
@@ -78,7 +78,7 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.Items.ToString())
             {
                 Assert.Pass("Inserted Consumption found in the list.");
             }
@@ -181,7 +181,7 @@ public class ReservationTest
         foreach (var Reservation in readResult)
         {
             List<TimeLine.Item> timeline_x = JsonConvert.DeserializeObject<List<TimeLine.Item>>(x.TimeLine.ToString());
-            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.t.ToString())
+            if (Reservation.Entertainments.Count == x.Entertainments.Count && Reservation.Id == x.Id && Reservation.Price == x.Price && Reservation.RoomId == x.RoomId && Reservation.UserId == x.UserId && Reservation.StartDate == x.StartDate && Reservation.EndDate == x.EndDate && Reservation.GroupSize == x.GroupSize && timeline_x.ToString() == Reservation.TimeLine.Items.ToString())
             {
                 Assert.Pass("Inserted reservation found in the list.");
             }
@@ -255,7 +255,7 @@ public class ReservationTest
 
     private int TestTimeLine(TimeLine.Holder t){
         int u = 0;
-        List<TimeLine.Item> timelineItems = t.t;
+        List<TimeLine.Item> timelineItems = t.Items;
         if(timelineItems.Count == 4){
             Assert.Pass("Reservation timeline holds all the objects in the list");
             if(timelineItems[0].Action is Break && (Break)(timelineItems[0].Action) != null){
@@ -273,4 +273,104 @@ public class ReservationTest
         }
         return u;
     }
+
+    [Test] 
+    public void EditReserVations()
+    {
+        TimeLine.Holder TimeLine = new TimeLine.Holder();
+        TimeLine.Add(
+            (object)(new Consumption("Test Consumption #1", 40.20, TimeOnly.MinValue, TimeOnly.MinValue)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+        TimeLine.Holder TimeLine2 = new TimeLine.Holder();
+        TimeLine2.Add(
+            (object)(new Consumption("Test Consumption #3", 40.20, TimeOnly.MinValue, TimeOnly.MinValue)),
+            DateTime.Parse("2024-04-24 02:00:00"),
+            DateTime.Parse("2024-04-24 02:00:00")
+        );
+
+        var reservation = new Reservation(
+            Id: 1,
+            RoomId: 1,
+            UserId: 2,
+            GroupSize: 10,
+            StartDate: DateTime.Parse("2024-04-24 02:00:00"),
+            EndDate: DateTime.Parse("2024-04-27 02:00:00"),
+            Price: 99.99,
+            TimeLine: TimeLine,
+            Entertainments: new List<Entertainment>()
+        );
+
+        var updatedReservation = new Reservation(
+            Id: 1,
+            RoomId: 1,
+            UserId: 2,
+            GroupSize: 10,
+            StartDate: DateTime.Parse("2024-04-24 02:00:00"),
+            EndDate: DateTime.Parse("2024-04-27 02:00:00"),
+            Price: 99.99,
+            TimeLine: TimeLine2,
+            Entertainments: new List<Entertainment>()
+        );
+
+
+        _Conn.Open();
+        string NewQuery = @"INSERT INTO Reservations(RoomId, UserId, GroupSize, StartDate, EndDate, Price, TimeLine, Entertainments)
+        VALUES (@RoomId, @UserId, @GroupSize, @StartDate, @EndDate, @Price, @TimeLine, @Entertainments);SELECT last_insert_rowid();";
+        int lastInsertedId = 0;
+        using (SQLiteCommand Launch = new SQLiteCommand(NewQuery, _Conn))
+        {
+            Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
+            Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
+            Launch.Parameters.AddWithValue("@GroupSize", reservation.GroupSize);
+            Launch.Parameters.AddWithValue("@StartDate", reservation.StartDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@EndDate", reservation.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@Price", reservation.Price);
+            Launch.Parameters.AddWithValue("@TimeLine", reservation.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(reservation.Entertainments));
+            lastInsertedId = unchecked((int)((long)Launch.ExecuteScalar()));
+        }
+        updatedReservation.Id = lastInsertedId;
+        _Conn.Close();
+
+        bool answer = r.EditReservation(updatedReservation);
+        
+        List<Reservation> reservations = new List<Reservation>();
+        _Conn.Open();
+        string NewQuerys = $@"SELECT * FROM Reservations WHERE ID = {updatedReservation.Id}";
+        using (SQLiteCommand Show = new SQLiteCommand(NewQuerys, _Conn))
+        {
+            SQLiteDataReader reader = Show.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32(0);
+                int roomid = reader.GetInt32(1);
+                int userid = reader.GetInt32(2);
+                int groupsize = reader.GetInt32(3);
+                DateTime startdate = DateTime.Parse(reader.GetString(4));
+                DateTime enddate = DateTime.Parse(reader.GetString(5));
+                double price = reader.GetDouble(6);
+                string timeline_str = reader.GetString(7);
+                List<Entertainment> entertainments = JsonConvert.DeserializeObject<List<Entertainment>>(reader.GetString(8)) ?? new List<Entertainment>();
+                reservations.Add(new Reservation(id, roomid, userid, groupsize, startdate, enddate, price, ReservationAccess.StringToTimeLine(timeline_str), entertainments));
+            }
+        }
+        _Conn.Close();
+
+        foreach(var reservations2 in reservations)
+        {
+            Console.WriteLine(reservations2.TimeLine);
+            Console.WriteLine(updatedReservation.TimeLine);
+
+            if (reservations2.TimeLine.ToString() == updatedReservation.TimeLine.ToString())
+            {
+                Assert.Pass("good");
+            }
+            else
+            {
+                Assert.Fail("wrong");
+            }
+        }
+    } 
 }
