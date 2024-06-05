@@ -170,10 +170,12 @@ public static class MenuHelper{
         string errorMessage = "";
         string keybinds = "Press Enter to confirm";
         if (canCancel){keybinds += "\nPress Escape to cancel";}
+        int placeInput = 0;
         ConsoleKey key;
         char keyChar;
         do
         {
+            int i = 0;
             errorMessage = "";
             if (input.Length < minimumLength || input.Length > maximumLength)
             {
@@ -181,7 +183,17 @@ public static class MenuHelper{
             }
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prefix}\n\n{input}\n");
+            Console.Write($"{prefix}\n\n");
+            foreach (char c in input)
+            {
+                if(i == placeInput){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placeInput == input.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write($"{errorMessage}");
             Console.ForegroundColor = ConsoleColor.White;
@@ -191,10 +203,18 @@ public static class MenuHelper{
             keyChar = uwu.KeyChar;
 
             if(Regex.IsMatch(keyChar.ToString(), allowedRegexPattern)){
-                input += keyChar;
+                input = input.Insert(placeInput, $"{keyChar}");
+                placeInput += 1;
             }
-            if (key == ConsoleKey.Backspace && input.Length > 0){
-                input = input.Remove(input.Length-1);
+            if (key == ConsoleKey.Backspace && input.Length > 0 && placeInput > 0){
+                input = input.Remove(placeInput-1, 1);
+                placeInput -= 1;
+            }
+            if(key == ConsoleKey.LeftArrow && placeInput > 0){
+                placeInput -= 1;
+            }
+            if(key == ConsoleKey.RightArrow && placeInput < input.Length){
+                placeInput += 1;
             }
             if (key == ConsoleKey.Enter)
             {
