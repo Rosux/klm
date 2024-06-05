@@ -93,55 +93,8 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-
-        MediaLogic.Media();
-
-
-        // MediaAccess.AddMedia(
-        //     new Film(
-        //         "Title",
-        //         69,
-        //         "Description",
-        //         2.5f,
-        //         "Language",
-        //         new List<Genre>() { Genre.HORROR, Genre.ACTION },
-        //         new DateOnly(2003, 9, 4),
-        //         Certification.PG,
-        //         new List<string>() { "Director1", "Director2" },
-        //         new List<string>() { "Actor1", "Actor2" },
-        //         new List<string>() { "Writer1", "Writer2" }
-        //     )
-        // );
-        // Console.WriteLine(MediaAccess.GetAllFilms().Count);
-        // Console.WriteLine("\n\n");
-        // Console.WriteLine(MediaAccess.GetAllSeries().Count);
-        // Console.WriteLine("\n\n");
-        // Console.WriteLine(MediaAccess.GetAllMedia().Count);
-
-        // ConsumptionAccess c = new ConsumptionAccess();
-        // var x = MenuHelper.SelectFromTable(
-        //     c.ReadConsumption(),
-        //     new Dictionary<string, Func<Consumption, object>>(){
-        //         { "Id", (x)=>x.Id },
-        //         { "Name", (x)=>x.Name },
-        //         { "Price", (x)=>x.Price },
-        //         { "StartTime", (x)=>x.StartTime },
-        //     },
-        //     true,
-        //     true
-        // );
-        // var y = MenuHelper.SelectFromTable(
-        //     c.ReadConsumption(),
-        //     new Dictionary<string, Func<Consumption, object>>(){
-        //         { "Id", (x)=>x.Id },
-        //         { "Name", (x)=>x.Name },
-        //         { "Price", (x)=>x.Price },
-        //         { "StartTime", (x)=>x.StartTime },
-        //     },
-        //     true
-        // );
-        // Console.WriteLine(x?.Name);
-        // Console.WriteLine(y?.Name);
+        List<Genre>? xxx = MenuHelper.SelectFromEnum<Genre>(new List<Genre>(){ Genre.HORROR, Genre.FANTASY, Genre.ACTION, Genre.FAMILY }, "Genres", "Prefix\nGOES HERE!!!!", "suffix here maybe?", true);
+        Console.WriteLine((xxx != null) ? xxx.Count : "NULL");
 
     }
 }
