@@ -93,8 +93,8 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        List<Genre>? xxx = MenuHelper.SelectFromEnum<Genre>(new List<Genre>(){ Genre.HORROR, Genre.FANTASY, Genre.ACTION, Genre.FAMILY }, "Genres", "Prefix\nGOES HERE!!!!", "suffix here maybe?", true);
-        Console.WriteLine((xxx != null) ? xxx.Count : "NULL");
+        MediaLogic.Media();
+
 
     }
 }

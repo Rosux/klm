@@ -17,19 +17,48 @@ public static class MediaMenu
         if (rating == null){return null;}
         string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
         if (language == null){return null;}
+        List<Genre> genres = new List<Genre>
+        {
+            Genre.HORROR,
+            Genre.ACTION,
+            Genre.COMEDY,
+            Genre.FAMILY,
+            Genre.DRAMA,
+            Genre.ADVENTURE,
+            Genre.FANTASY,
+            Genre.THRILLER,
+            Genre.MYSTERY,
+            Genre.CRIME
+        };
+        List<Genre>? selectedGenres = MenuHelper.SelectFromEnum<Genre>(genres, "Genres", "Select one or multiple Genres", "", true);
         DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
         if (date == null){return null;}
+        Certification? certification = MenuHelper.SelectFromList(
+            "Select a certification",
+            true,
+            new Dictionary<string, Certification>(){
+                {"No certification specified.", Certification.NONE},
+                {"General audiences. All ages admitted.", Certification.G},
+                {"Parental guidance suggested. Some material may not be suitable for children.", Certification.PG},
+                {"Parents strongly cautioned. Some material may be inappropriate for children under 13.", Certification.PG13},
+                {"Suitable for viewers over 18 years old.", Certification.PG18},
+                {"Restricted. Restricted to viewers over 17 years old unless accompanied by an adult.", Certification.R},
+                {"No one 17 and under admitted.", Certification.NC17},
+                {"Suitable for all children.", Certification.TVY},
+                {"Directed to older children, suitable for ages 7 and up.", Certification.TVY7},
+                {"Suitable for all ages.", Certification.TVG},
+                {"Parental guidance suggested. May contain material unsuitable for young children.", Certification.TVPG},
+                {"Parents strongly cautioned. May be unsuitable for children under 14.", Certification.TV14},
+                {"Mature audiences only. Content is intended only for adults.", Certification.TVMA},
+                {"Adult content. Viewer discretion advised.", Certification.X}
+            });
         string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (director == null){return null;}
         string? actors = MenuHelper.SelectText("Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
         string? writers = MenuHelper.SelectText("Please enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (writers == null){return null;}
-        List<Genre> genres = new List<Genre>{
-            Genre.HORROR
-        };
-        Certification certifications = Certification.PG13;
-        Film film = new Film(title, (int)runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
+        Film film = new Film(title, (int)runtime, description, (float)rating, language, selectedGenres, (DateOnly)date, (Certification)certification, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
         return film;
     }
 
