@@ -2428,76 +2428,144 @@ public static class MenuHelper{
     #endregion
 
     #region SelectFromEnum
-    public static T? SelectFromEnum<T>(string prompt = "", string suffix = "", bool canCancel = false, int minimumLength = 0, int maximumLength = int.MaxValue, string allowedRegexPattern = "([A-z]| )", List<T> options = null) where T : struct, Enum
+    public static List<T>? SelectFromEnum<T>(List<T> options, string selectionHeader, string prefix, string suffix, bool canCancel)
     {
-        string input = "";
-        string errorMessage = "";
-        string keybinds = "Press Enter to confirm";
-        if (canCancel) { keybinds += "\nPress Escape to cancel"; }
+        string keybinds = "Press Enter to confirm\nUse the Up/Down arrows to select an item\nUse the Left/Right arrow to switch selection\n";
+        if(canCancel){keybinds+="Press Escape to cancel";}
+        List<T> selectedItems = new List<T>();
+        bool inSelection = false;
+        int selectedIndex = 0;
+        int longestSelection = 0;
+        int longestOption = 0;
         ConsoleKey key;
-        char keyChar;
         do
         {
-            errorMessage = "";
-            if (input.Length < minimumLength || input.Length > maximumLength)
-            {
-                errorMessage += $"Text must be between {minimumLength} and {maximumLength} characters\n";
+            #region Calculate max length
+            if("Your selection".Length > longestSelection){
+                longestSelection = "Your selection".Length;
             }
+            if("Save Selection".Length > longestSelection){
+                longestSelection = "Save Selection".Length;
+            }
+            if(selectionHeader.Length > longestOption){
+                longestOption = selectionHeader.Length;
+            }
+            foreach(T v in options)
+            {
+                if(v.ToString().Length > longestOption){
+                    longestOption = v.ToString().Length;
+                }
+            }
+            foreach(T v in selectedItems)
+            {
+                if(v.ToString().Length > longestSelection){
+                    longestSelection = v.ToString().Length;
+                }
+            }
+            #endregion
 
+            #region Print
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prompt}\n\n{input}\n");
-
-            if (options != null && options.Count > 0)
+            Console.Write($"{prefix}\n\n");
+            Console.Write($"┌─{Format("Your selection", longestSelection, '─')}─┐ {(inSelection ? "->" : "<-")} ┌─{Format(selectionHeader, longestOption, '─')}─┐\n");
+            for(int i=0;i<Math.Max(selectedItems.Count+3, options.Count+1);i++)
             {
-                Console.WriteLine("\nOptions:");
-                foreach (T option in options)
-                {
-                    Console.WriteLine($"{option}: {option}");
+                Console.BackgroundColor = ConsoleColor.Black;
+                if(i < selectedItems.Count){
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"│ ");
+                    if(selectedIndex == i && inSelection){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.Write($"{Format(selectedItems[i].ToString(), longestSelection, ' ')}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($" │");
+                }else if(i == selectedItems.Count){
+                    Console.Write($"├{Format('─', longestSelection+2)}┤");
+                }else if(i == selectedItems.Count + 1){
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"│ ");
+                    if(selectedIndex == i-1 && inSelection){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.Write($"{Format("Save Selection", longestSelection, '─')}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($" │");
+                }else if(i == selectedItems.Count + 2){
+                    Console.Write($"└─{Format('─', longestSelection)}─┘");
+                }else{
+                    Console.Write($"{Format(' ', longestSelection+4)}");
                 }
-            }
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write($"{errorMessage}");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"\n\n{keybinds}\n{suffix}");
-
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-            key = keyInfo.Key;
-            keyChar = keyInfo.KeyChar;
-
-            if (Regex.IsMatch(keyChar.ToString(), allowedRegexPattern))
-            {
-                input += keyChar;
-            }
-
-            if (key == ConsoleKey.Backspace && input.Length > 0)
-            {
-                input = input.Remove(input.Length - 1);
-            }
-
-            if (key == ConsoleKey.Enter)
-            {
-                if (input.Length >= minimumLength && input.Length <= maximumLength)
-                {
-                    break;
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Write("    ");
+                if(i < options.Count){
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"│ ");
+                    if(selectedIndex == i && !inSelection){
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                    }
+                    Console.Write($"{Format(options[i].ToString(), longestOption, ' ')}");
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($" │");
+                }else if(i == options.Count){
+                    Console.Write($"└─{Format('─', longestOption)}─┘");
                 }
+                Console.Write($"\n");
             }
+            Console.Write($"\n{keybinds}\n\n{suffix}\n");
+            #endregion
 
-            if (canCancel && key == ConsoleKey.Escape)
+            #region Input
+            key = Console.ReadKey(true).Key;
+
+            if(key == ConsoleKey.Enter && !inSelection && options.Count > 0)
             {
-                Console.CursorVisible = false;
-                Console.Clear();
+                selectedItems.Add(options.ElementAt(selectedIndex));
+                options.RemoveAt(selectedIndex);
+                selectedIndex--;
+            }
+            if(key == ConsoleKey.Enter && inSelection && selectedItems.Count > 0 && selectedIndex < selectedItems.Count)
+            {
+                options.Add(selectedItems.ElementAt(selectedIndex));
+                selectedItems.RemoveAt(selectedIndex);
+                selectedIndex--;
+            }
+            if(key == ConsoleKey.LeftArrow)
+            {
+                inSelection = true;
+                selectedIndex = 0;
+            }
+            if(key == ConsoleKey.RightArrow)
+            {
+                inSelection = false;
+                selectedIndex = 0;
+            }
+            if(key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
+            {
+                selectedIndex += (key == ConsoleKey.UpArrow) ? -1 : 1;
+            }
+            // confirm/escape
+            if(key == ConsoleKey.Enter && inSelection && selectedIndex == selectedItems.Count)
+            {
+                return selectedItems;
+            }
+            if(key == ConsoleKey.Escape && canCancel)
+            {
                 return null;
             }
-        } while (true);
+            #endregion
 
-        Console.CursorVisible = false;
-        Console.Clear();
-        if (Enum.TryParse(input, out T result))
-        {
-            return result;
-        }
+            #region Clamping
+            if(inSelection){
+                selectedIndex = Math.Clamp(selectedIndex, 0, Math.Max(0, selectedItems.Count));
+            }else{
+                selectedIndex = Math.Clamp(selectedIndex, 0, Math.Max(0, options.Count-1));
+            }
+            #endregion
+
+        }while(true);
+
         return null;
     }
 
