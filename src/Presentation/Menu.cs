@@ -94,7 +94,7 @@ class Menu
         Console.CursorVisible = false;
 
         ConsumptionAccess c = new ConsumptionAccess();
-        MenuHelper.SelectFromTable(
+        var x = MenuHelper.SelectFromTable(
             c.ReadConsumption(),
             new Dictionary<string, Func<Consumption, object>>(){
                 { "Id", (x)=>x.Id },
@@ -105,6 +105,18 @@ class Menu
             true,
             true
         );
+        var y = MenuHelper.SelectFromTable(
+            c.ReadConsumption(),
+            new Dictionary<string, Func<Consumption, object>>(){
+                { "Id", (x)=>x.Id },
+                { "Name", (x)=>x.Name },
+                { "Price", (x)=>x.Price },
+                { "StartTime", (x)=>x.StartTime },
+            },
+            true
+        );
+        Console.WriteLine(x?.Name);
+        Console.WriteLine(y?.Name);
 
     }
 }
