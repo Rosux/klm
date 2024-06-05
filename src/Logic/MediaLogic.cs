@@ -5,8 +5,10 @@ public class MediaLogic
             MediaAccess.GetAllMedia(),
             new Dictionary<string, Func<Media, object>>(){
                 {"Type", m=>(m is Film) ? "Film" : "Serie"},
-                {"Id", m=>m.Id},
                 {"Title", m=>m.Title},
+                {"Runtime (Min)", m=>m.Runtime},
+                {"Description", m=>m.Description},
+                {"Rating", m=>m.Rating},
                 {"Language", m=>m.Language},
                 {"Genres", m=>string.Join(", ", m.Genres)},
                 {"Release Date", m=>m.ReleaseDate},
@@ -45,7 +47,7 @@ public class MediaLogic
         if(userSelection == null){return null;}
         if(userSelection == "FILM")
         {
-            return CreateFilm();
+            return MediaMenu.CreateFilm();
         }
         else if(userSelection == "SERIE")
         {
@@ -53,16 +55,6 @@ public class MediaLogic
         }
         return null;
     }
-
-    /// <summary>
-    /// Creates a new Film object.
-    /// </summary>
-    /// <returns>Returns a Film object or null in case the user exists the process.</returns>
-    private static Film? CreateFilm()
-    {
-        return null;
-    }
-
 
     /// <summary>
     /// Creates a new Serie object.

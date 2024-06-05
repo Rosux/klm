@@ -1,63 +1,123 @@
+using System.Reflection.Metadata;
+
 public static class MediaMenu
 {
-    public static Media? GetNewMedia(){
-        // string prompt = "Title: \nLanguage: \nGenres: \nRelease Date: \nCertification: \n";
+    /// <summary>
+    /// Creates a new Film object.
+    /// </summary>
+    /// <returns>Returns a Film object or null in case the user exists the process.</returns>
+    public static Film? CreateFilm(){
+        string? title = MenuHelper.SelectText("\nType the title of the film or serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (title == null){return null;}
+        int? runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 500);
+        if (runtime == null){return null;}
+        string? description = MenuHelper.SelectText("Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (description == null){return null;}
+        float? rating = (float?)MenuHelper.SelectPrice("Please enter a rating from 1-10:", "", true, 0d, 10d);
+        if (rating == null){return null;}
+        string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
+        if (language == null){return null;}
+        DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
+        if (date == null){return null;}
+        string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (director == null){return null;}
+        string? actors = MenuHelper.SelectText("Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (actors == null){return null;}
+        string? writers = MenuHelper.SelectText("Please enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (writers == null){return null;}
+        List<Genre> genres = new List<Genre>{
+            Genre.HORROR
+        };
+        Certification certifications = Certification.PG13;
+        Film film = new Film(title, (int)runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
+        return film;
+    }
 
-        // string Title;
-        // while(true){
-        //     string? title = MenuHelper.SelectText(prompt+"\nType the title of the film or serie.", "", true, 2, 30);
-        //     if(title == null){
-        //         return null;
-        //     }
-        //     if(MediaAccess.MediaExists(title)){
-        //         Title = title;
-        //         break;
-        //     }else{
-        //         Console.Write($"Title must be unique!\nTitle: '{title}' already exists.\n\nPress any key to continue.");
-        //         Console.ReadKey(true);
-        //     }
-        // }
-        //     /// <param name="directors">A list of directors.</param>
-        //     int runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", 0, 0,1000);
-        //     string? description = MenuHelper.SelectText("Please enter the description: ", "", true, 10, 500);
-        //     float? rating = MenuHelper.SelectFloat("Please enter a rating from 1-10:", "", true, 0, 0, 10);
-        //     string? language = MenuHelper.SelectText("Please enter a language: ", "", true, 0, 30);
-        //     List<Genre> genres = new List<Genre>
-        //     {
-        //         Genre.NONE,
-        //         Genre.HORROR,
-        //         Genre.ACTION,
-        //         Genre.COMEDY,
-        //         Genre.FAMILY,
-        //         Genre.DRAMA,
-        //         Genre.ADVENTURE,
-        //         Genre.FANTASY,
-        //         Genre.THRILLER,
-        //         Genre.MYSTERY,
-        //         Genre.CRIME
-        //     };
-        //     Genre? selectedGenre = MenuHelper.SelectFromEnum<Genre>("Please select a genre:", "", false, 0, 40,"([A-z]| )", genres);
-        //     DateOnly? releaseDate = MenuHelper.SelectDate("Please select a date", true);
-        //     List<Certification> certifications = new List<Certification>
-        //     {
-        //         Certification.NONE,
-        //         Certification.G,
-        //         Certification.PG,
-        //         Certification.PG13,
-        //         Certification.PG18,
-        //         Certification.R,
-        //         Certification.NC17,
-        //         Certification.TVY,
-        //         Certification.TVY7,
-        //         Certification.TVG,
-        //         Certification.TVPG,
-        //         Certification.TV14,
-        //         Certification.TVMA,
-        //         Certification.X
-        //     };
-        //     Certification? selectedCertification = MenuHelper.SelectFromEnum<Certification>("Please select a certification:", "", false, 0, 40,"([A-z]| )", certifications);
-        //     string? directors = MenuHelper.SelectText("Please enter a director: ", "", true, 0, 30);
-            // Media media = new Media(Title, (int)runtime, (string)description, (float)rating, (string)language, selectedGenre, (DateOnly)releaseDate, certifications, directors);
-        return null;
+    public static Serie? CreateSerie(){
+        List<Season> seasons = new List<Season>();
+
+        string? title = MenuHelper.SelectText("\nType the title of the film or serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (title == null){return null;}
+        int runtime = seasons.Sum(season => season.Runtime);
+        string? description = MenuHelper.SelectText("Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (description == null){return null;}
+        float? rating = (float?)MenuHelper.SelectPrice("Please enter a rating from 1-10:", "", true, 0d, 10d);
+        if (rating == null){return null;}
+        string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
+        if (language == null){return null;}
+        DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
+        if (date == null){return null;}
+        string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (director == null){return null;}
+
+        List<Genre> genres = new List<Genre>{
+            Genre.HORROR
+        };
+        Certification certifications = Certification.PG13;
+
+        bool bingeable = false;
+        if (runtime > 400 && rating > 8){
+            bingeable = true;
+        }
+
+        Serie serie = new Serie(title, runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
+        bool running = true;
+        while(running){
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"Add Season", ()=>{
+                    CreateSeason();
+                }},
+                {"Save", ()=>{
+                    running = false;
+                }},
+                {"Return to menu", ()=>{
+                    running = false;
+                }},
+            });
+        }
+        return serie;
+    }
+
+    public static Season? CreateSeason(){
+        List<Episode> episodes = new List<Episode>();
+
+        string? title = MenuHelper.SelectText("\nType the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (title == null){return null;}
+        int runtime = episodes.Sum(episode => episode.Runtime);
+        int? seasonNumber = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 60);
+        if (seasonNumber == null){return null;}
+
+        Season season = new Season(title, runtime, (int)seasonNumber, episodes);
+
+        bool running = true;
+        while(running){
+            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                {"Add Episode", ()=>{
+                    Episode? episode = CreateEpisode();
+                    if(episode == null){
+                        return;
+                    }else{
+                        episodes.Add(episode);
+                    }
+                }},
+                {"Return to menu", ()=>{
+                    running = false;
+                }},
+            });
+        }
+        return season;
+    }
+
+    public static Episode? CreateEpisode(){
+        string? title = MenuHelper.SelectText("\nType the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        if (title == null){return null;}
+        int? runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 500);
+        if (runtime == null){return null;}
+        int? episodeNumber = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 60);
+        if (episodeNumber == null){return null;}
+        string? actors = MenuHelper.SelectText("Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (actors == null){return null;}
+        Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
+        return episode;
     }
 }
