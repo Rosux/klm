@@ -10,7 +10,6 @@ public class MediaLogic
                 {"Description", m=>m.Description},
                 {"Rating", m=>m.Rating},
                 {"Language", m=>m.Language},
-                {"Genres", m=>string.Join(", ", m.Genres)},
                 {"Release Date", m=>m.ReleaseDate},
                 {"Certification", m=>m.Certification},
             },
@@ -21,6 +20,7 @@ public class MediaLogic
             new Dictionary<string, PropertyEditMapping<Media>>(){
                 {"Title", new(x=>x.Title, (Media m)=>{return m.Title;})},
             },
+
             SaveMedia,
             true,
             AddMedia,
@@ -51,17 +51,8 @@ public class MediaLogic
         }
         else if(userSelection == "SERIE")
         {
-            return CreateSerie();
+            return MediaMenu.CreateSerie();
         }
-        return null;
-    }
-
-    /// <summary>
-    /// Creates a new Serie object.
-    /// </summary>
-    /// <returns>Returns a Serie object or null in case the user exists the process.</returns>
-    private static Serie? CreateSerie()
-    {
         return null;
     }
 

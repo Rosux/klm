@@ -7,7 +7,7 @@ public static class MediaMenu
     /// </summary>
     /// <returns>Returns a Film object or null in case the user exists the process.</returns>
     public static Film? CreateFilm(){
-        string? title = MenuHelper.SelectText("\nType the title of the film or serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.SelectText("\nType the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
         int? runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
@@ -33,12 +33,16 @@ public static class MediaMenu
         return film;
     }
 
+    /// <summary>
+    /// Creates a new Serie object.
+    /// </summary>
+    /// <returns>Returns a Serie object or null in case the user exists the process.</returns>
     public static Serie? CreateSerie(){
         List<Season> seasons = new List<Season>();
 
-        string? title = MenuHelper.SelectText("\nType the title of the film or serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.SelectText("\nType the title of the serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
-        int runtime = seasons.Sum(season => season.Runtime);
+        int runtime = 0;
         string? description = MenuHelper.SelectText("Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
         if (description == null){return null;}
         float? rating = (float?)MenuHelper.SelectPrice("Please enter a rating from 1-10:", "", true, 0d, 10d);
@@ -55,17 +59,17 @@ public static class MediaMenu
         };
         Certification certifications = Certification.PG13;
 
-        bool bingeable = false;
-        if (runtime > 400 && rating > 8){
-            bingeable = true;
-        }
 
-        Serie serie = new Serie(title, runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
         bool running = true;
         while(running){
             MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"Add Season", ()=>{
-                    CreateSeason();
+                    Season? season = CreateSeason();
+                    if (season != null)
+                    {
+                        seasons.Add(season);
+                        runtime += season.Runtime;
+                    }
                 }},
                 {"Save", ()=>{
                     running = false;
@@ -75,6 +79,11 @@ public static class MediaMenu
                 }},
             });
         }
+        bool bingeable = false;
+        if (runtime > 400 && rating > 8){
+            bingeable = true;
+        }
+        Serie serie = new Serie(title, runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
         return serie;
     }
 
@@ -84,10 +93,9 @@ public static class MediaMenu
         string? title = MenuHelper.SelectText("\nType the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
         int runtime = episodes.Sum(episode => episode.Runtime);
-        int? seasonNumber = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 60);
+        int? seasonNumber = MenuHelper.SelectInteger("Please enter the seasonnumber:", "", true, 0, 0, 60);
         if (seasonNumber == null){return null;}
 
-        Season season = new Season(title, runtime, (int)seasonNumber, episodes);
 
         bool running = true;
         while(running){
@@ -98,6 +106,7 @@ public static class MediaMenu
                         return;
                     }else{
                         episodes.Add(episode);
+                        runtime += episode.Runtime;
                     }
                 }},
                 {"Return to menu", ()=>{
@@ -105,15 +114,16 @@ public static class MediaMenu
                 }},
             });
         }
+        Season season = new Season(title, runtime, (int)seasonNumber, episodes);
         return season;
     }
 
     public static Episode? CreateEpisode(){
-        string? title = MenuHelper.SelectText("\nType the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.SelectText("\nType the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
         int? runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
-        int? episodeNumber = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 60);
+        int? episodeNumber = MenuHelper.SelectInteger("Please enter the episodenumber:", "", true, 0, 0, 60);
         if (episodeNumber == null){return null;}
         string? actors = MenuHelper.SelectText("Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
