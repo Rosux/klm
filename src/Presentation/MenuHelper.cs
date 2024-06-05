@@ -1915,7 +1915,7 @@ public static class MenuHelper{
 
                 if(canSearch && currentPageSelection == -1 && i+tableSearchSelectionOffset <= 1 && i >= 3)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
+                    // hihi
                 }
                 else
                 {
@@ -1932,12 +1932,12 @@ public static class MenuHelper{
                     Console.BackgroundColor = ConsoleColor.Black;
                 }
 
-                // TODO fix cursor :(
                 if(canSearch && currentPageSelection == -1 && i+tableSearchSelectionOffset <= 1 && i >= 3)
                 {
-                    for(int j=0;j<tableStringLines[i].Length-4;j++)
+                    int charCount = 0;
+                    foreach(char c in tableStringLines[i].Substring(2, tableStringLines[i].Length-4))
                     {
-                        if(j == searchCursor+"Search: ".Length)
+                        if(i-3 >= 0 && ((totalWidth-4)*(i-3))+charCount == searchCursor+"Search: ".Length)
                         {
                             Console.BackgroundColor = ConsoleColor.DarkGray;
                         }
@@ -1945,7 +1945,8 @@ public static class MenuHelper{
                         {
                             Console.BackgroundColor = ConsoleColor.Black;
                         }
-                        Console.Write($"{tableStringLines[i].Substring(2+j, 1)}");
+                        Console.Write($"{c}");
+                        charCount++;
                     }
                 }
                 else
@@ -1953,8 +1954,27 @@ public static class MenuHelper{
                     Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(2, tableStringLines[i].Length-4) : new string(' ', totalWidth-4))}");
                 }
 
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(tableStringLines[i].Length-2, 2) : new string(' ', 2))}");
+                // the last 2 chars of the line (being " |")
+                if(canSearch && currentPageSelection == -1 && i+tableSearchSelectionOffset <= 1 && i >= 3 && i < tableStringLines.Count)
+                {
+                    if((searchString+"Search: ").Length % (totalWidth-4) == 0 && i+tableSearchSelectionOffset == 1 && searchCursor == searchString.Length)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                        Console.Write($"{tableStringLines[i].Substring(tableStringLines[i].Length-2, 1)}");
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($"{tableStringLines[i].Substring(tableStringLines[i].Length-1, 1)}");
+                    }
+                    else
+                    {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($"{tableStringLines[i].Substring(tableStringLines[i].Length-2, 2)}");
+                    }
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write($"{(i < tableStringLines.Count ? tableStringLines[i].Substring(tableStringLines[i].Length-2, 2) : new string(' ', 2))}");
+                }
                 Console.BackgroundColor = ConsoleColor.Black;
                 if(!showEditTable || chunks.Count == 0){
                     Console.Write("\n");
@@ -2337,6 +2357,8 @@ public static class MenuHelper{
         }
         return m;
     }
+    #endregion
+
     #region Print Seats
     /// <summary>
     /// PrintSeats gets the selectedroom, a list of entertainments on seats and the coordinates of those seats.
@@ -2432,7 +2454,6 @@ public static class MenuHelper{
         return layout;
     }
 
-    #endregion
     #endregion
 }
 // ┌─┬┐
