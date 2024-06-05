@@ -1330,19 +1330,32 @@ public static class MenuHelper{
         double price;
         string keybinds = "Press Enter to confirm";
         if(canCancel){keybinds += "\nPress Escape to cancel";}
-
+        int placeInput = 0;
         ConsoleKey key;
         ConsoleKeyInfo RawKey;
         do
         {
+            int i = 0;
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prefix}\n\n{input}\n\n{keybinds}\n{suffix}");
+            Console.Write($"{prefix}\n\n");
+            foreach (char c in input)
+            {
+                if(i == placeInput){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+             if(placeInput == input.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write($"\n{keybinds}\n{suffix}");
             RawKey = Console.ReadKey(true);
             key = RawKey.Key;
 
-            if(key == ConsoleKey.Backspace && input.Length > 0){
-                input = input.Remove(input.Length-1);
+            if(key == ConsoleKey.Backspace && input.Length > 0 && placeInput > 0){
+                input = input.Remove(placeInput-1, 1);
+                placeInput -= 1;
             }
             if(key == ConsoleKey.Escape && canCancel){
                 Console.CursorVisible = false;
@@ -1352,18 +1365,27 @@ public static class MenuHelper{
             if(key == ConsoleKey.Enter && double.TryParse(input, out price)){
                 break;
             }
-            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',')){
+            if((RawKey.KeyChar == ',' || RawKey.KeyChar == '.') && !input.Contains(',') && placeInput > input.Length - 3){
                 if(input.Length == 0){
-                    input += "0,";
+                    input = input.Insert(placeInput, "0,");
+                    placeInput += 2;
                 }else{
-                    input += ",";
+                    input = input.Insert(placeInput, ",");
+                    placeInput += 1;
                 }
             }
             if(char.IsDigit(RawKey.KeyChar)){
                 if(input.Contains(',') && input.Length >= 3 && input[input.Length-3] == ','){
                     continue;
                 }
-                input += RawKey.KeyChar.ToString();
+                input = input.Insert(placeInput, $"{RawKey.KeyChar.ToString()}");
+                placeInput += 1;
+            }
+            if(key == ConsoleKey.LeftArrow && placeInput > 0){
+                placeInput -= 1;
+            }
+            if(key == ConsoleKey.RightArrow && placeInput < input.Length){
+                placeInput += 1;
             }
 
         }while(true);
