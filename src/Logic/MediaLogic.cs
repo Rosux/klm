@@ -21,9 +21,12 @@ public class MediaLogic
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Media>>(){
                 {"Title", new(x=>x.Title, GetValidTitle)},
-                // {"Runtime (Min)", new(x=>x.Runtime, GetValidRuntime)},
+                {"Runtime (Min)", new(x=>x.Runtime, GetValidRuntime)},
                 {"Description", new(x=>x.Description, GetValidDescription)},
-
+                {"Rating", new(x=>x.Rating, GetValidRating)},
+                {"Language", new(x=>x.Language, GetValidLanguage)},
+                {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
+                {"Certification", new(x=>x.Certification, GetValidCertification)},
             },
             SaveEditedMedia,
             true,
@@ -208,38 +211,106 @@ public class MediaLogic
     private static string GetValidTitle<T>(T title){
         if(title is Film film){
             string prompt = $"Current Title: {film.Title}\n\n";
-            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new Title of the Movie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the movie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
             return newTitle ?? film.Title;
-        }else if (title is Serie serie){
+        }else if(title is Serie serie){
                 string prompt = $"Current Title: {serie.Title}\n\n";
-                string? newTitle = MenuHelper.SelectText(prompt+"Enter the new Title of the Serie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+                string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the serie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newTitle ?? serie.Title;
         }else{
             return "An error occurred. The provided title is not valid for editing.\n\nPress any key to continue";
         }
     }
 
-    // private static int GetValidRuntime<T>(T runtime){
-    //     if(runtime is Film film){
-    //         string prompt = $"Current Runtime: {film.Runtime}\n\n";
-    //         int? newRuntime = MenuHelper.SelectInteger(prompt + "Enter the new Runtime of the Movie:", "", true, 0, 0, 500);
-    //         return newRuntime ?? film.Runtime;
-    //     } else {
-    //         throw new ArgumentException("Runtime can only be edited for movies.");
-    //     }
-    // }
+    private static object GetValidRuntime<T>(T runtime){
+        if(runtime is Film film){
+            string prompt = $"Current Runtime: {film.Runtime}\n\n";
+            int? newRuntime = MenuHelper.SelectInteger(prompt + "Enter the new runtime of the movie:", "", true, 0, 0, 500);
+            return newRuntime ?? film.Runtime;
+        } else {
+            return 0;
+        }
+    }
 
     private static string GetValidDescription<T>(T description){
         if(description is Film film){
             string prompt = $"Current Description: {film.Description}\n\n";
-            string? newDescription = MenuHelper.SelectText(prompt+"Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the movie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
             return newDescription ?? film.Description;
-        }else if (description is Serie serie){
+        }else if(description is Serie serie){
                 string prompt = $"Current Description: {serie.Description}\n\n";
-                string? newDescription = MenuHelper.SelectText(prompt+"Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+                string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the serie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newDescription ?? serie.Description;
         }else{
             return "An error occurred. The provided description is not valid for editing.\n\nPress any key to continue";
+        }
+    }
+
+    private static object GetValidRating<T>(T rating){
+        if(rating is Film film){
+            string prompt = $"Current Rating: {film.Rating}\n\n";
+            float? newRating = (float?)MenuHelper.SelectPrice(prompt+"Please enter ther new rating of the movie from 1-10::", "", true, 0d, 10d);
+            return newRating ?? film.Rating;
+        } else {
+            return 0;
+        }
+    }
+
+    private static string GetValidLanguage<T>(T language){
+        if(language is Film film){
+            string prompt = $"Current Language: {film.Language}\n\n";
+            string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the movie:", "", true, 0, 30);
+            return newLanguage ?? film.Language;
+        }else if (language is Serie serie){
+                string prompt = $"Current Language: {serie.Language}\n\n";
+                string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the serie:", "", true, 0, 30);
+                return newLanguage ?? serie.Language;
+        }else{
+            return "An error occurred. The provided language is not valid for editing.\n\nPress any key to continue";
+        }
+    }
+
+    private static object GetValidReleaseDate<T>(T releasedate){
+        if(releasedate is Film film){
+            string prompt = $"Current Release Date: {film.ReleaseDate}\n\n";
+            DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the movie:", true);
+            return newDate ?? film.ReleaseDate;
+        }else if(releasedate is Serie serie){
+            string prompt = $"Current Release Date: {serie.ReleaseDate}\n\n";
+            DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the serie:", true);
+            return newDate ?? serie.ReleaseDate;
+        }else{
+            return new DateOnly();
+        }
+    }
+
+    private static object GetValidCertification<T>(T certification){
+        Certification? newCertification = MenuHelper.SelectFromList(
+            "Select a certification",
+            true,
+            new Dictionary<string, Certification>(){
+                {"No certification specified.", Certification.NONE},
+                {"General audiences. All ages admitted.", Certification.G},
+                {"Parental guidance suggested. Some material may not be suitable for children.", Certification.PG},
+                {"Parents strongly cautioned. Some material may be inappropriate for children under 13.", Certification.PG13},
+                {"Suitable for viewers over 18 years old.", Certification.PG18},
+                {"Restricted. Restricted to viewers over 17 years old unless accompanied by an adult.", Certification.R},
+                {"No one 17 and under admitted.", Certification.NC17},
+                {"Suitable for all children.", Certification.TVY},
+                {"Directed to older children, suitable for ages 7 and up.", Certification.TVY7},
+                {"Suitable for all ages.", Certification.TVG},
+                {"Parental guidance suggested. May contain material unsuitable for young children.", Certification.TVPG},
+                {"Parents strongly cautioned. May be unsuitable for children under 14.", Certification.TV14},
+                {"Mature audiences only. Content is intended only for adults.", Certification.TVMA},
+                {"Adult content. Viewer discretion advised.", Certification.X}
+            }
+        );
+        if(certification is Film film){
+            return newCertification != null ? newCertification : film.Certification;
+        }else if(certification is Serie serie){
+            return newCertification != null ? newCertification : serie.Certification;
+        }else{
+            return Certification.NONE;
         }
     }
 }
