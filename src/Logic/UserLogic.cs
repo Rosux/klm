@@ -1,6 +1,7 @@
 public static class UserLogic
 {
     private static UserAccess _userAccess = new UserAccess();
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
 
     /// <summary>
     /// Asks the user to select an option among Edit user and Exit to main menu.
@@ -38,7 +39,23 @@ public static class UserLogic
     /// <param name="user">The user instance to delete from the database.</param>
     /// <returns>A boolean indicating if the deletion was successful</returns>
     private static bool DeleteUser(User user){
-        bool confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
+        bool exists = false;
+        bool confirmation = false;
+        List<Reservation> allReservations = _reservationAccess.GetAllReservations();
+            foreach(Reservation reservation in allReservations)
+            {
+                if(reservation.UserId == user.Id)
+                {
+                    exists = true;
+                }
+            }
+        if(exists)
+        {
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}\nThis user has an reservation.");
+        }else
+        {
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
+        }
         if(confirmation){
             bool success = _userAccess.DeleteUser(user);
             UserMenu.UserRemoved(success);
