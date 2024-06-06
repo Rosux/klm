@@ -145,11 +145,24 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
+        int placeInput = 0;
         do
         {
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
+            Console.Write($"{prompt}\n");
+            int i = 0;
+            foreach (char c in input)
+            {
+                if(i == placeInput){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placeInput == input.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(error);
             Console.ForegroundColor = ConsoleColor.White;
@@ -158,7 +171,8 @@ public static class UserMenu{
             keyInfo = Console.ReadKey(true);
             if (!char.IsControl(keyInfo.KeyChar))
             {
-                input += keyInfo.KeyChar;
+                input = input.Insert(placeInput, $"{keyInfo.KeyChar}");
+                placeInput += 1;
             }
             if (keyInfo.Key == ConsoleKey.Enter && Regex.IsMatch(input, "[A-z]") && input.Length <= maxLength && input.Length >= minLength && IsStrongPassword(input))
             {
@@ -170,12 +184,10 @@ public static class UserMenu{
                     break;
                 }
             }
-            if (keyInfo.Key == ConsoleKey.Backspace)
+            if (keyInfo.Key == ConsoleKey.Backspace && input.Length > 0 && placeInput > 0)
             {
-                if (input.Length > 0)
-                {
-                    input = input.Substring(0, input.Length - 1);
-                }
+                input = input.Remove(placeInput-1, 1);
+                placeInput -= 1;
             }
             if (keyInfo.Key == ConsoleKey.Escape)
             {
@@ -197,6 +209,12 @@ public static class UserMenu{
             {
                 error += $"Input must only contain letters.\n";
             }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placeInput > 0){
+                placeInput -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placeInput < input.Length){
+                placeInput += 1;
+            }
         }while(true);
         Console.CursorVisible = false;
         Console.Clear();
@@ -214,11 +232,24 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
+        int placeInput = 0;
         do
         {
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
+            Console.Write($"{prompt}\n");
+            int i = 0;
+            foreach (char c in input)
+            {
+                if(i == placeInput){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placeInput == input.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(error);
             Console.ForegroundColor = ConsoleColor.White;
@@ -229,12 +260,10 @@ public static class UserMenu{
             {
                 break;
             }
-            if (keyInfo.Key == ConsoleKey.Backspace)
-            {
-                if (input.Length > 0)
-                {
-                    input = input.Substring(0, input.Length - 1);
-                }
+            if (keyInfo.Key == ConsoleKey.Backspace && input.Length > 0 && placeInput > 0)
+            {  
+                input = input.Remove(placeInput-1, 1);
+                placeInput -= 1;
             }
             if (keyInfo.Key == ConsoleKey.Escape)
             {
@@ -242,7 +271,14 @@ public static class UserMenu{
             }
             if (char.IsLetter(keyInfo.KeyChar))
             {
-                input += keyInfo.KeyChar;
+                input = input.Insert(placeInput, $"{keyInfo.KeyChar}");
+                placeInput += 1;
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placeInput > 0){
+                placeInput -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placeInput < input.Length){
+                placeInput += 1;
             }
             if (input.Length < minLength || input.Length > maxLength)
             {
@@ -269,23 +305,37 @@ public static class UserMenu{
     {
         string input = "";
         string error= "";
+        int placeInput = 0;
         do
         {
-            error = "";
             User? user = _userAccess.VerifyUser(input);
             if (user != null)
             {
-                error += $"Email already exists.\n";
+                //error += $"Email already exists.\n";
+                error = error.Insert(0, "Email already exists.\n");
             }
             if (!MailAddress.TryCreate(input, out MailAddress? _))
             {
-                error += $"email is not valid";
+                error = error.Insert(0, "email is not valid\n");
             }
             Console.CursorVisible = false;
             Console.Clear();
-            Console.Write($"{prompt}\n{input}\n\nPress enter to confirm. Press escape to cancel.\n");
+            Console.Write($"{prompt}\n");
+            int i = 0;
+            foreach (char c in input)
+            {
+                if(i == placeInput){ Console.BackgroundColor = ConsoleColor.DarkGray; }
+                Console.Write(c);
+                Console.BackgroundColor = ConsoleColor.Black;
+                i++;
+            }
+            if(placeInput == input.Length){Console.BackgroundColor = ConsoleColor.DarkGray;}
+            Console.Write($" \n");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("\nPress enter to confirm. Press escape to cancel.\n");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(error);
+            error = "";
             Console.ForegroundColor = ConsoleColor.White;
             ConsoleKeyInfo keyInfo;
             MailAddress b;
@@ -296,7 +346,8 @@ public static class UserMenu{
             }
             if (!char.IsControl(keyInfo.KeyChar))
             {
-                input += keyInfo.KeyChar;
+                input = input.Insert(placeInput, $"{keyInfo.KeyChar}");
+                placeInput += 1;
             }
             if (keyInfo.Key == ConsoleKey.Enter && input.Length <= maxLength && input.Length >= minLength && MailAddress.TryCreate(input, out b))
             {
@@ -305,19 +356,23 @@ public static class UserMenu{
                     break;
                 }
             }
-            if (keyInfo.Key == ConsoleKey.Backspace)
+            if (keyInfo.Key == ConsoleKey.Backspace && input.Length > 0 && placeInput > 0)
             {
-                if (input.Length > 0)
-                {
-                    input = input.Substring(0, input.Length - 1);
-                }
+                input = input.Remove(placeInput-1, 1);
+                placeInput -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.LeftArrow && placeInput > 0){
+                placeInput -= 1;
+            }
+            if(keyInfo.Key == ConsoleKey.RightArrow && placeInput < input.Length){
+                placeInput += 1;
             }
             if (input.Length < minLength || input.Length > maxLength)
             {
                 error += $"Input must be between {minLength} and {maxLength} characters. Please try again.\n";
             }
             if (!Regex.IsMatch(input, "[A-z]"))
-            {
+            {  
                 error += $"Input must only contain letters.\n";
             }
         }while(true);
