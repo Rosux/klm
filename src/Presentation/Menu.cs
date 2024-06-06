@@ -92,32 +92,33 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        List<Media> x = new List<Media>(){
-            new Film("FILM SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), new List<string>(), new List<string>()),
-            new Serie("TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>()),
-        };
-        // Console.WriteLine(x[0].Title);
-        // Console.WriteLine(x[1].Title);
+        MediaLogic.Media();
+        // List<Media> x = new List<Media>(){
+        //     new Film("FILM SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), new List<string>(), new List<string>()),
+        //     new Serie("TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>()),
+        // };
+        // // Console.WriteLine(x[0].Title);
+        // // Console.WriteLine(x[1].Title);
 
-        MenuHelper.Table<Media>(
-            x,
-            new Dictionary<string, Func<Media, object>>(){
-                {"Title but like long af cus it breaks the ui", m=>m.Title},
-                {"Genre", m=>m.Genres.Count},
-            },
-            false,
-            true,
-            true,
-            new Dictionary<string, PropertyEditMapping<Media>>(){
-                {"Title", new(x=>x.Title, (Media m)=>{return "NEW TITLE:!!!!!!!!!!";})},
-                {"Genres", new(x=>ShowListInTable(x.Genres), x=>x.Genres, (Media m)=>{return new List<Genre>(){Genre.HORROR,Genre.ACTION,Genre.COMEDY,Genre.DRAMA};})},
-            },
-            SaveEditedMedia,
-            false,
-            null,
-            false,
-            null
-        );
+        // MenuHelper.Table<Media>(
+        //     x,
+        //     new Dictionary<string, Func<Media, object>>(){
+        //         {"Title but like long af cus it breaks the ui", m=>m.Title},
+        //         {"Genre", m=>m.Genres.Count},
+        //     },
+        //     false,
+        //     true,
+        //     true,
+        //     new Dictionary<string, PropertyEditMapping<Media>>(){
+        //         {"Title", new(x=>x.Title, (Media m)=>{return "NEW TITLE:!!!!!!!!!!";})},
+        //         {"Genres", new(x=>ShowListInTable(x.Genres), x=>x.Genres, (Media m)=>{return new List<Genre>(){Genre.HORROR,Genre.ACTION,Genre.COMEDY,Genre.DRAMA};})},
+        //     },
+        //     SaveEditedMedia,
+        //     false,
+        //     null,
+        //     false,
+        //     null
+        // );
 
         // MediaLogic.Media();
 
