@@ -163,7 +163,7 @@ public static class MediaMenu
     }
 
 
-    public static Episode? CreateEpisode(){
+    public static Episode? CreateEpisode(Season season){
         string prompt = "Title: \nRuntime (Min): \nSeasonNumber: \nRating: \nActors: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
@@ -185,6 +185,21 @@ public static class MediaMenu
         if (actors == null){return null;}
 
         Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
+        season.Episodes.Add(episode);
         return episode;
+    }
+
+    public static void MediaAdded(bool success){
+        Console.CursorVisible = false;
+        Console.Clear();
+        if(success){
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("The Media has successfully been added.\n\nPress any key to continue");
+        }else{
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadKey(true);
     }
 }

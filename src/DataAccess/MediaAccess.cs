@@ -43,6 +43,49 @@ public static class MediaAccess
     }
 
     /// <summary>
+    /// Saves the given media.
+    /// </summary>
+    /// <param name="media">The Film/Serie object to save.</param>
+    /// <typeparam name="T">Can either be Film or Serie.</typeparam>
+    /// <returns>A boolean indicating if the media got saved.</returns>
+    public static bool EditMedia<T>(T media)
+    {
+        // if environment is not set throw an exception
+        if(Environment.GetEnvironmentVariable("MEDIA_PATH") == null){
+            throw new Exception("Environment MEDIA_PATH not set.");
+        }
+        // if the type is not Film or Serie dont save it
+        if(typeof(T) != typeof(Film) && typeof(T) != typeof(Serie)){
+            return false;
+        }
+
+        CreateFile();
+
+        // convert json to a MediaJsonStruct
+        MediaJsonStruct mediaStructure = GetMedia();
+
+        if(media is Film film){
+            for(int i = 0; i < mediaStructure.Films.Count; i++){
+                if(mediaStructure.Films[i].Id == film.Id){
+                    mediaStructure.Films[i] = film;
+                }
+            }
+        }else if(media is Serie serie){
+            for(int i = 0; i < mediaStructure.Series.Count; i++){
+                if(mediaStructure.Series[i].Id == serie.Id){
+                    mediaStructure.Series[i] = serie;
+                }
+            }
+        }
+
+        // save the MediaJsonStruct to the json file
+        SetMedia(mediaStructure);
+
+        SearchAccess.UpdateMedia();
+        return true;
+    }
+
+    /// <summary>
     /// Gets all the films.
     /// </summary>
     /// <returns>A list of all the films.</returns>

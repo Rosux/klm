@@ -71,25 +71,6 @@ public class MediaLogic
     //     return null;
     // }
 
-    // /// <summary>
-    // /// Saves the given media and returns a boolean indicating if the media got saved.
-    // /// </summary>
-    // /// <param name="media">The Media object to save.</param>
-    // /// <returns>Returns a boolean indicating if the Media got saved.</returns>
-    // private static bool SaveEditedMedia(Media media)
-    // {
-    //     return false;
-    // }
-
-    // /// <summary>
-    // /// Deletes the given media and returns a boolean indicating if the media got deleted.
-    // /// </summary>
-    // /// <param name="media">The Media object to delete.</param>
-    // /// <returns>Returns a boolean indicating if the Media got deleted.</returns>
-    // private static bool DeleteMedia(Media media)
-    // {
-    //     return false;
-    // }
     public static void SeasonsTable(){
         var allMedia = MediaAccess.GetAllMedia();
         var series = allMedia.OfType<Serie>().ToList();
@@ -108,8 +89,8 @@ public class MediaLogic
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Season>>(){
                 {"Title", new(x => x.Title, (Season m) => m.Title)},
-                {"Runtime", new(x => x.Title, (Season m) => m.Runtime)},
-                {"SeasonNumber", new(x => x.Title, (Season m) => m.SeasonNumber)},
+                {"Runtime", new(x => x.Runtime, (Season m) => m.Runtime)},
+                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)},
                 {"Episode", new(x=>x.Episodes, (Season m) => { EpisodesTable(m); return m.Episodes; })},
             },
             SaveEditedMedia,
@@ -142,23 +123,12 @@ public class MediaLogic
             },
             SaveEditedMedia,
             true,
-            MediaMenu.CreateEpisode,
+            () => MediaMenu.CreateEpisode(season),
             true,
             DeleteMedia
         );
     }
-    // private static Episode? AddEpisodes(){
-    //     string prompt = "Title: \nRuntime (Min): \nDescription: \nRating: \n";
-    //     string? title = MenuHelper.SelectText(prompt+"Type the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
-    //     if (title == null){return null;}
-    //     int? runtime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
-    //     if (runtime == null){return null;}
-    //     string? description = MenuHelper.SelectText(prompt+"Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
-    //     if (description == null){return null;}
-    //     float? rating = (float?)MenuHelper.SelectPrice(prompt+"Please enter a rating from 1-10:", "", true, 0d, 10d);
-    //     if (rating == null){return null;}
-    //     return newEpisode;
-    // }
+
     /// <summary>
     /// Saves the given media and returns a boolean indicating if the media got saved.
     /// </summary>
@@ -166,6 +136,19 @@ public class MediaLogic
     /// <returns>Returns a boolean indicating if the Media got saved.</returns>
     private static bool SaveEditedMedia<T>(T media)
     {
+        if(media is Season season){
+            bool confirmation = MenuHelper.Confirm($"you sure you want to save the following edited data:\n\nTitle{season.Title}\nRuntime: {season.Runtime}\nSeasonNumber: {season.SeasonNumber}\nEpisodes: {season.Episodes.Count}");
+            if(confirmation){
+                bool success = MediaAccess.EditMedia(media);
+                MediaMenu.MediaAdded(success);
+                return success;
+            }
+        }else if(media is Episode episode){
+            bool confirmation = MenuHelper.Confirm($"you sure you want to save the following edited data:\n\nTitle{episode.Title}\nRuntime: {episode.Runtime}\nSeasonNumber: {episode.EpisodeNumber}\nEpisodes: {episode.Actors}");
+            if(confirmation){
+                bool succes;
+            }
+        }
         return false;
     }
 
