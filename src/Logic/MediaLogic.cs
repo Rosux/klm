@@ -20,7 +20,6 @@ public class MediaLogic
             new Dictionary<string, PropertyEditMapping<Media>>(){
                 {"Title", new(x=>x.Title, (Media m)=>{return m.Title;})},
             },
-
             SaveMedia,
             true,
             AddMedia,
@@ -47,11 +46,27 @@ public class MediaLogic
         if(userSelection == null){return null;}
         if(userSelection == "FILM")
         {
-            return MediaMenu.CreateFilm();
+            Film? film = MediaMenu.CreateFilm();
+            if(film == null){
+                return null;
+            }
+            bool saved = MediaAccess.AddMedia(film);
+            if(!saved){
+                return null;
+            }
+            return film;
         }
         else if(userSelection == "SERIE")
         {
-            return MediaMenu.CreateSerie();
+            Serie? serie = MediaMenu.CreateSerie();
+            if(serie == null){
+                return null;
+            }
+            bool saved = MediaAccess.AddMedia(serie);
+            if(!saved){
+                return null;
+            }
+            return serie;
         }
         return null;
     }

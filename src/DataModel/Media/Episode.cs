@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 /// <summary>
 /// Model class for Episode.
 /// </summary>
@@ -17,6 +19,7 @@ public class Episode
     /// <param name="runtime">The runtime of the episode.</param>
     /// <param name="episodeNumber">The episodenumber of the episode.</param>
     /// <param name="actors">The actors in the episode.</param>
+    [JsonConstructor]
     public Episode(int id, string title, int runtime, int episodeNumber, List<string> actors){
         this.Id = id;
         this.EpisodeNumber = episodeNumber;

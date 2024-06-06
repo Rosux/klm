@@ -93,6 +93,8 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
+        // MediaLogic.Media();
+        
         MediaLogic.Media();
 
 

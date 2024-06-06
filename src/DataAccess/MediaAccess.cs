@@ -28,10 +28,10 @@ public static class MediaAccess
 
         // add the media to the correct list and increment the current id of that list
         if(media is Film film){
-            film.Id = ++mediaStructure.CurrentFilmId;
+            film.Id = (++mediaStructure.CurrentFilmId);
             mediaStructure.Films.Add(film);
         }else if(media is Serie serie){
-            serie.Id = ++mediaStructure.CurrentSerieId;
+            serie.Id = (++mediaStructure.CurrentSerieId);
             mediaStructure.Series.Add(serie);
         }
 
