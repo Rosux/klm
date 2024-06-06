@@ -95,7 +95,7 @@ class Menu
 
         // MediaLogic.Media();
         
-        MediaLogic.Media();
+        MediaMenu.CreateSerie();
 
 
     }
