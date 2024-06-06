@@ -447,8 +447,16 @@ class FilmSerieMenu
         if(filmlogic_obj.Check_films_exist())
         {
             Film? ToRemove = MenuHelper.SelectMovie();
+            bool a = false;
+            bool exists = filmlogic_obj.ExistsReservationCheck(ToRemove);
             if(ToRemove == null){return;}
-            bool a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
+            if(exists == true)
+            {
+                a = MenuHelper.Confirm("Are you sure you want to remove this movie? 1 or more reservations may have this movie.");
+            }else
+            {
+                a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
+            }
             if (a)
             {
                 filmlogic_obj.Remove_film(ToRemove.Id);

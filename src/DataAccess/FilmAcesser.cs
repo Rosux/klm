@@ -25,20 +25,23 @@ public class FilmAcesser
         writer.Write(string_movies);
         writer.Close();
         SearchAccess.UpdateMedia();
-        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
-        foreach(Reservation Reservation in Reservations)
+        if(removedFilm != null)
         {
-            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+            foreach(Reservation Reservation in Reservations)
             {
-                if(TimelineObject.Action is Film)
+                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
                 {
-                    if(((Film)TimelineObject.Action).Id == removedFilm.Id)
+                    if(TimelineObject.Action is Film)
                     {
-                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        if(((Film)TimelineObject.Action).Id == removedFilm.Id)
+                        {
+                            Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        }
                     }
                 }
+                _reservationAccess.EditReservation(Reservation);
             }
-            _reservationAccess.EditReservation(Reservation);
         }
     }
     

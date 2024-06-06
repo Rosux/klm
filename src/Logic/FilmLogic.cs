@@ -1,5 +1,6 @@
 public class FilmLogic
 {
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
     public string info()
     {
         string all_info = "";
@@ -255,5 +256,25 @@ public class FilmLogic
         }
         filmacesser.Return_info(list_films, null);
         return info;
+    }
+
+    public bool ExistsReservationCheck(Film film)
+    {
+        bool exists = false;
+        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+        foreach(Reservation Reservation in Reservations)
+        {
+            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            {
+                if(TimelineObject.Action is Film)
+                {
+                    if(((Film)TimelineObject.Action).Id == film.Id)
+                    {
+                        exists = true;
+                    }
+                }
+            }
+        }
+        return exists;
     }
 }

@@ -59,30 +59,35 @@ public class ConsumptionAccess : DatabaseHandler
     /// <returns>A boolean indicating if the deletion was successful.</returns>
     public bool DeleteConsumption(Consumption consumption){
         _Conn.Open();
+        int rowsAffected = 0;
         string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
         using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
         {
             Remove.Parameters.AddWithValue("@Id", consumption.Id);
-            int rowsAffected = Remove.ExecuteNonQuery();
+            rowsAffected = Remove.ExecuteNonQuery();
             _Conn.Close();
         }
         bool changed = false;
-        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
-        foreach(Reservation Reservation in Reservations)
+        if(consumption != null)
         {
-            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+            foreach(Reservation Reservation in Reservations)
             {
-                if(TimelineObject.Action is Consumption)
+                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
                 {
-                    if(((Consumption)TimelineObject.Action).Id == consumption.Id)
+                    if(TimelineObject.Action is Consumption)
                     {
-                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        if(((Consumption)TimelineObject.Action).Id == consumption.Id)
+                        {
+                            Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        }
                     }
                 }
+                changed = _reservationAccess.EditReservation(Reservation);
             }
-            changed = _reservationAccess.EditReservation(Reservation);
+            return changed;
         }
-        return changed;
+        return rowsAffected > 0;
     }
 
     /// <summary>
