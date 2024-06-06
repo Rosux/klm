@@ -264,7 +264,7 @@ public class FilmLogic
         List<Reservation> Reservations = _reservationAccess.GetAllReservations();
         foreach(Reservation Reservation in Reservations)
         {
-            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+            foreach(TimeLine.Item TimelineObject in Reservation.TimeLine.Items.ToList())
             {
                 if(TimelineObject.Action is Film)
                 {

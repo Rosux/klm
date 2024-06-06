@@ -74,7 +74,7 @@ public static class RoomLogic
             // ask the user if they're sure they want to delete the room
             if(exists)
             {
-                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}\nThis room is planned in for 1 or more users.");
+                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}\nThis room is planned in for 1 or more users.", true);
             }else
             {
                 deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");

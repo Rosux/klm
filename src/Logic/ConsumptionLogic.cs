@@ -92,7 +92,7 @@ public static class ConsumptionLogic
         }
         if (exists == true)
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}\nIt is used in one or more reservations.\n");
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}\nIt is used in one or more reservations.\n", true);
         }else
         {
             confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");

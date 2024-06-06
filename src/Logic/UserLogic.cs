@@ -51,7 +51,7 @@ public static class UserLogic
             }
         if(exists)
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}\nThis user has an reservation.");
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}\nThis user has an reservation.", true);
         }else
         {
             confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");

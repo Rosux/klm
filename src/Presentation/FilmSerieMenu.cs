@@ -452,7 +452,7 @@ class FilmSerieMenu
             if(ToRemove == null){return;}
             if(exists == true)
             {
-                a = MenuHelper.Confirm("Are you sure you want to remove this movie? 1 or more reservations may have this movie.");
+                a = MenuHelper.Confirm("Are you sure you want to remove this movie?\n1 or more reservations have this movie.", true);
             }else
             {
                 a = MenuHelper.Confirm("Are you sure you want to remove this movie?");
