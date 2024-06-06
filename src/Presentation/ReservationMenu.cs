@@ -84,11 +84,21 @@ public static class ReservationMenu
                         }else{
                             t = MenuHelper.SelectTime($"Select the date and time you want {film.Title} to begin.", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
                         }
-                        timeline.Add(
-                            film,
-                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                            new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(film.Runtime)
-                        );
+
+                        DateTime startDateTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
+                        DateTime endDateTime = startDateTime.AddMinutes(film.Runtime);
+                        //HasConflict returns tuple with bool Conflict (true = conflict) and string ConflictingFilm (title)
+                        var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime);
+                        if (!ConflictReturns.Conflict) {
+                            timeline.Add(
+                                film,
+                                startDateTime,
+                                endDateTime
+                            );
+                        } else {
+                            Console.WriteLine($"Movie has not been added: {ConflictReturns.ConflictingTitle} is already scheduled {ConflictReturns.ConflictingTime}.\n\nPress enter to continue...");
+                            Console.ReadKey(true);
+                        }
                     }else if(FilmOrEpisode != null && FilmOrEpisode is Dictionary<Serie, List<Episode>>){
                         List<Episode> episode_list = ((Dictionary<Serie, List<Episode>>)FilmOrEpisode).First().Value;
                         DateTime serieTime = new DateTime();

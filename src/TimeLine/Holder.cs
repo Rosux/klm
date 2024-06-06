@@ -40,20 +40,21 @@ namespace TimeLine{
         /// <param name="startTime">Start time of the new item.</param>
         /// <param name="endTime">End time of the new item.</param>
         /// <returns>True if there is a conflict, otherwise false.</returns>
-        public bool HasConflict(DateTime startTime, DateTime endTime)
+        public (bool Conflict, string ConflictingTitle, string ConflictingTime) HasConflict(DateTime startTime, DateTime endTime)
         {
             foreach (var item in Items)
             {
-                if (item.Action is Film)
+                if (item.Action is Film film)
                 {
                     // Check if the new time range is also within any already added film 
                     if (startTime < item.EndTime && endTime > item.StartTime)
                     {
-                        return true;
+                        string ConflictingTime = $"from {item.StartTime.ToString("HH:mm")} to {item.EndTime.ToString("HH:mm")}";
+                        return (true, film.Title, ConflictingTime);
                     }
                 }
             }
-            return false;
+            return (false, null, null);
         }
 
         public override string ToString()
