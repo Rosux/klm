@@ -164,38 +164,6 @@ public class MediaLogic
 
 
     public static bool TempSaveTest<T>(T media){
-        if (media is Season editedSeason)
-        {
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nTitle: {editedSeason.Title}\nRuntime: {editedSeason.Runtime}\nSeason Number: {editedSeason.SeasonNumber}\nEpisodes: {editedSeason.Episodes.Count}");
-            if (confirmation)
-            {
-                var existingSeason = TempSeasonList.FirstOrDefault(s => s.SeasonNumber == editedSeason.SeasonNumber);
-                if (existingSeason != null)
-                {
-                    TempSeasonList.Remove(existingSeason);
-                }
-                TempSeasonList.Add(editedSeason);
-                return true;
-            }
-        }
-        else if (media is Episode editedEpisode)
-        {
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nTitle: {editedEpisode.Title}\nRuntime: {editedEpisode.Runtime}\nEpisode Number: {editedEpisode.EpisodeNumber}\nActors: {string.Join(", ", editedEpisode.Actors)}");
-            if (confirmation)
-            {
-                var season = TempSeasonList.FirstOrDefault(s => s.Episodes.Any(e => e.Title == editedEpisode.Title));
-                if (season != null)
-                {
-                    var existingEpisode = season.Episodes.FirstOrDefault(e => e.Title == editedEpisode.Title);
-                    if (existingEpisode != null)
-                    {
-                        season.Episodes.Remove(existingEpisode);
-                    }
-                    season.Episodes.Add(editedEpisode);
-                    return true;
-                }
-            }
-        }
         return false;
     }
     /// <summary>

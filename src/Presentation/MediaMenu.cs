@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 public static class MediaMenu
 {
     /// <summary>
@@ -133,7 +131,7 @@ public static class MediaMenu
         List<Episode> episodes = new List<Episode>();
 
         string prompt = "Title: \nRuntime (Min): \nSeasonNumber: \n";
-        string? title = MenuHelper.SelectText(prompt+"Type the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.SelectText(prompt+"Type the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
         prompt = $"Title: {title}\nRuntime (Min): \nSeasonNumber: \n";
