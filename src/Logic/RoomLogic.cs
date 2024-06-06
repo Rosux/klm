@@ -4,7 +4,7 @@
 public static class RoomLogic
 {
     private static RoomAccess _roomAccess = new RoomAccess();
-
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
     /// <summary>
     /// Creates a menu of 4 options to choose from and a back option. Options are: "Show room", "Add room", "Remove room", "Edit room".
     /// </summary>
@@ -61,8 +61,24 @@ public static class RoomLogic
             // user pressed escape so dont delete anything and return to the menu
             return;
         }else{
-            // ask the user if theyre sure they want to delete the room
-            bool deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
+            bool exists = false;
+            bool deletion = false;
+            List<Reservation> allReservations = _reservationAccess.GetAllReservations();
+            foreach(Reservation reservation in allReservations)
+            {
+                if(reservation.RoomId == selectedRoom.Id)
+                {
+                    exists = true;
+                }
+            }
+            // ask the user if they're sure they want to delete the room
+            if(exists)
+            {
+                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}\nThis room is planned in for 1 or more users.", true);
+            }else
+            {
+                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
+            }
             if(deletion){
                 // if the user answered yes remove the room and show the user if it worked or not
                 bool success = _roomAccess.RemoveRoom(selectedRoom.Id);

@@ -1,5 +1,7 @@
 public class ConsumptionAccess : DatabaseHandler
 {
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
+
     public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){}
 
     /// <summary>
@@ -57,14 +59,35 @@ public class ConsumptionAccess : DatabaseHandler
     /// <returns>A boolean indicating if the deletion was successful.</returns>
     public bool DeleteConsumption(Consumption consumption){
         _Conn.Open();
+        int rowsAffected = 0;
         string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
         using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
         {
             Remove.Parameters.AddWithValue("@Id", consumption.Id);
-            int rowsAffected = Remove.ExecuteNonQuery();
+            rowsAffected = Remove.ExecuteNonQuery();
             _Conn.Close();
-            return rowsAffected > 0;
         }
+        bool changed = false;
+        if(consumption != null)
+        {
+            List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+            foreach(Reservation Reservation in Reservations)
+            {
+                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+                {
+                    if(TimelineObject.Action is Consumption)
+                    {
+                        if(((Consumption)TimelineObject.Action).Id == consumption.Id)
+                        {
+                            Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        }
+                    }
+                }
+                changed = _reservationAccess.EditReservation(Reservation);
+            }
+            return changed;
+        }
+        return rowsAffected > 0;
     }
 
     /// <summary>

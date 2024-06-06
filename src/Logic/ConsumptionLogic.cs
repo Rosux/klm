@@ -1,6 +1,8 @@
 public static class ConsumptionLogic
 {
     private static ConsumptionAccess _consumptionAccess = new ConsumptionAccess();
+    public static ReservationAccess _reservationAccess = new ReservationAccess();
+
 
     /// <summary>
     /// Asks the user to select an option among Edit consumption and Exit to main menu.
@@ -72,7 +74,29 @@ public static class ConsumptionLogic
     /// <param name="consumption">The consumption instance to delete from the database.</param>
     /// <returns>A boolean indicating if the deletion was successful.</returns>
     private static bool DeleteConsumption(Consumption consumption){
-        bool confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
+        bool exists = false;
+        bool confirmation = false;
+        List<Reservation> allReservations = _reservationAccess.GetAllReservations();
+        foreach(Reservation reservation in allReservations)
+        {
+            foreach(var TimelineObject in reservation.TimeLine.Items.ToList())
+            {
+                if(TimelineObject.Action is Consumption)
+                {
+                    if(((Consumption)TimelineObject.Action).Id == consumption.Id)
+                    {
+                        exists = true;
+                    }
+                }
+            }
+        }
+        if (exists == true)
+        {
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}\nIt is used in one or more reservations.\n", true);
+        }else
+        {
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
+        }
         if(confirmation){
             bool success = _consumptionAccess.DeleteConsumption(consumption);
             ConsumptionMenu.ConsumptionRemoved(success);

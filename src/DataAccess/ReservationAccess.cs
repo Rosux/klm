@@ -226,4 +226,26 @@ public class ReservationAccess : DatabaseHandler
         }
         return true;
     }
+
+
+    public bool EditReservation(Reservation reservation)
+    {
+        _Conn.Open();
+        int rowsAffected = -1;
+        string UpdateReservation = $@"UPDATE Reservations SET RoomId = @RoomId, UserId= @UserId, GroupSize = @GroupSize, StartDate = @StartDate, EndDate = @EndDate, Price = @Price, TimeLine = @TimeLine, Entertainments = @Entertainments WHERE ID = {reservation.Id}";
+        using (SQLiteCommand Launch = new SQLiteCommand(UpdateReservation, _Conn)){
+            Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
+            Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
+            Launch.Parameters.AddWithValue("@GroupSize", reservation.GroupSize);
+            Launch.Parameters.AddWithValue("@StartDate", reservation.StartDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@EndDate", reservation.EndDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Launch.Parameters.AddWithValue("@Price", reservation.Price);
+            Launch.Parameters.AddWithValue("@TimeLine", reservation.TimeLine.ToString());
+            Launch.Parameters.AddWithValue("@Entertainments", JsonConvert.SerializeObject(reservation.Entertainments));
+            Launch.Parameters.AddWithValue("@Id", reservation.Id);
+            rowsAffected = Launch.ExecuteNonQuery();
+        }
+        _Conn.Close();
+        return rowsAffected > 0;
+    }
 }
