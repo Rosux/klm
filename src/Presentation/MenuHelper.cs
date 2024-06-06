@@ -1599,6 +1599,12 @@ public static class MenuHelper{
                         foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
                             Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
                             string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                            Func<T, object>? editedValueDisplayMethod = null;
+                            if(editMapping.Value.DisplayAccessor != null){
+                                editedValueDisplayMethod = editMapping.Value.DisplayAccessor.Compile();
+                                dataString = editedValueDisplayMethod(chunks[currentPage][currentPageSelection]).ToString() ?? "";
+                            }
+                            // this if statement handles the updated data
                             if(editing){
 
                                 string propertyName = "";
@@ -1611,8 +1617,36 @@ public static class MenuHelper{
                                 foreach(KeyValuePair<MemberInfo, (object, object)> kvp in propertyUpdate){
                                     if(kvp.Key.Name.ToString() == propertyName){
                                         (object oldData, object newData) = kvp.Value;
-                                        if(oldData.ToString() != newData.ToString()){
-                                            dataString = $"{oldData} -> {newData}";
+                                        string oldDataString = oldData.ToString();
+                                        string newDataString = newData.ToString();
+                                        if(editedValueDisplayMethod != null && editedObject != null){
+                                            // editedObject only holds old values
+                                            // so we set oldData to its currentValue
+                                            oldDataString = editedValueDisplayMethod.Invoke(editedObject).ToString() ?? "";
+
+                                            // set the editedObject data to its new value
+                                            PropertyInfo? property = editedObject.GetType().GetProperty(kvp.Key.Name.ToString());
+                                            if(property != null){
+                                                property.SetValue(editedObject, newData);
+                                            }
+                                            FieldInfo? field = editedObject.GetType().GetField(kvp.Key.Name.ToString());
+                                            if(field != null){
+                                                field.SetValue(editedObject, newData);
+                                            }
+
+                                            // set newData to its property value
+                                            newDataString = editedValueDisplayMethod.Invoke(editedObject).ToString() ?? "";
+
+                                            // reset the editedObject back to its old value
+                                            if(property != null){
+                                                property.SetValue(editedObject, oldData);
+                                            }
+                                            if(field != null){
+                                                field.SetValue(editedObject, oldData);
+                                            }
+                                        }
+                                        if(oldDataString != newDataString){
+                                            dataString = $"{oldDataString} -> {newDataString}";
                                         }
                                     }
                                 }

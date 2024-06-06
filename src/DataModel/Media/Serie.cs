@@ -5,8 +5,18 @@ using Newtonsoft.Json;
 /// </summary>
 public class Serie : Media
 {
-    public bool Bingeable = false;
-    public List<Season> Seasons = new List<Season>();
+    public int Id { get; set; } = -1;
+    public string Title { get; set; } = "";
+    public int Runtime { get; set; } = -1;
+    public string Description { get; set; } = "";
+    public float Rating { get; set; } = 0f; // ranges from 0.0f to 10.0f
+    public string Language { get; set; } = "";
+    public List<Genre> Genres { get; set; } = new List<Genre>();
+    public DateOnly ReleaseDate { get; set; } = DateOnly.MinValue;
+    public Certification Certification { get; set; } = Certification.NONE;
+    public List<string> Directors { get; set; } = new List<string>();
+    public bool Bingeable { get; set; } = false;
+    public List<Season> Seasons { get; set; } = new List<Season>();
 
     /// <summary>
     /// Creates a serie with specified data.
@@ -25,7 +35,18 @@ public class Serie : Media
     /// <param name="seasons"></param>
     /// <returns>The created serie.</returns>
     [JsonConstructor]
-    public Serie(int id, string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons) : base(id, title, runtime, description, rating, language, genres, releaseDate, certification, directors){
+    public Serie(int id, string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons)
+    {
+        this.Id = id;
+        this.Title = title;
+        this.Runtime = runtime;
+        this.Description = description;
+        this.Rating = rating;
+        this.Language = language;
+        this.Genres = genres;
+        this.ReleaseDate = releaseDate;
+        this.Certification = certification;
+        this.Directors = directors;
         this.Bingeable = bingeable;
         this.Seasons = seasons;
     }
@@ -45,7 +66,18 @@ public class Serie : Media
     /// <param name="bingeable"></param>
     /// <param name="seasons"></param>
     /// <returns>The created serie.</returns>
-    public Serie(string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons) : base(title, runtime, description, rating, language, genres, releaseDate, certification, directors){
+    public Serie(string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons)
+    {
+        this.Id = -1;
+        this.Title = title;
+        this.Runtime = runtime;
+        this.Description = description;
+        this.Rating = rating;
+        this.Language = language;
+        this.Genres = genres;
+        this.ReleaseDate = releaseDate;
+        this.Certification = certification;
+        this.Directors = directors;
         this.Bingeable = bingeable;
         this.Seasons = seasons;
     }
