@@ -7,32 +7,28 @@ public static class MediaMenu
     /// </summary>
     /// <returns>Returns a Film object or null in case the user exists the process.</returns>
     public static Film? CreateFilm(){
-        string? title = MenuHelper.SelectText("\nType the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.SelectText($"Title: \nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nType the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
-        int? runtime = MenuHelper.SelectInteger("Please enter the runtime in minutes:", "", true, 0, 0, 500);
+
+        int? runtime = MenuHelper.SelectInteger($"Title: {title}\nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
-        string? description = MenuHelper.SelectText("Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+
+        string? description = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
         if (description == null){return null;}
-        float? rating = (float?)MenuHelper.SelectPrice("Please enter a rating from 1-10:", "", true, 0d, 10d);
+
+        float? rating = (float?)MenuHelper.SelectPrice($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a rating from 1-10:", "", true, 0d, 10d);
         if (rating == null){return null;}
-        string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
+
+        string? language = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a language:", "", true, 0, 30);
         if (language == null){return null;}
-        List<Genre> genres = new List<Genre>
-        {
-            Genre.HORROR,
-            Genre.ACTION,
-            Genre.COMEDY,
-            Genre.FAMILY,
-            Genre.DRAMA,
-            Genre.ADVENTURE,
-            Genre.FANTASY,
-            Genre.THRILLER,
-            Genre.MYSTERY,
-            Genre.CRIME
-        };
-        List<Genre>? selectedGenres = MenuHelper.SelectFromEnum<Genre>(genres, "Genres", "Select one or multiple Genres", "", true);
-        DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
-        if (date == null){return null;}
+
+        DateOnly? releaseDate = MenuHelper.SelectDate($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the date of the movie:", true);
+        if (releaseDate == null){return null;}
+
+        List<Genre> genres = new List<Genre>{ Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA, Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME };
+        List<Genre>? selectedGenres = MenuHelper.SelectFromEnum<Genre>(genres, "Genres", $"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nSelect one or multiple Genres", "", true);
+        if(selectedGenres == null){return null;}
+
         Certification? certification = MenuHelper.SelectFromList(
             "Select a certification",
             true,
@@ -51,15 +47,19 @@ public static class MediaMenu
                 {"Parents strongly cautioned. May be unsuitable for children under 14.", Certification.TV14},
                 {"Mature audiences only. Content is intended only for adults.", Certification.TVMA},
                 {"Adult content. Viewer discretion advised.", Certification.X}
-            });
-        string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
-        if (director == null){return null;}
-        string? actors = MenuHelper.SelectText("Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            }
+        );
+
+        string? directors = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: \nActors: \nWriters: \n\nPlease enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if (directors == null){return null;}
+
+        string? actors = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: \nWriters: \n\nPlease enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
-        string? writers = MenuHelper.SelectText("Please enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+
+        string? writers = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: {actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nWriters: \n\nPlease enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (writers == null){return null;}
-        Film film = new Film(title, (int)runtime, description, (float)rating, language, selectedGenres, (DateOnly)date, (Certification)certification, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
-        return film;
+
+        return new Film(title, (int)runtime, description, (float)rating, language, selectedGenres, (DateOnly)releaseDate, (Certification)certification, directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
     }
 
     /// <summary>
@@ -70,22 +70,30 @@ public static class MediaMenu
         List<Season> seasons = new List<Season>();
 
         string? title = MenuHelper.SelectText("\nType the title of the serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
-        if (title == null){return null;}
-        int runtime = 0;
-        string? description = MenuHelper.SelectText("Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
-        if (description == null){return null;}
-        float? rating = (float?)MenuHelper.SelectPrice("Please enter a rating from 1-10:", "", true, 0d, 10d);
-        if (rating == null){return null;}
-        string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
-        if (language == null){return null;}
-        DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
-        if (date == null){return null;}
-        string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
-        if (director == null){return null;}
+        if(title == null){return null;}
 
-        List<Genre> genres = new List<Genre>{
-            Genre.HORROR
-        };
+        int runtime = 0;
+
+        string? description = MenuHelper.SelectText("Please enter the description:", "", true, 1, 500, @"([A-Za-z]|\ |\.|\,|[0-9]|\-)");
+        if(description == null){return null;}
+
+        float rating = 0f;
+
+        string? language = MenuHelper.SelectText("Please enter a language:", "", true, 0, 30);
+        if(language == null){return null;}
+
+        DateOnly? date = MenuHelper.SelectDate("Please enter the date of the movie:", true);
+        if(date == null){return null;}
+
+        string? director = MenuHelper.SelectText("Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        if(director == null){return null;}
+
+
+        List<Genre> possibleGenres = new List<Genre>{ Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA, Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME };
+        List<Genre>? genres = MenuHelper.SelectFromEnum<Genre>(possibleGenres, "Genres", "Select one or multiple genres", "", true);
+        if(genres == null){return null;}
+
+
         Certification certifications = Certification.PG13;
 
 
@@ -112,7 +120,7 @@ public static class MediaMenu
         if (runtime > 400 && rating > 8){
             bingeable = true;
         }
-        Serie serie = new Serie(title, runtime, description, (float)rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
+        Serie serie = new Serie(title, runtime, description, rating, language, genres, (DateOnly)date, certifications, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
         return serie;
     }
 
