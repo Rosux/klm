@@ -144,7 +144,7 @@ public class UserAccess : DatabaseHandler{
     /// <returns>Returns true if the user has been found/delted and false if not.</returns>
     public bool DeleteUser(User user){
         _Conn.Open();
-        string NewQuery = @"DELETE FROM Users WHERE ID = @Id ";
+        string NewQuery = @"DELETE FROM Users WHERE ID = @Id;DELETE FROM Reservations WHERE UserId = @Id";
         using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
         {
             Remove.Parameters.AddWithValue("@Id", user.Id);

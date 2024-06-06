@@ -55,7 +55,7 @@ public class RoomAccess : DatabaseHandler {
     {
         int rowsAffected;
         _Conn.Open();
-        string query = "DELETE FROM Rooms WHERE ID=@id";
+        string query = "DELETE FROM Rooms WHERE ID=@id;DELETE FROM Reservations WHERE RoomId = @id";
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@id", id);
             rowsAffected = Command.ExecuteNonQuery();

@@ -1455,14 +1455,16 @@ public static class MenuHelper{
     /// </summary>
     /// <param name="prompt">A string containing the question to confirm.</param>
     /// <returns>A boolean indicating if the user confirms or not.</returns>
-    public static bool Confirm(string prompt=""){
+    public static bool Confirm(string prompt="", bool warning = false){
         bool selection = false;
         ConsoleKey key;
         do
         {
             Console.CursorVisible = false;
             Console.Clear();
+            Console.ForegroundColor = warning ? ConsoleColor.DarkYellow : ConsoleColor.White;
             Console.Write($"{prompt}\n\n");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = selection ? ConsoleColor.Black : ConsoleColor.DarkGray;
             Console.Write($">No");
             Console.BackgroundColor = ConsoleColor.Black;
