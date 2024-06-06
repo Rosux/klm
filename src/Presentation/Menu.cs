@@ -92,5 +92,31 @@ class Menu
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
+
+        ConsumptionAccess c = new ConsumptionAccess();
+        var x = MenuHelper.SelectFromTable(
+            c.ReadConsumption(),
+            new Dictionary<string, Func<Consumption, object>>(){
+                { "Id", (x)=>x.Id },
+                { "Name", (x)=>x.Name },
+                { "Price", (x)=>x.Price },
+                { "StartTime", (x)=>x.StartTime },
+            },
+            true,
+            true
+        );
+        var y = MenuHelper.SelectFromTable(
+            c.ReadConsumption(),
+            new Dictionary<string, Func<Consumption, object>>(){
+                { "Id", (x)=>x.Id },
+                { "Name", (x)=>x.Name },
+                { "Price", (x)=>x.Price },
+                { "StartTime", (x)=>x.StartTime },
+            },
+            true
+        );
+        Console.WriteLine(x?.Name);
+        Console.WriteLine(y?.Name);
+
     }
 }
