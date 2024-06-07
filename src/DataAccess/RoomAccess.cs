@@ -12,14 +12,15 @@ public class RoomAccess : DatabaseHandler {
     {
         Room? newRoom = null;
         _Conn.Open();
-        string query = "INSERT INTO Rooms (Capacity, Seats) VALUES (@capacity, @seats); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
+        string query = "INSERT INTO Rooms (Capacity, Seats, RoomName) VALUES (@capacity, @seats, @roomname); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            Command.Parameters.AddWithValue("@roomname", room.RoomName);
             SQLiteDataReader reader = Command.ExecuteReader();
             while(reader.Read()){
                 room.Id = reader.GetInt32(0);
-                newRoom = new Room(reader.GetInt32(0), reader.GetString(2));
+                newRoom = new Room(reader.GetInt32(0), reader.GetString(2), reader.GetString(3));
             }
         }
         _Conn.Close();
@@ -35,11 +36,12 @@ public class RoomAccess : DatabaseHandler {
     {
         int rowsAffected;
         _Conn.Open();
-        string query = "UPDATE Rooms SET Capacity=@capacity, Seats=@seats WHERE ID=@id";
+        string query = "UPDATE Rooms SET Capacity=@capacity, Seats=@seats, RoomName=@roomname WHERE ID=@id";
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@id", room.Id);
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            Command.Parameters.AddWithValue("@roomname", room.RoomName);
             rowsAffected = Command.ExecuteNonQuery();
         }
         _Conn.Close();
@@ -79,7 +81,7 @@ public class RoomAccess : DatabaseHandler {
             SQLiteDataReader reader = Command.ExecuteReader();
             while(reader.Read())
             {
-                r = new Room(reader.GetInt32(0), reader.GetString(2));
+                r = new Room(reader.GetInt32(0), reader.GetString(2), reader.GetString(3));
             }
         }
         _Conn.Close();
@@ -102,7 +104,8 @@ public class RoomAccess : DatabaseHandler {
             {
                 int id = reader.GetInt32(0);
                 string layoutJson = reader.GetString(2);
-                roomlist.Add(new Room(id, layoutJson));
+                string roomname = reader.GetString(3);
+                roomlist.Add(new Room(id, layoutJson, roomname));
             }
         }
         _Conn.Close();
