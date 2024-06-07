@@ -123,12 +123,12 @@ public static class MediaMenu
     public static Season? CreateSeason(){
         List<Episode> episodes = new List<Episode>();
 
-        string prompt = "Title: \nSeasonNumber: \n";
+        string prompt = "Title: \nSeason Number: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
-        prompt = $"Title: {title}\nSeasonNumber: \n";
-        int? seasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the seasonnumber:", "", true, 0, 0, 60);
+        prompt = $"Title: {title}\nSeason Number: \n";
+        int? seasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the season number:", "", true, 0, 0, 60);
         if (seasonNumber == null){return null;}
 
         return new Season(title, -1, (int)seasonNumber, episodes);
@@ -139,23 +139,23 @@ public static class MediaMenu
     /// </summary>
     /// <returns>The created episode.</returns>
     public static Episode? CreateEpisode(){
-        string prompt = "Title: \nRuntime (Min): \nEpisodeNumber: \nRating: \nActors: \n";
+        string prompt = "Title: \nRuntime (Min): \nEpisode Number: \nRating: \nActors: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
-        prompt = $"Title: {title}\nRuntime (Min): \nEpisodeNumber: \nRating: \nActors: \n";
+        prompt = $"Title: {title}\nRuntime (Min): \nEpisode Number: \nRating: \nActors: \n";
         int? runtime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
 
-        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisodeNumber: \nRating: \nActors: \n";
-        int? episodeNumber = MenuHelper.SelectInteger(prompt+"Please enter the episodenumber:", "", true, 0, 0, 60);
+        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: \nRating: \nActors: \n";
+        int? episodeNumber = MenuHelper.SelectInteger(prompt+"Please enter the episode number:", "", true, 0, 0, 60);
         if (episodeNumber == null){return null;}
 
-        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisodeNumber: {episodeNumber}\nRating: \nActors: \n";
+        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: {episodeNumber}\nRating: \nActors: \n";
         float? rating = (float?)MenuHelper.SelectPrice(prompt+"Please enter a rating from 1-10:", "", true, 0d, 10d);
         if (rating == null){return null;}
 
-        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisodeNumber: {episodeNumber}\nRating: {rating}\nActors: \n";
+        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: {episodeNumber}\nRating: {rating}\nActors: \n";
         string? actors = MenuHelper.SelectText(prompt+"Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
 

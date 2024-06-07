@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 public class MediaLogic
 {
     public static void Media(){
@@ -12,7 +14,7 @@ public class MediaLogic
                 {"Language", m=>m.Language},
                 {"Release Date", m=>m.ReleaseDate},
                 {"Certification", m=>m.Certification},
-                {"Directors", m=>ListToString(m.Directors)},
+                {"Directors", m=>m.Directors.Count},
             },
             false, // canSelect
             true,
@@ -20,9 +22,28 @@ public class MediaLogic
             true, // canSearch
             (
                 new Dictionary<string, PropertyEditMapping<Media>>(){
-                    {"Actors", new(m=>ListToString(((Film)m).Actors), m=>((Film)m).Actors, (Media m)=>new List<String>(){"Actorssss", "Actosssssr2"})},
+                    {"Title", new(x=>x.Title, GetValidTitle)},
+                    {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
+                    {"Description", new(x=>x.Description, GetValidDescription)},
+                    {"Rating", new(x=>x.Rating, GetValidRating)},
+                    {"Language", new(x=>x.Language, GetValidLanguage)},
+                    {"Genres", new(x=>ListToString(((Film)x).Genres), x=>((Film)x).Genres, GetValidGenres)},
+                    {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
+                    {"Certification", new(x=>x.Certification, GetValidCertification)},
+                    {"Directors", new(x=>ListToString(((Film)x).Directors), x=>((Film)x).Directors , GetValidDirectors)},
+                    {"Actors", new(x=>ListToString(((Film)x).Actors), x=>((Film)x).Actors, GetValidActors)},
+                    {"Writers", new(x=>ListToString(((Film)x).Writers), x=>((Film)x).Writers, GetValidWriters)},
                 },
                 new Dictionary<string, PropertyEditMapping<Media>>(){
+                    {"Title", new(x=>x.Title, GetValidTitle)},
+                    {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
+                    {"Description", new(x=>x.Description, GetValidDescription)},
+                    {"Rating", new(x=>x.Rating, GetValidRating)},
+                    {"Language", new(x=>x.Language, GetValidLanguage)},
+                    {"Genres", new(x=>ListToString(((Serie)x).Genres), x=>((Serie)x).Genres, GetValidGenres)},
+                    {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
+                    {"Certification", new(x=>x.Certification, GetValidCertification)},
+                    {"Directors", new(x=>ListToString(((Serie)x).Directors), x=>((Serie)x).Directors , GetValidDirectors)},
                     {"Bingeable", new(m=>((Serie)m).Bingeable, (Media m)=>true)},
                     {"Seasons", new(m=>ListToString(((Serie)m).Seasons), m=>((Serie)m).Seasons, (Media m)=>EditSeasons((Serie)m))},
                 }
@@ -92,64 +113,6 @@ public class MediaLogic
         return null;
     }
 
-    // public static void SeasonsTable(Serie serie){
-    //     var allMedia = MediaAccess.GetAllMedia();
-    //     var series = allMedia.OfType<Serie>().ToList();
-    //     var seasons = new List<Season>();
-    //     MenuHelper.Table<Season>(
-    //         TempSeasonList,
-    //         new Dictionary<string, Func<Season, object>>(){
-    //             {"Title", m=>m.Title},
-    //             {"Runtime", m=>m.Runtime},
-    //             {"SeasonNumber", m=>m.SeasonNumber},
-    //             {"Episodes", m=>m.Episodes},
-    //         },
-    //         false, // canSelect
-    //         true,
-    //         true,
-    //         true, // canSearch
-    //         new Dictionary<string, PropertyEditMapping<Season>>(){
-    //             {"Title", new(x => x.Title, (Season m) => m.Title)},
-    //             {"Runtime", new(x => x.Runtime, (Season m) => m.Runtime)},
-    //             {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)},
-    //             {"Episode", new(x=>x.Episodes, (Season m) => { EpisodesTable(m); return m.Episodes; })},
-    //         },
-    //         TempSaveTest,
-    //         true,
-    //         () => MediaMenu.CreateSeason(serie),
-    //         true,
-    //         DeleteMedia
-    //     );
-    // }
-
-    // public static void EpisodesTable(Season season){
-    //     var episodes = season.Episodes.ToList();
-    //     MenuHelper.Table<Episode>(
-    //         TempEpisodeList,
-    //         new Dictionary<string, Func<Episode, object>>(){
-    //             {"Title", m=>m.Title},
-    //             {"Runtime", m=>m.Runtime},
-    //             {"EpisodeNumber", m=>m.EpisodeNumber},
-    //             {"Actors", m=>m.Actors},
-    //         },
-    //         false, // canSelect
-    //         true,
-    //         true,
-    //         true, // canSearch
-    //         new Dictionary<string, PropertyEditMapping<Episode>>(){
-    //             {"Title", new(x => x.Title, (Episode m) => m.Title)},
-    //             {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)},
-    //             {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)},
-    //             {"Actors", new(x => x.Actors, (Episode m) => m.Actors)},
-    //         },
-    //         SaveEditedMedia,
-    //         true,
-    //         () => MediaMenu.CreateEpisode(season),
-    //         true,
-    //         DeleteMedia
-    //     );
-    // }
-
     /// <summary>
     /// Saves the given media and returns a boolean indicating if the media got saved.
     /// </summary>
@@ -175,10 +138,6 @@ public class MediaLogic
         return false;
     }
 
-    public static bool TempSaveTest<T>(T media){
-        return false;
-    }
-
     /// <summary>
     /// Deletes the given media and returns a boolean indicating if the media got deleted.
     /// </summary>
@@ -189,36 +148,62 @@ public class MediaLogic
         return false;
     }
 
-    private static string GetValidTitle<T>(T title){
-        if(title is Film film){
+    private static string GetValidTitle<T>(T media){
+        if(media is Film film){
             string prompt = $"Current Title: {film.Title}\n\n";
             string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the movie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
             return newTitle ?? film.Title;
-        }else if(title is Serie serie){
+        }else if(media is Serie serie){
                 string prompt = $"Current Title: {serie.Title}\n\n";
                 string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the serie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newTitle ?? serie.Title;
+        }else if(media is Season season){
+            string prompt = $"Current Title: {season.Title}\n\n";
+            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the season:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            return newTitle ?? season.Title;
+        }else if(media is Episode episode){
+            string prompt = $"Current Title: {episode.Title}\n\n";
+            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the episode:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            return newTitle ?? episode.Title;
         }else{
             return "An error occurred. The provided title is not valid for editing.\n\nPress any key to continue";
         }
     }
 
-    private static object GetValidRuntime<T>(T runtime){
-        if(runtime is Film film){
+    private static object GetValidInteger<T>(T media){
+        if(media is Film film){
             string prompt = $"Current Runtime: {film.Runtime}\n\n";
             int? newRuntime = MenuHelper.SelectInteger(prompt + "Enter the new runtime of the movie:", "", true, 0, 0, 500);
             return newRuntime ?? film.Runtime;
-        } else {
+        }else if(media is Season season){
+            string prompt = $"Current Season Number: {season.SeasonNumber}\n\n";
+            int? newSeasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the new season number:", "", true, 0, 0, 60);
+            return newSeasonNumber ?? season.SeasonNumber;
+        }else if(media is Episode episode){
+            string prompt = $"Current Episode Number: {episode.EpisodeNumber}\n\n";
+            int? newEpisodeNumber = MenuHelper.SelectInteger(prompt+"Please enter the new episode number:", "", true, 0, 0, 60);
+            return newEpisodeNumber ?? episode.EpisodeNumber;
+        }else{
             return 0;
         }
     }
 
-    private static string GetValidDescription<T>(T description){
-        if(description is Film film){
+    private static object GetValidRuntime<T>(T media){
+        if(media is Episode episode){
+            string prompt = $"Current Runtime: {episode.Runtime}\n\n";
+            int? newRuntime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
+            return newRuntime ?? episode.Runtime;
+        }else{
+            return 0;
+        }
+    }
+
+    private static string GetValidDescription<T>(T media){
+        if(media is Film film){
             string prompt = $"Current Description: {film.Description}\n\n";
             string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the movie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
             return newDescription ?? film.Description;
-        }else if(description is Serie serie){
+        }else if(media is Serie serie){
                 string prompt = $"Current Description: {serie.Description}\n\n";
                 string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the serie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newDescription ?? serie.Description;
@@ -237,12 +222,12 @@ public class MediaLogic
         }
     }
 
-    private static string GetValidLanguage<T>(T language){
-        if(language is Film film){
+    private static string GetValidLanguage<T>(T media){
+        if(media is Film film){
             string prompt = $"Current Language: {film.Language}\n\n";
             string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the movie:", "", true, 0, 30);
             return newLanguage ?? film.Language;
-        }else if (language is Serie serie){
+        }else if (media is Serie serie){
                 string prompt = $"Current Language: {serie.Language}\n\n";
                 string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the serie:", "", true, 0, 30);
                 return newLanguage ?? serie.Language;
@@ -251,12 +236,31 @@ public class MediaLogic
         }
     }
 
-    private static object GetValidReleaseDate<T>(T releasedate){
-        if(releasedate is Film film){
+    private static object GetValidGenres<T>(T media){
+        List<Genre> possibleGenres = new List<Genre> {
+            Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA,
+            Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME
+        };
+
+        List<Genre>? newGenres = MenuHelper.SelectFromEnum<Genre>(
+            possibleGenres, "Genres", "Select one or multiple genres", "", true
+        );
+
+        if (media is Film film) {
+            return newGenres != null ? newGenres : film.Genres;
+        } else if (media is Serie serie) {
+            return newGenres != null ? newGenres : serie.Genres;
+        } else {
+            return null;
+        }
+    }
+
+    private static object GetValidReleaseDate<T>(T media){
+        if(media is Film film){
             string prompt = $"Current Release Date: {film.ReleaseDate}\n\n";
             DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the movie:", true);
             return newDate ?? film.ReleaseDate;
-        }else if(releasedate is Serie serie){
+        }else if(media is Serie serie){
             string prompt = $"Current Release Date: {serie.ReleaseDate}\n\n";
             DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the serie:", true);
             return newDate ?? serie.ReleaseDate;
@@ -265,7 +269,7 @@ public class MediaLogic
         }
     }
 
-    private static object GetValidCertification<T>(T certification){
+    private static object GetValidCertification<T>(T media){
         Certification? newCertification = MenuHelper.SelectFromList(
             "Select a certification",
             true,
@@ -286,18 +290,52 @@ public class MediaLogic
                 {"Adult content. Viewer discretion advised.", Certification.X}
             }
         );
-        if(certification is Film film){
+        if(media is Film film){
             return newCertification != null ? newCertification : film.Certification;
-        }else if(certification is Serie serie){
+        }else if(media is Serie serie){
             return newCertification != null ? newCertification : serie.Certification;
         }else{
             return Certification.NONE;
         }
     }
 
+    private static List<string> GetValidDirectors(Media media){
+        if(media is Film film){
+            string prompt = $"Current Directors: {ListToString(film.Directors)}\n\n";
+            string? newDirectors = MenuHelper.SelectText(prompt+"Please enter the new directors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            return newDirectors != null ? newDirectors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Directors;
+        }else if(media is Serie serie){
+            string prompt = $"Current Directors: {ListToString(serie.Directors)}\n\n";
+            string? newDirectors = MenuHelper.SelectText(prompt+"Please enter the new directors of the serie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            return newDirectors != null ? newDirectors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : serie.Directors;
+        }else{
+            return media.Directors;
+        }
+    }
 
+    private static List<string> GetValidActors<T>(T media){
+        if(media is Film film){
+            string prompt = $"Current Actors: {ListToString(film.Actors)}\n\n";
+            string? newActors = MenuHelper.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            return newActors != null ? newActors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Actors;
+        }else if(media is Episode episode){
+            string prompt = $"Current Actors: {ListToString(episode.Actors)}\n\n";
+            string? newActors = MenuHelper.SelectText(prompt+"Please enter the actors of the episode seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            return newActors != null ? newActors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : episode.Actors;
+        }else{
+            return null;
+        }
+    }
 
-
+    private static object GetValidWriters<T>(T media){
+        if(media is Film film){
+            string prompt = $"Current Writers: {ListToString(film.Writers)}\n\n";
+            string? newWriters = MenuHelper.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            return newWriters != null ? newWriters.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Writers;
+        }else{
+            return null;
+        }
+    }
 
     private static List<Season> EditSeasons(Serie serie)
     {
@@ -305,7 +343,7 @@ public class MediaLogic
             serie.Seasons,
             new Dictionary<string, Func<Season, object>>(){
                 {"Title", m=>m.Title},
-                {"SeasonNumber", m=>m.SeasonNumber},
+                {"Season Number", m=>m.SeasonNumber},
                 {"Runtime", m=>m.Runtime},
                 {"Episodes", m=>ListToString(m.Episodes)},
             },
@@ -314,8 +352,8 @@ public class MediaLogic
             true,
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Season>>(){
-                {"Title", new(x => x.Title, (Season m) => m.Title)}, // TODO make Title
-                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)}, // TODO make SeasonNumber
+                {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
+                {"Season Number", new(x => x.SeasonNumber, GetValidInteger)}, // TODO make SeasonNumber
                 {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, s=>EditEpisodes(s.Episodes))},
             },
             SaveTempSeason,
@@ -334,7 +372,7 @@ public class MediaLogic
             new Dictionary<string, Func<Episode, object>>(){
                 {"Title", m=>m.Title},
                 {"Runtime", m=>m.Runtime},
-                {"EpisodeNumber", m=>m.EpisodeNumber},
+                {"Episode Number", m=>m.EpisodeNumber},
                 {"Actors", m=>ListToString(m.Actors)},
             },
             false, // canSelect
@@ -342,10 +380,10 @@ public class MediaLogic
             true,
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Episode>>(){
-                {"Title", new(x => x.Title, (Episode m) => m.Title)}, // TODO make Title
-                {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)}, // TODO make Runtime
-                {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)}, // TODO make EpisodeNumber
-                {"Actors", new(x=>ListToString(x.Actors), x => x.Actors, (Episode m) => m.Actors)}, // TODO make Actors
+                {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
+                {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
+                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
             },
             SaveTempEpisode,
             true,
@@ -369,7 +407,7 @@ public class MediaLogic
             _tempSeasons,
             new Dictionary<string, Func<Season, object>>(){
                 {"Title", m=>m.Title},
-                {"SeasonNumber", m=>m.SeasonNumber},
+                {"Season Number", m=>m.SeasonNumber},
                 {"Runtime", m=>m.Runtime},
                 {"Episodes", m=>ListToString(m.Episodes)},
             },
@@ -378,8 +416,8 @@ public class MediaLogic
             true,
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Season>>(){
-                {"Title", new(x => x.Title, (Season m) => m.Title)}, // TODO make Title
-                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)}, // TODO make SeasonNumber
+                {"Title", new(x=>x.Title, GetValidTitle)}, // TODO make Title
+                {"Season Number", new(x => x.SeasonNumber, GetValidInteger)}, // TODO make SeasonNumber
                 {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, CreateEpisode)},
             },
             SaveTempSeason,
@@ -407,7 +445,7 @@ public class MediaLogic
             new Dictionary<string, Func<Episode, object>>(){
                 {"Title", m=>m.Title},
                 {"Runtime", m=>m.Runtime},
-                {"EpisodeNumber", m=>m.EpisodeNumber},
+                {"Episode Number", m=>m.EpisodeNumber},
                 {"Actors", m=>ListToString(m.Actors)},
             },
             false, // canSelect
@@ -415,10 +453,10 @@ public class MediaLogic
             true,
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Episode>>(){
-                {"Title", new(x => x.Title, (Episode m) => m.Title)}, // TODO make Title
-                {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)}, // TODO make Runtime
-                {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)}, // TODO make EpisodeNumber
-                {"Actors", new(x=>ListToString(x.Actors), x => x.Actors, (Episode m) => m.Actors)}, // TODO make Actors
+                {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
+                {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
+                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
             },
             SaveTempEpisode,
             true,
@@ -433,12 +471,6 @@ public class MediaLogic
         _tempEpisodes = new List<Episode>();
         return episodesClone;
     }
-
-
-
-
-
-
 
     private static Episode? CreateTempEpisode()
     {
