@@ -263,6 +263,8 @@ public static class ReservationMenu
                                     EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime, endTime);
                                 }else if (EntertainmentDate == startDate){
                                     EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
+                                }else if (EntertainmentDate == endDate && endTime == TimeOnly.MinValue) {
+                                    EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), TimeOnly.MinValue, new TimeOnly(23, 59));
                                 }else if (EntertainmentDate == endDate){
                                     EntertainmentStartTime = MenuHelper.SelectTime("Select the time you want to start the Entertainment", "", new TimeOnly(), TimeOnly.MinValue, endTime);
                                 }else{
