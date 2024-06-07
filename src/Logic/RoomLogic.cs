@@ -101,7 +101,14 @@ public static class RoomLogic
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int given_rows = 0, int seat = 0)
     {
-        string RoomName = MenuHelper.SelectText("Give a room name", "", false, 0, 100, @"([A-z]|\d| )");
+        string? RoomName = MenuHelper.SelectText("Give a room name", "", true, 0, 100, @"([A-z]|\d| )");
+        if (RoomName == null || RoomName.Length == 0)
+        {
+            Console.WriteLine("Action cancelled.");
+            Console.Write($"\n\nPress any key to continue...");
+            Console.ReadKey(true);
+            return;
+        }
         int? givenRows = null;
         if(given_rows == 0)
         {
@@ -224,7 +231,6 @@ public static class RoomLogic
                     longest = 0;
                     i = 0;
                     check = false;
-                    
                 }
                 else
                 {
@@ -312,31 +318,30 @@ public static class RoomLogic
             /// prints the arrows under the page
             Console.Write($"│ {pageArrows} │\n");
             Console.Write($"└─{new string('─', Math.Max(0, allLength[page] ))}─┘\n");
-            
             key = Console.ReadKey(true).Key;
              /// lets user go up and down page to selcect a room
-            if (key == ConsoleKey.UpArrow && choice > 0 + 10 * page) 
-            {  
+            if (key == ConsoleKey.UpArrow && choice > 0 + 10 * page)
+            {
                 Console.CursorVisible = false;
                 Console.Clear();
                 choice --;
             }
             else if (key == ConsoleKey.DownArrow && choice < 10 + 10 * page-1 && choice < roomListRoom.Count -1)
-            {  
+            {
                 Console.CursorVisible = false;
                 Console.Clear();
                 choice ++;
             }
              /// lets user go through pages
             if (key == ConsoleKey.RightArrow && page != allRoomList.Count-1)
-            {  
+            {
                 Console.CursorVisible = false;
                 Console.Clear();
                 page ++;
                 choice = 10 * page;
             }
             else if (key == ConsoleKey.LeftArrow && page != 0)
-            {  
+            {
                 Console.CursorVisible = false;
                 Console.Clear();
                 page --;
@@ -344,11 +349,11 @@ public static class RoomLogic
             }
             /// returns chosen room
             else if (key == ConsoleKey.Enter)
-            {  
+            {
                 return roomListRoom[choice];
                 break;
             }
-        } while (key != ConsoleKey.Escape);   
+        } while (key != ConsoleKey.Escape);
         return null;
     }
 
@@ -373,7 +378,7 @@ public static class RoomLogic
         {
             longest = 2;
             foreach(bool seat in row)
-            { 
+            {
                 longest = longest + 3;
             }
         }
@@ -397,7 +402,7 @@ public static class RoomLogic
                 List<string> rowTop = new List<string>();
                 List<string> rowBottom = new List<string>();
                 foreach(bool seat in row)
-                {         
+                {
                     if (seat)
                     {
                         rowTop.Add("╔═╗");
@@ -435,7 +440,6 @@ public static class RoomLogic
                 Console.Write("│ ");
                 foreach(string seatTop in rowTop)
                 {
-                    
                     if (i == choiceSeat){ Console.BackgroundColor = ConsoleColor.DarkGray; }
                     Console.Write(seatTop);
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -452,7 +456,7 @@ public static class RoomLogic
                     ii++;
                 }
                 Console.Write($"{new string(' ', whiteSpace)}│");
-                Console.WriteLine();         
+                Console.WriteLine();
             }
             Console.Write($"└{new string('─', longest)}┘\n\n");
             Console.Write(suffix);
