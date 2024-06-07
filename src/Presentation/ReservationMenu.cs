@@ -95,7 +95,7 @@ public static class ReservationMenu
                         DateTime startDateTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
                         DateTime endDateTime = startDateTime.AddMinutes(film.Runtime);
                         //HasConflict returns tuple with bool Conflict (true = conflict) and string ConflictingFilm (title)
-                        var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime, true);
+                        var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime);
                         if (!ConflictReturns.Conflict) {
                             timeline.Add(
                                 film,
@@ -103,7 +103,7 @@ public static class ReservationMenu
                                 endDateTime
                             );
                         } else {
-                            Console.WriteLine($"Movie has not been added: {ConflictReturns.ConflictingTitle} is already scheduled {ConflictReturns.ConflictingTime}.\n\nPress enter to continue...");
+                            Console.WriteLine($"Movie has not been added: {ConflictReturns.ConflictingString}.\n\nPress enter to continue...");
                             Console.ReadKey(true);
                         }
                     }else if(FilmOrEpisode != null && FilmOrEpisode is Dictionary<Serie, List<Episode>>){
@@ -140,7 +140,7 @@ public static class ReservationMenu
                             DateTime startDateTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
                             DateTime endDateTime = startDateTime.AddMinutes(episode.Length);
                             //HasConflict returns tuple with bool Conflict (true = conflict) and string ConflictingFilm (title)
-                            var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime, false);
+                            var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime);
                             if (!ConflictReturns.Conflict) {
                                 timeline.Add(
                                     episode,
@@ -148,7 +148,7 @@ public static class ReservationMenu
                                     endDateTime
                                 );
                             } else {
-                                Console.WriteLine($"Episode has not been added: {ConflictReturns.ConflictingTitle} is already scheduled {ConflictReturns.ConflictingTime}.\nPlease try again!\n\nPress enter to continue...");
+                                Console.WriteLine($"Episode has not been added: {ConflictReturns.ConflictingString}.\nPlease try again!\n\nPress enter to continue...");
                                 Console.ReadKey(true);
                                 i--;
                             }
@@ -308,8 +308,19 @@ public static class ReservationMenu
                         }
                     }while(true);
                 }},
-                {"View TimeLine", ()=>{
-                    MenuHelper.PrintTimeLine("Press Escape to return", "",  timeline.Items);
+                {"Show current reservation", ()=>{
+                    Reservation CurrentReservation = new Reservation(
+                        SelectedRoom.Id,
+                        Program.CurrentUser.Id,
+                        GroupSize,
+                        new DateTime(startDate.Year, startDate.Month, startDate.Day, startTime.Hour, startTime.Minute, 0),
+                        new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0),
+                        (double)(GroupSize * 12.0) + totalPrice,
+                        timeline,
+                        entertainments
+                    );
+                    ShowReservationDetails(CurrentReservation);
+
                 }},
                 {"Save", ()=>{
                     save = true;
