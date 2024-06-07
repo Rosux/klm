@@ -67,17 +67,18 @@ public class ReservationTest
     [Test]
     public void CorrectConflictReturn()
     {
+        //-------test for movie
         // Test for a time with no conflict
         DateTime startTime = new DateTime(2024, 6, 5, 17, 0, 0); // After the first film ends
         DateTime endTime = startTime.AddMinutes(_film2.Runtime);
 
-        var result = _timeline.HasConflict(startTime, endTime);
+        var result = _timeline.HasConflict(startTime, endTime, true);
 
         Assert.IsFalse(result.Conflict);
         startTime = new DateTime(2024, 6, 5, 15, 0, 0); // During the first film
         endTime = startTime.AddMinutes(_film2.Runtime);
 
-        result = _timeline.HasConflict(startTime, endTime);
+        result = _timeline.HasConflict(startTime, endTime, true);
         Assert.IsTrue(result.Conflict);
         Assert.AreEqual(_film1.Title, result.ConflictingTitle);
         Assert.AreEqual("from 14:00 to 16:00", result.ConflictingTime);

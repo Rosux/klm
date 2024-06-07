@@ -39,18 +39,27 @@ namespace TimeLine{
         /// </summary>
         /// <param name="startTime">Start time of the new item.</param>
         /// <param name="endTime">End time of the new item.</param>
-        /// <returns>True if there is a conflict, otherwise false.</returns>
-        public (bool Conflict, string ConflictingTitle, string ConflictingTime) HasConflict(DateTime startTime, DateTime endTime)
+        /// <param name="MovieOrSerie"> true = Movie, false = Serie
+        /// <returns>bool Conflict, string conflicting title, string conflicting time ("From ... to ...)</returns>
+        public (bool Conflict, string ConflictingTitle, string ConflictingTime) HasConflict(DateTime startTime, DateTime endTime, bool MovieOrSerie)
         {
             foreach (var item in Items)
             {
-                if (item.Action is Film film)
+                if (item.Action is Film film && MovieOrSerie == true)
                 {
                     // Check if the new time range is also within any already added film 
                     if (startTime < item.EndTime && endTime > item.StartTime)
                     {
                         string ConflictingTime = $"from {item.StartTime.ToString("HH:mm")} to {item.EndTime.ToString("HH:mm")}";
                         return (true, film.Title, ConflictingTime);
+                    }
+                }
+                if (item.Action is Episode episode && MovieOrSerie != true)
+                {
+                    if (startTime < item.EndTime && endTime > item.StartTime)
+                    {
+                        string ConflictingSerie = $"from {item.StartTime.ToString("HH:mm")} to {item.EndTime.ToString("HH:mm")}";
+                        return (true, episode.Title, ConflictingSerie);
                     }
                 }
             }

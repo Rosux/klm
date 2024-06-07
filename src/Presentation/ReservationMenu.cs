@@ -15,6 +15,13 @@ public static class ReservationMenu
     /// <returns>A reservation object holding the users planned reservation or NULL in case the user cancels the creation.</returns>
     public static Reservation? BookReservation(){
         double totalPrice = 0.0;
+        List<Room> AllRooms = RoomsAccess.GetAllRooms();
+        if (AllRooms.Count == 0)
+        {
+            Console.WriteLine("There are currently no rooms available. Press enter to go back...");
+            Console.ReadKey(true);
+            return null;
+        }
         int roomMaxSize = RoomsAccess.GetMaxRoomCapacity();
         int GroupSize = MenuHelper.SelectInteger("Select your group size:", "", 1, 1, roomMaxSize);
         totalPrice += (double)GroupSize * 12.0;
@@ -88,7 +95,7 @@ public static class ReservationMenu
                         DateTime startDateTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
                         DateTime endDateTime = startDateTime.AddMinutes(film.Runtime);
                         //HasConflict returns tuple with bool Conflict (true = conflict) and string ConflictingFilm (title)
-                        var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime);
+                        var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime, true);
                         if (!ConflictReturns.Conflict) {
                             timeline.Add(
                                 film,
@@ -122,24 +129,28 @@ public static class ReservationMenu
                                 serieTime = new DateTime(endDate.Year, endDate.Month, endDate.Day, endTime.Hour, endTime.Minute, 0);
                             }
                             if (d == startDate && d == endDate){
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, endTime); // when runtime is added to serie, change endTime to **endTime.AddMinutes(-episode.Runtime)**
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, endTime.AddMinutes(-episode.Length)); // when runtime is added to serie, change endTime to **endTime.AddMinutes(-episode.Runtime)**
                             }else if (d == startDate){
                                 t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), startTime, TimeOnly.MaxValue);
                             }else if (d == endDate){
-                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, endTime); // when runtime is added to serie, change endTime to **endTime.AddMinutes(-episode.Runtime)**
+                                t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, endTime.AddMinutes(-episode.Length)); // when runtime is added to serie, change endTime to **endTime.AddMinutes(-episode.Runtime)**
                             }else{
                                 t = MenuHelper.SelectTime($"Select the date and time you want the episode {episode.Title} to begin.", "", TimeOnly.FromDateTime(serieTime), TimeOnly.MinValue, TimeOnly.MaxValue);
                             }
-                            lastDay = d.Day;
-                            timeline.Add(
-                                episode,
-                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                                new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length)
-                            );
-                            if(i == 0){
-                                serieTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(episode.Length);
-                            }else{
-                                serieTime = serieTime.AddMinutes(episode.Length);
+                            DateTime startDateTime = new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0);
+                            DateTime endDateTime = startDateTime.AddMinutes(episode.Length);
+                            //HasConflict returns tuple with bool Conflict (true = conflict) and string ConflictingFilm (title)
+                            var ConflictReturns = timeline.HasConflict(startDateTime, endDateTime, false);
+                            if (!ConflictReturns.Conflict) {
+                                timeline.Add(
+                                    episode,
+                                    startDateTime,
+                                    endDateTime
+                                );
+                            } else {
+                                Console.WriteLine($"Episode has not been added: {ConflictReturns.ConflictingTitle} is already scheduled {ConflictReturns.ConflictingTime}.\nPlease try again!\n\nPress enter to continue...");
+                                Console.ReadKey(true);
+                                i--;
                             }
                         }
                     }
@@ -296,6 +307,9 @@ public static class ReservationMenu
                             break;
                         }
                     }while(true);
+                }},
+                {"View TimeLine", ()=>{
+                    MenuHelper.PrintTimeLine("Press Escape to return", "",  timeline.Items);
                 }},
                 {"Save", ()=>{
                     save = true;
