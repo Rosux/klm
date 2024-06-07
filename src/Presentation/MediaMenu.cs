@@ -131,7 +131,7 @@ public static class MediaMenu
         int? seasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the season number:", "", true, 0, 0, 60);
         if (seasonNumber == null){return null;}
 
-        return new Season(title, -1, (int)seasonNumber, episodes);
+        return new Season(title, (int)seasonNumber, episodes);
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ public static class MediaMenu
         string? actors = MenuHelper.SelectText(prompt+"Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
 
-        Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
+        Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, (float)rating, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
         return episode;
     }
 

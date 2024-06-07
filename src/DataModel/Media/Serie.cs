@@ -7,22 +7,37 @@ public class Serie : Media
 {
     public int Id { get; set; } = -1;
     public string Title { get; set; } = "";
-    public int Runtime { get; set; } = -1;
+    public int Runtime
+    {
+        get
+        {
+            return Seasons?.Sum(s => s.Runtime) ?? 0;
+        }set{}
+    }
+
     public string Description { get; set; } = "";
-    public float Rating { get; set; } = 0f; // ranges from 0.0f to 10.0f
+    public float Rating{
+        get{
+            if (Seasons == null || Seasons.Count == 0)
+            {
+                return 0f;
+            }
+            return Seasons.Average(e => e.Rating);
+        }set{}
+    } // ranges from 0.0f to 10.0f
     public string Language { get; set; } = "";
     public List<Genre> Genres { get; set; } = new List<Genre>();
     public DateOnly ReleaseDate { get; set; } = DateOnly.MinValue;
     public Certification Certification { get; set; } = Certification.NONE;
     public List<string> Directors { get; set; } = new List<string>();
-    private bool _bingeable = false;
     public bool Bingeable {
         get{
-            return _bingeable;
+            if (Rating > 8.5 && Runtime > 400){
+                return true;
+            }
+            return false;
         }
-        set{
-            _bingeable = value;
-        }
+        set{}
     }
     public List<Season> Seasons { get; set; } = new List<Season>();
 

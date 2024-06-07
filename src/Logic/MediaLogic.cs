@@ -38,13 +38,11 @@ public class MediaLogic
                     {"Title", new(x=>x.Title, GetValidTitle)},
                     {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
                     {"Description", new(x=>x.Description, GetValidDescription)},
-                    {"Rating", new(x=>x.Rating, GetValidRating)},
                     {"Language", new(x=>x.Language, GetValidLanguage)},
                     {"Genres", new(x=>ListToString(((Serie)x).Genres), x=>((Serie)x).Genres, GetValidGenres)},
                     {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
                     {"Certification", new(x=>x.Certification, GetValidCertification)},
                     {"Directors", new(x=>ListToString(((Serie)x).Directors), x=>((Serie)x).Directors , GetValidDirectors)},
-                    {"Bingeable", new(m=>((Serie)m).Bingeable, (Media m)=>true)},
                     {"Seasons", new(m=>ListToString(((Serie)m).Seasons), m=>((Serie)m).Seasons, (Media m)=>EditSeasons((Serie)m))},
                 }
             ),
@@ -121,14 +119,14 @@ public class MediaLogic
     private static bool SaveEditedMedia<T>(T media)
     {
         if(media is Film film){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {film.Genres.Count}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {string.Join(", ", film.Directors)}\nActors: {string.Join(", ", film.Actors)}\nWriters: {string.Join(", ", film.Writers)}");
+            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(film);
                 MediaMenu.MediaAdded(success);
                 return success;
             }
         }else if(media is Serie serie){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {serie.Genres.Count}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {string.Join(", ", serie.Directors)}");
+            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(serie);
                 MediaMenu.MediaAdded(success);
@@ -217,7 +215,11 @@ public class MediaLogic
             string prompt = $"Current Rating: {film.Rating}\n\n";
             float? newRating = (float?)MenuHelper.SelectPrice(prompt+"Please enter ther new rating of the movie from 1-10::", "", true, 0d, 10d);
             return newRating ?? film.Rating;
-        } else {
+        }else if(rating is Episode episode){
+            string prompt = $"Current Rating: {episode.Rating}\n\n";
+            float? newRating = (float?)MenuHelper.SelectPrice(prompt+"Please enter ther new rating of the episode from 1-10::", "", true, 0d, 10d);
+            return newRating ?? episode.Rating;
+        }else {
             return 0;
         }
     }
@@ -345,6 +347,7 @@ public class MediaLogic
                 {"Title", m=>m.Title},
                 {"Season Number", m=>m.SeasonNumber},
                 {"Runtime", m=>m.Runtime},
+                {"Rating", m=>m.Rating},
                 {"Episodes", m=>ListToString(m.Episodes)},
             },
             false, // canSelect
@@ -373,6 +376,7 @@ public class MediaLogic
                 {"Title", m=>m.Title},
                 {"Runtime", m=>m.Runtime},
                 {"Episode Number", m=>m.EpisodeNumber},
+                {"Rating", m=>((Episode)m).Rating},
                 {"Actors", m=>ListToString(m.Actors)},
             },
             false, // canSelect
@@ -382,7 +386,8 @@ public class MediaLogic
             new Dictionary<string, PropertyEditMapping<Episode>>(){
                 {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
                 {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
-                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)},
+                {"Rating", new(m=>((Episode)m).Rating, GetValidRating)},
                 {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
             },
             SaveTempEpisode,
@@ -409,6 +414,7 @@ public class MediaLogic
                 {"Title", m=>m.Title},
                 {"Season Number", m=>m.SeasonNumber},
                 {"Runtime", m=>m.Runtime},
+                {"Rating", m=>m.Rating},
                 {"Episodes", m=>ListToString(m.Episodes)},
             },
             false, // canSelect
@@ -446,6 +452,7 @@ public class MediaLogic
                 {"Title", m=>m.Title},
                 {"Runtime", m=>m.Runtime},
                 {"Episode Number", m=>m.EpisodeNumber},
+                {"Rating", m=>((Episode)m).Rating},
                 {"Actors", m=>ListToString(m.Actors)},
             },
             false, // canSelect
@@ -455,7 +462,8 @@ public class MediaLogic
             new Dictionary<string, PropertyEditMapping<Episode>>(){
                 {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
                 {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
-                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber\
+                {"Rating", new(m=>((Episode)m).Rating, GetValidRating)},
                 {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
             },
             SaveTempEpisode,

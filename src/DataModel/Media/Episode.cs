@@ -8,6 +8,7 @@ public class Episode
     public int Id = -1;
     public string Title = "";
     public int Runtime = 0;
+    public float Rating = 0.0f;
     public int EpisodeNumber = 0;
     public List<string> Actors = new List<string>();
 
@@ -18,13 +19,15 @@ public class Episode
     /// <param name="title">The episodetitle of the episode.</param>
     /// <param name="runtime">The runtime of the episode.</param>
     /// <param name="episodeNumber">The episodenumber of the episode.</param>
+    /// /// <param name="rating">The rating of the episode.</param>
     /// <param name="actors">The actors in the episode.</param>
     [JsonConstructor]
-    public Episode(int id, string title, int runtime, int episodeNumber, List<string> actors){
+    public Episode(int id, string title, int runtime, int episodeNumber, float rating, List<string> actors){
         this.Id = id;
         this.EpisodeNumber = episodeNumber;
         this.Title = title;
         this.Runtime = runtime;
+        this.Rating = rating;
         this.Actors = actors;
     }
 
@@ -34,11 +37,13 @@ public class Episode
     /// <param name="title">The episodetitle of the episode.</param>
     /// <param name="runtime">The runtime of the episode.</param>
     /// <param name="episodeNumber">The episodenumber of the episode.</param>
+    /// <param name="rating">The rating of the episode.</param>
     /// <param name="actors">The actors in the episode.</param>
-    public Episode(string title, int runtime, int episodeNumber, List<string> actors){
+    public Episode(string title, int runtime, int episodeNumber, float rating, List<string> actors){
         this.EpisodeNumber = episodeNumber;
         this.Title = title;
         this.Runtime = runtime;
+        this.Rating = rating;
         this.Actors = actors;
     }
 }
