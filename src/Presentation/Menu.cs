@@ -87,12 +87,18 @@ class Menu
     /// <summary>
     /// Used for testing purposes.
     /// </summary>
-    public static void TestStart(){     Console.WriteLine("TEST START!!!");
+    public static void TestStart(){
+        Console.WriteLine("TEST START!!!");
         Program.CurrentUser = new User(8, "Ad", "Min", "hihihi", "uwu-onichan-senpai", UserRole.ADMIN);
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        MediaLogic.Media();
+        // bool x = MediaAccess.DeleteMedia(
+        //     new Serie(1, "TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>())
+        // );
+        // Console.WriteLine(x);
+
+        // MediaLogic.Media();
         // List<Media> x = new List<Media>(){
         //     new Film("FILM SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), new List<string>(), new List<string>()),
         //     new Serie("TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>()),

@@ -2,6 +2,12 @@ using System.Diagnostics;
 
 public class MediaLogic
 {
+    private static List<Season> _tempSeasons = new List<Season>();
+    private static List<Episode> _tempEpisodes = new List<Episode>();
+
+    /// <summary>
+    /// Main method for the media table. handles Films and Series together in one neat table. Whoever made this possible deserves a great reward like at least 200 dollars cash. Send it to my btc address: 1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX. (totally me btw)
+    /// </summary>
     public static void Media(){
         MenuHelper.Table<Media, Film, Serie>(
             MediaAccess.GetAllMedia(),
@@ -145,6 +151,19 @@ public class MediaLogic
     /// <returns>Returns a boolean indicating if the Media got deleted.</returns>
     private static bool DeleteMedia<T>(T media)
     {
+        bool confirmation = false;
+        if(media is Film film){
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
+        }else if(media is Serie serie){
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
+        }
+        if(confirmation){
+            bool success = MediaAccess.DeleteMedia(media);
+            MediaMenu.MediaDeleted(success);
+            return success;
+        }else{
+            return false;
+        }
         return false;
     }
 
@@ -327,6 +346,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Asks the user to create a new list of writers.
+    /// </summary>
+    /// <param name="media">The default object (Film).</param>
+    /// <typeparam name="T">Can only be Film.</typeparam>
+    /// <returns>A new list of directors or the previous version.</returns>
     private static object GetValidWriters<T>(T media){
         if(media is Film film){
             string prompt = $"Current Writers: {ListToString(film.Writers)}\n\n";
@@ -337,6 +362,11 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Shows the user a table to edit seasons of a serie.
+    /// </summary>
+    /// <param name="serie">The serie to show the user.</param>
+    /// <returns>A list of edited seasons.</returns>
     private static List<Season> EditSeasons(Serie serie)
     {
         MenuHelper.Table<Season>(
@@ -356,15 +386,20 @@ public class MediaLogic
                 {"Season Number", new(x => x.SeasonNumber, GetValidInteger)}, // TODO make SeasonNumber
                 {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, s=>EditEpisodes(s.Episodes))},
             },
-            SaveTempSeason,
+            (Season season)=>true,
             true,
-            CreateTempSeason,
+            CreateSeason,
             true,
             DeleteTempSeason
         );
         return serie.Seasons;
     }
 
+    /// <summary>
+    /// Shows the user a table to edit episodes of a season.
+    /// </summary>
+    /// <param name="episodes">The episodes to edit.</param>
+    /// <returns>A list of edited episodes.</returns>
     private static List<Episode> EditEpisodes(List<Episode> episodes)
     {
         MenuHelper.Table<Episode>(
@@ -375,27 +410,29 @@ public class MediaLogic
                 {"Episode Number", m=>m.EpisodeNumber},
                 {"Actors", m=>ListToString(m.Actors)},
             },
-            false, // canSelect
+            false,
             true,
             true,
-            true, // canSearch
+            true,
             new Dictionary<string, PropertyEditMapping<Episode>>(){
-                {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
-                {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
-                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
-                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
+                {"Title", new(x => x.Title, GetValidTitle)},
+                {"Runtime", new(x => x.Runtime, GetValidRuntime)},
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)},
+                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)},
             },
-            SaveTempEpisode,
+            (Episode episode)=>true,
             true,
-            CreateTempEpisode,
+            CreateEpisode,
             true,
             DeleteTempEpisode
         );
         return episodes;
     }
 
-
-    private static List<Season> _tempSeasons = new List<Season>();
+    /// <summary>
+    /// Asks the user to create a new Serie and lets them create/remove/edit new seasons and episodes.
+    /// </summary>
+    /// <returns>The created Serie or NULL in case the user exited.</returns>
     private static Serie? CreateSerie()
     {
         Serie? currentSerie = MediaMenu.CreateSerie();
@@ -416,13 +453,13 @@ public class MediaLogic
             true,
             true, // canSearch
             new Dictionary<string, PropertyEditMapping<Season>>(){
-                {"Title", new(x=>x.Title, GetValidTitle)}, // TODO make Title
-                {"Season Number", new(x => x.SeasonNumber, GetValidInteger)}, // TODO make SeasonNumber
+                {"Title", new(x=>x.Title, GetValidTitle)},
+                {"Season Number", new(x => x.SeasonNumber, GetValidInteger)},
                 {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, CreateEpisode)},
             },
-            SaveTempSeason,
+            (Season season)=>true,
             true,
-            CreateTempSeason,
+            CreateSeason,
             true,
             DeleteTempSeason
         );
@@ -436,8 +473,11 @@ public class MediaLogic
         return currentSerie;
     }
 
-
-    private static List<Episode> _tempEpisodes = new List<Episode>();
+    /// <summary>
+    /// Shows the user an empty table they can fill up and returns the list of episodes.
+    /// </summary>
+    /// <param name="season">A season (can be empty).</param>
+    /// <returns>A list of episodes made by the user.</returns>
     private static List<Episode> CreateEpisode(Season season)
     {
         MenuHelper.Table<Episode>(
@@ -448,19 +488,19 @@ public class MediaLogic
                 {"Episode Number", m=>m.EpisodeNumber},
                 {"Actors", m=>ListToString(m.Actors)},
             },
-            false, // canSelect
+            false,
             true,
             true,
-            true, // canSearch
+            true,
             new Dictionary<string, PropertyEditMapping<Episode>>(){
-                {"Title", new(x => x.Title, GetValidTitle)}, // TODO make Title
-                {"Runtime", new(x => x.Runtime, GetValidRuntime)}, // TODO make Runtime
-                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)}, // TODO make EpisodeNumber
-                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)}, // TODO make Actors
+                {"Title", new(x => x.Title, GetValidTitle)},
+                {"Runtime", new(x => x.Runtime, GetValidRuntime)},
+                {"Episode Number", new(x => x.EpisodeNumber, GetValidInteger)},
+                {"Actors", new(x=>ListToString(((Episode)x).Actors), x=>((Episode)x).Actors, GetValidActors)},
             },
-            SaveTempEpisode,
+            (Episode episode)=>true,
             true,
-            CreateTempEpisode,
+            CreateEpisode,
             true,
             DeleteTempEpisode
         );
@@ -472,39 +512,43 @@ public class MediaLogic
         return episodesClone;
     }
 
-    private static Episode? CreateTempEpisode()
+    /// <summary>
+    /// Creates a new episode.
+    /// </summary>
+    /// <returns>The created episode or NULL if the user stops.</returns>
+    private static Episode? CreateEpisode()
     {
         return MediaMenu.CreateEpisode();
     }
 
-    private static bool SaveTempEpisode(Episode episode)
-    {
-        // TODO EDIT EPISODE
-        return true;
-    }
-
+    /// <summary>
+    /// Remove an episode from the temporary Season episode lists.
+    /// </summary>
+    /// <param name="episode">The Episode to delete.</param>
+    /// <returns>Always returns true.</returns>
     private static bool DeleteTempEpisode(Episode episode)
     {
         _tempEpisodes.Remove(episode);
         return true;
     }
 
-
-    private static Season? CreateTempSeason()
+    /// <summary>
+    /// Creates a new Season.
+    /// </summary>
+    /// <returns>The new Season data. Or NULL if the user stopped.</returns>
+    private static Season? CreateSeason()
     {
         return MediaMenu.CreateSeason();
     }
 
-    private static bool SaveTempSeason(Season season)
-    {
-        // TODO EDIT SEASON
-        return true;
-    }
-
+    /// <summary>
+    /// Removes the given Season from the temporary seasons.
+    /// </summary>
+    /// <param name="season">Season to remove</param>
+    /// <returns>Always returns true.</returns>
     private static bool DeleteTempSeason(Season season)
     {
         _tempSeasons.Remove(season);
         return true;
     }
-
 }

@@ -180,4 +180,22 @@ public static class MediaMenu
         Console.ForegroundColor = ConsoleColor.White;
         Console.ReadKey(true);
     }
+
+    /// <summary>
+    /// Notifies the user if their media got deleted or not,
+    /// </summary>
+    /// <param name="success">A boolean indicating if the action was successful.</param>
+    public static void MediaDeleted(bool success){
+        Console.CursorVisible = false;
+        Console.Clear();
+        if(success){
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("The Media has successfully been removed.\n\nPress any key to continue");
+        }else{
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("An error occured. Please try again later.\n\nPress any key to continue");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.ReadKey(true);
+    }
 }
