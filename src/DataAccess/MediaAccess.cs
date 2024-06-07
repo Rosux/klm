@@ -64,16 +64,19 @@ public static class MediaAccess
         // convert json to a MediaJsonStruct
         MediaJsonStruct mediaStructure = GetMedia();
 
+        bool changed = false;
         if(media is Film film){
             for(int i = 0; i < mediaStructure.Films.Count; i++){
                 if(mediaStructure.Films[i].Id == film.Id){
                     mediaStructure.Films[i] = film;
+                    changed = true;
                 }
             }
         }else if(media is Serie serie){
             for(int i = 0; i < mediaStructure.Series.Count; i++){
                 if(mediaStructure.Series[i].Id == serie.Id){
                     mediaStructure.Series[i] = serie;
+                    changed = true;
                 }
             }
         }
@@ -82,7 +85,50 @@ public static class MediaAccess
         SetMedia(mediaStructure);
 
         SearchAccess.UpdateMedia();
-        return true;
+        return changed;
+    }
+
+    /// <summary>
+    /// Deletes the given media based on its ID.
+    /// </summary>
+    /// <param name="media">The Film/Serie object to delete.</param>
+    /// <typeparam name="T">Can either be FIlm or Serie.</typeparam>
+    /// <returns>A boolean indicating if the media got deleted.</returns>
+    public static bool DeleteMedia<T>(T media)
+    {
+        // if environment is not set throw an exception
+        if(Environment.GetEnvironmentVariable("MEDIA_PATH") == null){
+            throw new Exception("Environment MEDIA_PATH not set.");
+        }
+        // if the type is not Film or Serie dont save it
+        if(typeof(T) != typeof(Film) && typeof(T) != typeof(Serie)){
+            return false;
+        }
+
+        CreateFile();
+
+        // convert json to a MediaJsonStruct
+        MediaJsonStruct mediaStructure = GetMedia();
+
+        bool changed = false;
+        int filmsCount = mediaStructure.Films.Count;
+        int seriesCount = mediaStructure.Series.Count;
+
+        if(media is Film film){
+            mediaStructure.Films.RemoveAll(f => f.Id == film.Id);
+        }else if(media is Serie serie){
+            mediaStructure.Series.RemoveAll(s => s.Id == serie.Id);
+        }
+
+        if(filmsCount != mediaStructure.Films.Count || seriesCount != mediaStructure.Series.Count){
+            changed = true;
+        }
+
+        // save the MediaJsonStruct to the json file
+        SetMedia(mediaStructure);
+
+        SearchAccess.UpdateMedia();
+        return changed;
     }
 
     /// <summary>
