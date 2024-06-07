@@ -126,21 +126,4 @@ class Menu
         // MenuHelper.Table();
 
     }
-
-    private static string ShowListInTable<T>(List<T> items)
-    {
-        if(items.Count == 0){return "None";}
-        if(items.Count == 1){return $"[{items[0]}]";}
-        if(items.Count == 2){return $"[{items[0]}, {items[1]}]";}
-        return $"[{items[0]}, {items[1]}, +{items.Count-2}]";
-    }
-
-    private static bool SaveEditedMedia(Media media)
-    {
-        return true;
-        
-        MediaMenu.CreateSerie();
-
-
-    }
 }

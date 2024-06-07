@@ -3,37 +3,51 @@ public class MediaLogic
     public static List<Season> TempSeasonList = new List<Season>();
     public static List<Episode> TempEpisodeList = new List<Episode>();
     public static void Media(){
-        MenuHelper.Table<Media>(
+        MenuHelper.Table<Media, Film, Serie>(
             MediaAccess.GetAllMedia(),
             new Dictionary<string, Func<Media, object>>(){
                 {"Type", m=>(m is Film) ? "Film" : "Serie"},
                 {"Title", m=>m.Title},
                 {"Runtime (Min)", m=>m.Runtime},
-                {"Description", m=>m.Description},
+                {"Description", m=>m.Description.Substring(0, 10) + (m.Description.Length > 10 ? "..." : "")},
                 {"Rating", m=>m.Rating},
                 {"Language", m=>m.Language},
                 {"Release Date", m=>m.ReleaseDate},
                 {"Certification", m=>m.Certification},
+                {"Directors", m=>ListToString(m.Directors)},
             },
             false, // canSelect
             true,
             true,
             true, // canSearch
-            new Dictionary<string, PropertyEditMapping<Media>>(){
-                {"Title", new(x=>x.Title, GetValidTitle)},
-                {"Runtime (Min)", new(x=>x.Runtime, GetValidRuntime)},
-                {"Description", new(x=>x.Description, GetValidDescription)},
-                {"Rating", new(x=>x.Rating, GetValidRating)},
-                {"Language", new(x=>x.Language, GetValidLanguage)},
-                {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
-                {"Certification", new(x=>x.Certification, GetValidCertification)},
-            },
+            (
+                new Dictionary<string, PropertyEditMapping<Media>>(){
+                    {"Actors", new(m=>ListToString(((Film)m).Actors), m=>((Film)m).Actors, (Media m)=>new List<String>(){"Actorssss", "Actosssssr2"})},
+                },
+                new Dictionary<string, PropertyEditMapping<Media>>(){
+                    {"Bingeable", new(m=>((Serie)m).Bingeable, (Media m)=>true)},
+                }
+            ),
             SaveEditedMedia,
             true,
             AddMedia,
             true,
             DeleteMedia
         );
+    }
+
+    /// <summary>
+    /// Converts a list to a string. Formatted like this: "[item1, item2, +32]".
+    /// </summary>
+    /// <param name="items">The list to convert.</param>
+    /// <typeparam name="T">The type of the list.</typeparam>
+    /// <returns>A string containing the list in string format for a table.</returns>
+    private static string ListToString<T>(List<T> items)
+    {
+        if(items.Count == 0){return "None";}
+        if(items.Count == 1){return $"[{items[0]}]";}
+        if(items.Count == 2){return $"[{items[0]}, {items[1]}]";}
+        return $"[{items[0]}, {items[1]}, +{items.Count-2}]";
     }
 
     /// <summary>

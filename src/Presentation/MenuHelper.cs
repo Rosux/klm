@@ -1482,21 +1482,23 @@ public static class MenuHelper{
     /// <summary>
     /// Creates a table that holds a list of objects.
     /// </summary>
-    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <typeparam name="BaseType">The type of object that the table will display.</typeparam>
+    /// <typeparam name="T1">The first type of object that the table will edit. If theser are set the types must extend or implement the BaseType. For example Film extends Media, then set the BaseType to Media and this one to Film.</typeparam>
+    /// <typeparam name="T2">The second type of object that the table will edit. If theser are set the types must extend or implement the BaseType. For example Serie extends Media, then set the BaseType to Media and this one to Serie.</typeparam>
     /// <param name="items">A list of type T that holds all the objects</param>
     /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> being a method that gets a type T object and returns an object of any type.</param>
     /// <param name="canSelect">A boolean indicating if the user is able to select a row. The item on this row will be returned.</param>
     /// <param name="canCancel">A boolean indicating if the user can press escape to cancel everything and return back.</param>
     /// <param name="canEdit">A boolean indicating if the user is able to edit properties of the items.</param>
     /// <param name="canSearch">A boolean indicating if the user is able to search the rows by value.</param>
-    /// <param name="propertyEditMapping">A Dictionary where the key is the editing text and the value being a PropertyEditMapping instance of type T that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the user object and returns an object being the new member of type T.</param>
+    /// <param name="propertyEditMapping">A tuple of 2 Dictionaries where the key is the editing text and the value being a PropertyEditMapping instance of the Type that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the Type object and returns an object being the new member of type T.</param>
     /// <param name="saveEditedUserMethod">A Func<T, bool> that takes in the newly edited T object and returns a boolean indicating if it saved or not.</param>
     /// <param name="canAdd">A boolean indicating if the user can add a new object of type T. If the user chooses to make a new object of type T it will call the addMethod.</param>
     /// <param name="addMethod">A Func<T?> that creates a new instance of object T or NULL and returns it. If the result is NULL the new instance wont get saved. If the result is the new object it gets added to the table.</param>
     /// <param name="canDelete">A boolean indicating if the user can delete the item in the list. Uses the deleteMethod to delete the instance.</param>
     /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
     /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
-    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, bool canSearch, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod)
+    public static BaseType? Table<BaseType, T1, T2>(List<BaseType> items, Dictionary<string, Func<BaseType, object>> headers, bool canSelect, bool canCancel, bool canEdit, bool canSearch, (Dictionary<string, PropertyEditMapping<BaseType>>?, Dictionary<string, PropertyEditMapping<BaseType>>?)? propertyEditMapping, Func<BaseType, bool>? saveEditedUserMethod, bool canAdd, Func<BaseType?>? addMethod, bool canDelete, Func<BaseType, bool>? deleteMethod)
     {
         if(propertyEditMapping == null || saveEditedUserMethod == null){
             canEdit = false;
@@ -1518,21 +1520,13 @@ public static class MenuHelper{
             showSelection = false;
         }
 
-        // create a list of editable options (like UserName, Email, role etc)
-        List<string> editOptions = new List<string>();
-        if(canEdit){
-            foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                editOptions.Add(editMapping.Key);
-            }
-        }
-
         // if you can edit the data and ur not a user prevent editing (failsafe for incompetent developers in case a user ever uses this method (jk jk not incompetent))
         if((canEdit || canDelete || canAdd) && Program.CurrentUser != null && Program.CurrentUser.Role == UserRole.USER){
-            return default(T);
+            return default(BaseType);
         }
 
         Dictionary<MemberInfo, (object, object)> propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
-        T editedObject = default(T);
+        BaseType editedObject = default(BaseType);
         bool showEditTable = (canEdit || canDelete);
         bool editing = false;
         int editSelection = 0;
@@ -1548,9 +1542,8 @@ public static class MenuHelper{
         do
         {
             #region Generate pages
-
             string[] tokens = searchString.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries);
-            List<T> sortedItems = new List<T>();
+            List<BaseType> sortedItems = new List<BaseType>();
             if(searchString == "")
             {
                 sortedItems = items;
@@ -1560,7 +1553,7 @@ public static class MenuHelper{
                 for(int i=0;i<items.Count;i++)
                 {
                     bool added = false;
-                    foreach(KeyValuePair<string, Func<T, object>> header in headers){
+                    foreach(KeyValuePair<string, Func<BaseType, object>> header in headers){
                         foreach(string token in tokens)
                         {
                             if(header.Value.Invoke(items[i]).ToString().ToLower().Contains(token.ToLower())){
@@ -1578,7 +1571,7 @@ public static class MenuHelper{
                 }
             }
 
-            List<List<T>> chunks = new List<List<T>>();
+            List<List<BaseType>> chunks = new List<List<BaseType>>();
             for (int i=0;i<sortedItems.Count;i+=10)
             {
                 chunks.Add(sortedItems.Skip(i).Take(10).ToList());
@@ -1590,16 +1583,49 @@ public static class MenuHelper{
             }
             #endregion
 
+            #region Generate edit table values based on the type of the selected object
+            // create a list of editable options (like UserName, Email, role etc)
+            List<string> editOptions = new List<string>();
+            if(canEdit && currentPageSelection != -1 && currentPageSelection <= chunks[currentPage].Count-1 && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
+                if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T1)
+                {
+                    foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> mapping in propertyEditMapping.Value.Item1)
+                    {
+                        editOptions.Add(mapping.Key);
+                    }
+                }
+                else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T2)
+                {
+                    foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> mapping in propertyEditMapping.Value.Item2)
+                    {
+                        editOptions.Add(mapping.Key);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Object is not of type T1 or T2");
+                }
+            }
+            #endregion
+
             #region Create edit table values (": oldData -> newData")
             List<string> editOptionData = new List<string>();
             if(currentPageSelection != -1){
                 if(showEditTable && chunks.Count > 0){
                     // create the edit table text
-                    if(canEdit){
-                        foreach(KeyValuePair<string, PropertyEditMapping<T>> editMapping in propertyEditMapping){
-                            Func<T, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
+                    if(canEdit && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
+                        Dictionary<string, PropertyEditMapping<BaseType>>? typedPropertyEditMapping;
+                        if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T1){
+                            typedPropertyEditMapping = propertyEditMapping.Value.Item1;
+                        }else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T2){
+                            typedPropertyEditMapping = propertyEditMapping.Value.Item2;
+                        }else{
+                            throw new Exception("Object is not of type T1 or T2");
+                        }
+                        foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> editMapping in typedPropertyEditMapping){
+                            Func<BaseType, object> editMappingValueLambda = editMapping.Value.Accessor.Compile();
                             string dataString = editMappingValueLambda(chunks[currentPage][currentPageSelection]).ToString() ?? "";
-                            Func<T, object>? editedValueDisplayMethod = null;
+                            Func<BaseType, object>? editedValueDisplayMethod = null;
                             if(editMapping.Value.DisplayAccessor != null){
                                 editedValueDisplayMethod = editMapping.Value.DisplayAccessor.Compile();
                                 dataString = editedValueDisplayMethod(chunks[currentPage][currentPageSelection]).ToString() ?? "";
@@ -1678,14 +1704,16 @@ public static class MenuHelper{
             if(currentPageSelection != -1){
                 if(showEditTable && chunks.Count > 0){
                     for(int i=0;i<editOptions.Count;i++){
-                        if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){longestEditOption = editOptionData[i].Length+editOptions[i].Length;}
+                        if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){
+                            longestEditOption = editOptionData[i].Length+editOptions[i].Length;
+                        }
                     }
-                    if($"Edit {typeof(T)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(T)}".Length;}
+                    if($"Edit {typeof(BaseType)}".Length > longestEditOption){longestEditOption = $"Edit {typeof(BaseType)}".Length;}
                     if("Save changes".Length > longestEditOption){longestEditOption = "Save changes".Length;}
                     if("Discard changes".Length > longestEditOption){longestEditOption = "Discard changes".Length;}
                 }
                 if(canDelete){
-                    if($"Delete {typeof(T)}".Length > longestEditOption){longestEditOption = $"Delete {typeof(T)}".Length;}
+                    if($"Delete {typeof(BaseType)}".Length > longestEditOption){longestEditOption = $"Delete {typeof(BaseType)}".Length;}
                 }
             }
             #endregion
@@ -1758,7 +1786,7 @@ public static class MenuHelper{
                     string dataLine = "";
                     dataLine += "│";
                     int j = 0;
-                    foreach(Func<T, object> header in headers.Values){
+                    foreach(Func<BaseType, object> header in headers.Values){
                         string itemText = header(chunks[currentPage][i]).ToString();
                         dataLine += $" {Format(itemText, columnWidths[j])} │";
                         j++;
@@ -1782,8 +1810,8 @@ public static class MenuHelper{
                 }
                 tableStringLines.Add(seperatorLine3);
 
-                // prints the Add T line
-                tableStringLines.Add($"│ {Format($"Add new {typeof(T)}", totalWidth-4)} │");
+                // prints the Add BaseType line
+                tableStringLines.Add($"│ {Format($"Add new {typeof(BaseType)}", totalWidth-4)} │");
 
                 // print the bottom line
                 // the +2 is for a space at both sides
@@ -1808,7 +1836,7 @@ public static class MenuHelper{
             if(currentPageSelection != -1)
             {
                 if(showEditTable && canEdit && chunks.Count > 0){
-                    editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
+                    editStringLines.Add($"┌─Edit {typeof(BaseType)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(BaseType)}".Length))}─┐");
                     for(int i=0;i<Math.Max(editOptionData.Count, editOptions.Count);i++){
                         string editLine = editOptions[i];
                         string editDataLine = editOptionData[i];
@@ -1819,12 +1847,12 @@ public static class MenuHelper{
                     editStringLines.Add($"│ Discard changes{new string(' ', Math.Max(0, longestEditOption-"Discard changes".Length))} │");
                     if(canDelete){
                         editStringLines.Add($"├{Format('─', longestEditOption+2)}┤");
-                        editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
+                        editStringLines.Add($"│ Delete {typeof(BaseType)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(BaseType)}".Length))} │");
                     }
                     editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
                 }else if(showEditTable && canDelete){
-                    editStringLines.Add($"┌─Edit {typeof(T)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(T)}".Length))}─┐");
-                    editStringLines.Add($"│ Delete {typeof(T)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(T)}".Length))} │");
+                    editStringLines.Add($"┌─Edit {typeof(BaseType)}{new string('─', Math.Max(0, longestEditOption-$"Edit {typeof(BaseType)}".Length))}─┐");
+                    editStringLines.Add($"│ Delete {typeof(BaseType)}{new string(' ', Math.Max(0, longestEditOption-$"Delete {typeof(BaseType)}".Length))} │");
                     editStringLines.Add($"└─{new string('─', Math.Max(0, longestEditOption))}─┘");
 
                 }
@@ -1955,6 +1983,7 @@ public static class MenuHelper{
                 if(editing){
                     editing = false;
                     editSelection = 0;
+                    editedObject = default(BaseType);
                 }
             }
             if(!searching && key == ConsoleKey.DownArrow || key == ConsoleKey.UpArrow){
@@ -1996,15 +2025,15 @@ public static class MenuHelper{
                     adding = true;
                 }
                 if(adding && canAdd && addMethod != null){
-                    #region Add new T
-                    // Func<T?>? addMethod
-                    T? newT = addMethod.Invoke();
+                    #region Add new BaseType
+                    // Func<BaseType?>? addMethod
+                    BaseType? newT = addMethod.Invoke();
                     if(newT != null){
                         items.Add(newT);
                     }
                     editing = false;
                     editSelection = 0;
-                    editedObject = default(T);
+                    editedObject = default(BaseType);
                     #endregion
                 }
             }else if(key == ConsoleKey.Enter && editing && (canEdit || canDelete)){
@@ -2056,24 +2085,34 @@ public static class MenuHelper{
                             }
                             editing = false;
                             editSelection = 0;
-                            editedObject = default(T);
+                            editedObject = default(BaseType);
                             propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
                         }else if(editSelection == 2+editOptions.Count-1){ // user selected Discard Changes
                             editing = false;
                             editSelection = 0;
-                            editedObject = default(T);
+                            editedObject = default(BaseType);
                             propertyUpdate = new Dictionary<MemberInfo, (object, object)>();
                         }else if(editSelection <= editOptions.Count-1){ // user selected a PropertEditMapping method
                             if(editedObject != null){
-                                Func<T, object> editMappingValueLambda = propertyEditMapping.ElementAt(editSelection).Value.Accessor.Compile();
+                                Dictionary<string, PropertyEditMapping<BaseType>> typedPropertyEditMapping;
+
+                                if(editedObject is T1){
+                                    typedPropertyEditMapping = propertyEditMapping.Value.Item1;
+                                }else if(editedObject is T2){
+                                    typedPropertyEditMapping = propertyEditMapping.Value.Item2;
+                                }else{
+                                    throw new Exception("Object is not of type T1 or T2");
+                                }
+
+                                Func<BaseType, object> editMappingValueLambda = typedPropertyEditMapping.ElementAt(editSelection).Value.Accessor.Compile();
 
                                 object currentPropertyValue = editMappingValueLambda(editedObject);
-                                object newPropertyValue = propertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
+                                object newPropertyValue = typedPropertyEditMapping.ElementAt(editSelection).Value.ValueGenerator.Invoke(editedObject);
                                 foreach(KeyValuePair<MemberInfo, (object, object)> member in propertyUpdate){
                                     string propertyName = "";
-                                    if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is MemberExpression bodyMember){
+                                    if(typedPropertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is MemberExpression bodyMember){
                                         propertyName = bodyMember.Member.Name;
-                                    }else if(propertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
+                                    }else if(typedPropertyEditMapping.ElementAt(editSelection).Value.Accessor.Body is UnaryExpression unary && unary.Operand is MemberExpression unaryMember){
                                         propertyName = unaryMember.Member.Name;
                                     }
                                     if(member.Key.Name.ToString() == propertyName.ToString()){
@@ -2096,7 +2135,7 @@ public static class MenuHelper{
                         }
                         editing = false;
                         editSelection = 0;
-                        editedObject = default(T);
+                        editedObject = default(BaseType);
                         if(remove){
                             if(chunks[currentPage].Count == 0){
                                 // go page back
@@ -2169,11 +2208,11 @@ public static class MenuHelper{
                 showEditTable = false;
                 editing = false;
                 editSelection = 0;
-                editedObject = default(T);
+                editedObject = default(BaseType);
             }
             #endregion
         }while(true);
-        return default(T);
+        return default(BaseType);
     }
 
     /// <summary>
@@ -2193,7 +2232,28 @@ public static class MenuHelper{
     /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
     /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
     public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod){
-        return Table(items, headers, canSelect, canCancel, canEdit, false, propertyEditMapping, saveEditedUserMethod, canAdd, addMethod, canDelete, deleteMethod);
+        return Table<T, T, T>(items, headers, canSelect, canCancel, canEdit, false, (propertyEditMapping, propertyEditMapping), saveEditedUserMethod, canAdd, addMethod, canDelete, deleteMethod);
+    }
+
+    /// <summary>
+    /// Creates a table that holds a list of objects.
+    /// </summary>
+    /// <typeparam name="T">The type of object that the table will handle.</typeparam>
+    /// <param name="items">A list of type T that holds all the objects</param>
+    /// <param name="headers">A Dictionary where the key is the header of the table column and the Func<T, object> being a method that gets a type T object and returns an object of any type.</param>
+    /// <param name="canSelect">A boolean indicating if the user is able to select a row. The item on this row will be returned.</param>
+    /// <param name="canCancel">A boolean indicating if the user can press escape to cancel everything and return back.</param>
+    /// <param name="canEdit">A boolean indicating if the user is able to edit properties of the items.</param>
+    /// <param name="canSearch">A boolean indicating if the user is able to search the rows by value.</param>
+    /// <param name="propertyEditMapping">A Dictionary where the key is the editing text and the value being a PropertyEditMapping instance of type T that holds a Func<T, object> that returns a member type of T and a Func<T, object> that is a method that will take the user object and returns an object being the new member of type T.</param>
+    /// <param name="saveEditedUserMethod">A Func<T, bool> that takes in the newly edited T object and returns a boolean indicating if it saved or not.</param>
+    /// <param name="canAdd">A boolean indicating if the user can add a new object of type T. If the user chooses to make a new object of type T it will call the addMethod.</param>
+    /// <param name="addMethod">A Func<T?> that creates a new instance of object T or NULL and returns it. If the result is NULL the new instance wont get saved. If the result is the new object it gets added to the table.</param>
+    /// <param name="canDelete">A boolean indicating if the user can delete the item in the list. Uses the deleteMethod to delete the instance.</param>
+    /// <param name="deleteMethod">A Func<T, bool> that takes in the selected object T and returns a boolean indicating if the object should be removed from the table.</param>
+    /// <returns>NULL if the canSelect is false. If canSelect is true it can either return NULL in case the user presses escape OR it returns an object of type T which the user selected.</returns>
+    public static T? Table<T>(List<T> items, Dictionary<string, Func<T, object>> headers, bool canSelect, bool canCancel, bool canEdit, bool canSearch, Dictionary<string, PropertyEditMapping<T>>? propertyEditMapping, Func<T, bool>? saveEditedUserMethod, bool canAdd, Func<T?>? addMethod, bool canDelete, Func<T, bool>? deleteMethod){
+        return Table<T, T, T>(items, headers, canSelect, canCancel, canEdit, canSearch, (propertyEditMapping, propertyEditMapping), saveEditedUserMethod, canAdd, addMethod, canDelete, deleteMethod);
     }
 
     /// <summary>
