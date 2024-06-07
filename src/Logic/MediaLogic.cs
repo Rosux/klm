@@ -1,7 +1,5 @@
 public class MediaLogic
 {
-    public static List<Season> TempSeasonList = new List<Season>();
-    public static List<Episode> TempEpisodeList = new List<Episode>();
     public static void Media(){
         MenuHelper.Table<Media, Film, Serie>(
             MediaAccess.GetAllMedia(),
@@ -26,6 +24,7 @@ public class MediaLogic
                 },
                 new Dictionary<string, PropertyEditMapping<Media>>(){
                     {"Bingeable", new(m=>((Serie)m).Bingeable, (Media m)=>true)},
+                    {"Seasons", new(m=>ListToString(((Serie)m).Seasons), m=>((Serie)m).Seasons, (Media m)=>EditSeasons((Serie)m))},
                 }
             ),
             SaveEditedMedia,
@@ -80,7 +79,7 @@ public class MediaLogic
         }
         else if(userSelection == "SERIE")
         {
-            Serie? serie = MediaMenu.CreateSerie();
+            Serie? serie = MediaLogic.CreateSerie();
             if(serie == null){
                 return null;
             }
@@ -93,63 +92,63 @@ public class MediaLogic
         return null;
     }
 
-    public static void SeasonsTable(Serie serie){
-        var allMedia = MediaAccess.GetAllMedia();
-        var series = allMedia.OfType<Serie>().ToList();
-        var seasons = new List<Season>();
-        MenuHelper.Table<Season>(
-            TempSeasonList,
-            new Dictionary<string, Func<Season, object>>(){
-                {"Title", m=>m.Title},
-                {"Runtime", m=>m.Runtime},
-                {"SeasonNumber", m=>m.SeasonNumber},
-                {"Episodes", m=>m.Episodes},
-            },
-            false, // canSelect
-            true,
-            true,
-            true, // canSearch
-            new Dictionary<string, PropertyEditMapping<Season>>(){
-                {"Title", new(x => x.Title, (Season m) => m.Title)},
-                {"Runtime", new(x => x.Runtime, (Season m) => m.Runtime)},
-                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)},
-                {"Episode", new(x=>x.Episodes, (Season m) => { EpisodesTable(m); return m.Episodes; })},
-            },
-            TempSaveTest,
-            true,
-            () => MediaMenu.AddSeason(serie),
-            true,
-            DeleteMedia
-        );
-    }
+    // public static void SeasonsTable(Serie serie){
+    //     var allMedia = MediaAccess.GetAllMedia();
+    //     var series = allMedia.OfType<Serie>().ToList();
+    //     var seasons = new List<Season>();
+    //     MenuHelper.Table<Season>(
+    //         TempSeasonList,
+    //         new Dictionary<string, Func<Season, object>>(){
+    //             {"Title", m=>m.Title},
+    //             {"Runtime", m=>m.Runtime},
+    //             {"SeasonNumber", m=>m.SeasonNumber},
+    //             {"Episodes", m=>m.Episodes},
+    //         },
+    //         false, // canSelect
+    //         true,
+    //         true,
+    //         true, // canSearch
+    //         new Dictionary<string, PropertyEditMapping<Season>>(){
+    //             {"Title", new(x => x.Title, (Season m) => m.Title)},
+    //             {"Runtime", new(x => x.Runtime, (Season m) => m.Runtime)},
+    //             {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)},
+    //             {"Episode", new(x=>x.Episodes, (Season m) => { EpisodesTable(m); return m.Episodes; })},
+    //         },
+    //         TempSaveTest,
+    //         true,
+    //         () => MediaMenu.CreateSeason(serie),
+    //         true,
+    //         DeleteMedia
+    //     );
+    // }
 
-    public static void EpisodesTable(Season season){
-        var episodes = season.Episodes.ToList();
-        MenuHelper.Table<Episode>(
-            TempEpisodeList,
-            new Dictionary<string, Func<Episode, object>>(){
-                {"Title", m=>m.Title},
-                {"Runtime", m=>m.Runtime},
-                {"EpisodeNumber", m=>m.EpisodeNumber},
-                {"Actors", m=>m.Actors},
-            },
-            false, // canSelect
-            true,
-            true,
-            true, // canSearch
-            new Dictionary<string, PropertyEditMapping<Episode>>(){
-                {"Title", new(x => x.Title, (Episode m) => m.Title)},
-                {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)},
-                {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)},
-                {"Actors", new(x => x.Actors, (Episode m) => m.Actors)},
-            },
-            SaveEditedMedia,
-            true,
-            () => MediaMenu.CreateEpisode(season),
-            true,
-            DeleteMedia
-        );
-    }
+    // public static void EpisodesTable(Season season){
+    //     var episodes = season.Episodes.ToList();
+    //     MenuHelper.Table<Episode>(
+    //         TempEpisodeList,
+    //         new Dictionary<string, Func<Episode, object>>(){
+    //             {"Title", m=>m.Title},
+    //             {"Runtime", m=>m.Runtime},
+    //             {"EpisodeNumber", m=>m.EpisodeNumber},
+    //             {"Actors", m=>m.Actors},
+    //         },
+    //         false, // canSelect
+    //         true,
+    //         true,
+    //         true, // canSearch
+    //         new Dictionary<string, PropertyEditMapping<Episode>>(){
+    //             {"Title", new(x => x.Title, (Episode m) => m.Title)},
+    //             {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)},
+    //             {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)},
+    //             {"Actors", new(x => x.Actors, (Episode m) => m.Actors)},
+    //         },
+    //         SaveEditedMedia,
+    //         true,
+    //         () => MediaMenu.CreateEpisode(season),
+    //         true,
+    //         DeleteMedia
+    //     );
+    // }
 
     /// <summary>
     /// Saves the given media and returns a boolean indicating if the media got saved.
@@ -176,10 +175,10 @@ public class MediaLogic
         return false;
     }
 
-
     public static bool TempSaveTest<T>(T media){
         return false;
     }
+
     /// <summary>
     /// Deletes the given media and returns a boolean indicating if the media got deleted.
     /// </summary>
@@ -295,4 +294,185 @@ public class MediaLogic
             return Certification.NONE;
         }
     }
+
+
+
+
+
+    private static List<Season> EditSeasons(Serie serie)
+    {
+        MenuHelper.Table<Season>(
+            serie.Seasons,
+            new Dictionary<string, Func<Season, object>>(){
+                {"Title", m=>m.Title},
+                {"SeasonNumber", m=>m.SeasonNumber},
+                {"Runtime", m=>m.Runtime},
+                {"Episodes", m=>ListToString(m.Episodes)},
+            },
+            false, // canSelect
+            true,
+            true,
+            true, // canSearch
+            new Dictionary<string, PropertyEditMapping<Season>>(){
+                {"Title", new(x => x.Title, (Season m) => m.Title)}, // TODO make Title
+                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)}, // TODO make SeasonNumber
+                {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, s=>EditEpisodes(s.Episodes))},
+            },
+            SaveTempSeason,
+            true,
+            CreateTempSeason,
+            true,
+            DeleteTempSeason
+        );
+        return serie.Seasons;
+    }
+
+    private static List<Episode> EditEpisodes(List<Episode> episodes)
+    {
+        MenuHelper.Table<Episode>(
+            episodes,
+            new Dictionary<string, Func<Episode, object>>(){
+                {"Title", m=>m.Title},
+                {"Runtime", m=>m.Runtime},
+                {"EpisodeNumber", m=>m.EpisodeNumber},
+                {"Actors", m=>ListToString(m.Actors)},
+            },
+            false, // canSelect
+            true,
+            true,
+            true, // canSearch
+            new Dictionary<string, PropertyEditMapping<Episode>>(){
+                {"Title", new(x => x.Title, (Episode m) => m.Title)}, // TODO make Title
+                {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)}, // TODO make Runtime
+                {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)}, // TODO make EpisodeNumber
+                {"Actors", new(x=>ListToString(x.Actors), x => x.Actors, (Episode m) => m.Actors)}, // TODO make Actors
+            },
+            SaveTempEpisode,
+            true,
+            CreateTempEpisode,
+            true,
+            DeleteTempEpisode
+        );
+        return episodes;
+    }
+
+
+    private static List<Season> _tempSeasons = new List<Season>();
+    private static Serie? CreateSerie()
+    {
+        Serie? currentSerie = MediaMenu.CreateSerie();
+        if(currentSerie == null){
+            return null;
+        }
+
+        MenuHelper.Table<Season>(
+            _tempSeasons,
+            new Dictionary<string, Func<Season, object>>(){
+                {"Title", m=>m.Title},
+                {"SeasonNumber", m=>m.SeasonNumber},
+                {"Runtime", m=>m.Runtime},
+                {"Episodes", m=>ListToString(m.Episodes)},
+            },
+            false, // canSelect
+            true,
+            true,
+            true, // canSearch
+            new Dictionary<string, PropertyEditMapping<Season>>(){
+                {"Title", new(x => x.Title, (Season m) => m.Title)}, // TODO make Title
+                {"SeasonNumber", new(x => x.SeasonNumber, (Season m) => m.SeasonNumber)}, // TODO make SeasonNumber
+                {"Episode", new(x=>ListToString(x.Episodes), x=>x.Episodes, CreateEpisode)},
+            },
+            SaveTempSeason,
+            true,
+            CreateTempSeason,
+            true,
+            DeleteTempSeason
+        );
+
+        List<Season> seasonsClone = new List<Season>();
+        foreach(Season season in _tempSeasons){
+            seasonsClone.Add(season);
+        }
+        _tempSeasons = new List<Season>();
+        currentSerie.Seasons = seasonsClone;
+        return currentSerie;
+    }
+
+
+    private static List<Episode> _tempEpisodes = new List<Episode>();
+    private static List<Episode> CreateEpisode(Season season)
+    {
+        MenuHelper.Table<Episode>(
+            _tempEpisodes,
+            new Dictionary<string, Func<Episode, object>>(){
+                {"Title", m=>m.Title},
+                {"Runtime", m=>m.Runtime},
+                {"EpisodeNumber", m=>m.EpisodeNumber},
+                {"Actors", m=>ListToString(m.Actors)},
+            },
+            false, // canSelect
+            true,
+            true,
+            true, // canSearch
+            new Dictionary<string, PropertyEditMapping<Episode>>(){
+                {"Title", new(x => x.Title, (Episode m) => m.Title)}, // TODO make Title
+                {"Runtime", new(x => x.Runtime, (Episode m) => m.Runtime)}, // TODO make Runtime
+                {"EpisodeNumber", new(x => x.EpisodeNumber, (Episode m) => m.EpisodeNumber)}, // TODO make EpisodeNumber
+                {"Actors", new(x=>ListToString(x.Actors), x => x.Actors, (Episode m) => m.Actors)}, // TODO make Actors
+            },
+            SaveTempEpisode,
+            true,
+            CreateTempEpisode,
+            true,
+            DeleteTempEpisode
+        );
+        List<Episode> episodesClone = new List<Episode>();
+        foreach(Episode episode in _tempEpisodes){
+            episodesClone.Add(episode);
+        }
+        _tempEpisodes = new List<Episode>();
+        return episodesClone;
+    }
+
+
+
+
+
+
+
+    private static Episode? CreateTempEpisode()
+    {
+        return MediaMenu.CreateEpisode();
+    }
+
+    private static bool SaveTempEpisode(Episode episode)
+    {
+        // TODO EDIT EPISODE
+        return true;
+    }
+
+    private static bool DeleteTempEpisode(Episode episode)
+    {
+        _tempEpisodes.Remove(episode);
+        return true;
+    }
+
+
+    private static Season? CreateTempSeason()
+    {
+        return MediaMenu.CreateSeason();
+    }
+
+    private static bool SaveTempSeason(Season season)
+    {
+        // TODO EDIT SEASON
+        return true;
+    }
+
+    private static bool DeleteTempSeason(Season season)
+    {
+        _tempSeasons.Remove(season);
+        return true;
+    }
+
 }

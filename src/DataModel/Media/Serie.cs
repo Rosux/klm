@@ -15,7 +15,15 @@ public class Serie : Media
     public DateOnly ReleaseDate { get; set; } = DateOnly.MinValue;
     public Certification Certification { get; set; } = Certification.NONE;
     public List<string> Directors { get; set; } = new List<string>();
-    public bool Bingeable { get; set; } = false;
+    private bool _bingeable = false;
+    public bool Bingeable {
+        get{
+            return _bingeable;
+        }
+        set{
+            _bingeable = value;
+        }
+    }
     public List<Season> Seasons { get; set; } = new List<Season>();
 
     /// <summary>
@@ -35,7 +43,7 @@ public class Serie : Media
     /// <param name="seasons"></param>
     /// <returns>The created serie.</returns>
     [JsonConstructor]
-    public Serie(int id, string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons)
+    public Serie(int id, string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors, bool bingeable, List<Season> seasons)
     {
         this.Id = id;
         this.Title = title;
@@ -66,7 +74,7 @@ public class Serie : Media
     /// <param name="bingeable"></param>
     /// <param name="seasons"></param>
     /// <returns>The created serie.</returns>
-    public Serie(string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors,bool bingeable, List<Season> seasons)
+    public Serie(string title, int runtime, string description, float rating, string language, List<Genre> genres, DateOnly releaseDate, Certification certification, List<string> directors, bool bingeable, List<Season> seasons)
     {
         this.Id = -1;
         this.Title = title;

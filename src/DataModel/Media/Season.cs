@@ -9,7 +9,7 @@ public class Season
     public string Title = "";
     public int Runtime = 0;
     public int SeasonNumber = 0;
-    public List<Episode> Episodes = new List<Episode>();
+    public List<Episode> Episodes { get; set; } = new List<Episode>();
 
 
     /// <summary>

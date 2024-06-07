@@ -61,12 +61,10 @@ public static class MediaMenu
     }
 
     /// <summary>
-    /// Creates a new Serie object.
+    /// Creates a new Serie.
     /// </summary>
-    /// <returns>Returns a Serie object or null in case the user exists the process.</returns>
+    /// <returns>A Serie or null in case the user exists the process.</returns>
     public static Serie? CreateSerie(){
-        List<Season> seasons = new List<Season>();
-
         string prompt = "Title: \nDescription: \nLanguage: \nDate: \nDirectors: \nGenres: \nCertifications: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if(title == null){return null;}
@@ -115,37 +113,32 @@ public static class MediaMenu
                 {"Adult content. Viewer discretion advised.", Certification.X}
             }
         );
-        bool bingeable = false;
-        if (runtime > 400 && rating > 8){
-            bingeable = true;
-        }
-        Serie serie = new Serie(title, runtime, description, rating, language, genres, (DateOnly)date, (Certification)certification, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), bingeable, seasons);
-        MediaLogic.SeasonsTable(serie);
-        return serie;
+        return new Serie(title, runtime, description, rating, language, genres, (DateOnly)date, (Certification)certification, director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), false, new List<Season>());
     }
 
-    public static Season? AddSeason(Serie serie){
+    /// <summary>
+    /// Create a new season.
+    /// </summary>
+    /// <returns>The created season.</returns>
+    public static Season? CreateSeason(){
         List<Episode> episodes = new List<Episode>();
 
-        string prompt = "Title: \nRuntime (Min): \nSeasonNumber: \n";
+        string prompt = "Title: \nSeasonNumber: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
-        prompt = $"Title: {title}\nRuntime (Min): \nSeasonNumber: \n";
-        int? runtime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
-        if (runtime == null){return null;}
-
-        prompt = $"Title: {title}\nRuntime (Min): {runtime}\nSeasonNumber: \n";
+        prompt = $"Title: {title}\nSeasonNumber: \n";
         int? seasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the seasonnumber:", "", true, 0, 0, 60);
         if (seasonNumber == null){return null;}
 
-        Season newSeason = new Season(title, (int)runtime, (int)seasonNumber, episodes);
-        serie.Seasons.Add(newSeason);
-        return newSeason;
+        return new Season(title, -1, (int)seasonNumber, episodes);
     }
 
-
-    public static Episode? CreateEpisode(Season season){
+    /// <summary>
+    /// Asks the user to create a new episode.
+    /// </summary>
+    /// <returns>The created episode.</returns>
+    public static Episode? CreateEpisode(){
         string prompt = "Title: \nRuntime (Min): \nEpisodeNumber: \nRating: \nActors: \n";
         string? title = MenuHelper.SelectText(prompt+"Type the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
@@ -167,10 +160,13 @@ public static class MediaMenu
         if (actors == null){return null;}
 
         Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
-        season.Episodes.Add(episode);
         return episode;
     }
 
+    /// <summary>
+    /// Notifies the user if their media got added or not,
+    /// </summary>
+    /// <param name="success">A boolean indicating if the action was successful.</param>
     public static void MediaAdded(bool success){
         Console.CursorVisible = false;
         Console.Clear();

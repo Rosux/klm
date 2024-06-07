@@ -1586,7 +1586,7 @@ public static class MenuHelper{
             #region Generate edit table values based on the type of the selected object
             // create a list of editable options (like UserName, Email, role etc)
             List<string> editOptions = new List<string>();
-            if(canEdit && currentPageSelection != -1 && currentPageSelection <= chunks[currentPage].Count-1 && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
+            if(canEdit && currentPageSelection != -1 && chunks.Count > 0 && currentPageSelection <= chunks[currentPage].Count-1 && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
                 if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T1)
                 {
                     foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> mapping in propertyEditMapping.Value.Item1)
