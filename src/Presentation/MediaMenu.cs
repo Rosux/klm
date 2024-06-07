@@ -91,13 +91,10 @@ public static class MediaMenu
         string? director = MenuHelper.SelectText(prompt+"Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if(director == null){return null;}
 
-
         List<Genre> possibleGenres = new List<Genre>{ Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA, Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME };
-        prompt = $"Title: {title}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nLanguage: {language}\nDate: {date}\nDirectors: {director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nGenres: \nCertifications: \n";
         List<Genre>? genres = MenuHelper.SelectFromEnum<Genre>(possibleGenres, "Genres", "Select one or multiple genres", "", true);
         if(genres == null){return null;}
 
-        prompt = $"Title: {title}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nLanguage: {language}\nDate: {date}\nDirectors: {director.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nGenres: {genres.Count}\nCertifications: \n";
         Certification? certification = MenuHelper.SelectFromList(
             "Select a certification",
             true,
