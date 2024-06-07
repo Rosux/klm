@@ -34,8 +34,7 @@ public class DatabaseHandler
         CREATE TABLE IF NOT EXISTS Rooms(
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Capacity INTEGER NOT NULL,
-            Seats TEXT NOT NULL,
-            RoomName TEXT NOT NULL
+            Seats TEXT NOT NULL
         )
     "; // Seats is a bool[][] array indicating the seat layout
 

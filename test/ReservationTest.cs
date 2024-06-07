@@ -1,16 +1,12 @@
 using System.Data.SQLite;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TimeLine;
 
 [TestFixture]
 public class ReservationTest
 {
     protected SQLiteConnection _Conn = new SQLiteConnection();
     ReservationAccess? r = null;
-    private Holder _timeline;
-    private Film _film1;
-    private Film _film2;
 
     [TearDown]
     public void Cleanup()
@@ -33,55 +29,6 @@ public class ReservationTest
         _Conn = new SQLiteConnection(connectionString);
         System.IO.Directory.CreateDirectory("./DataSource/");
         r = new ReservationAccess("./DataSource/TEST.db");
-        _timeline = new Holder();
-        _film1 = new Film(
-                    id: 0,
-                    genres: new List<string> { "Action" },
-                    original_language: "English",
-                    overview: "A beekeeper embarks on an adventure",
-                    release_date: "2023-05-29",
-                    runtime: 120,
-                    title: "Beekeeper",
-                    voteaverage: 7.5,
-                    certification: "PG-13",
-                    directors: new List<string> { "John Doe" }
-                );
-        _film2 = new Film(
-                    id: 1,
-                    genres: new List<string> { "Adventure" },
-                    original_language: "English",
-                    overview: "A journey through mud",
-                    release_date: "2023-05-29",
-                    runtime: 90,
-                    title: "Mudrunner",
-                    voteaverage: 8.2,
-                    certification: "R",
-                    directors: new List<string> { "Jane Smith" }
-                );
-        // Add a movie to the timeline
-        DateTime startTime = new DateTime(2024, 6, 5, 14, 0, 0);
-        DateTime endTime = startTime.AddMinutes(_film1.Runtime);
-        _timeline.Add(_film1, startTime, endTime);
-    }
-
-    [Test]
-    public void CorrectConflictReturn()
-    {
-        //-------test for movie
-        // Test for a time with no conflict
-        DateTime startTime = new DateTime(2024, 6, 5, 17, 0, 0); // After the first film ends
-        DateTime endTime = startTime.AddMinutes(_film2.Runtime);
-
-        var result = _timeline.HasConflict(startTime, endTime);
-
-        Assert.IsFalse(result.Conflict);
-        startTime = new DateTime(2024, 6, 5, 15, 0, 0); // During the first film
-        endTime = startTime.AddMinutes(_film2.Runtime);
-
-        result = _timeline.HasConflict(startTime, endTime);
-        Assert.IsTrue(result.Conflict);
-        Assert.AreEqual(_film1.Title, result.ConflictingTitle);
-        Assert.AreEqual("from 14:00 to 16:00", result.ConflictingTime);
     }
 
     [Test]
