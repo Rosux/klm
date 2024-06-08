@@ -197,12 +197,6 @@ public class ReservationAccess : DatabaseHandler
                     TimeOnly.Parse((string)(x.Property("EndTime").Value))
                 );
             }
-            else if(x.Property("Time") != null)
-            {
-                obj = (object)new Break(
-                    (int)(x.Property("Time").Value)
-                );
-            }
 
             if(obj != null){
                 newTimeLine.Add(new TimeLine.Item(

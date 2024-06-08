@@ -148,25 +148,6 @@ public static class ReservationMenu
                         totalPrice += c.Price;
                     }
                 }},
-                {"Add Breaks", ()=>{
-                    int breakTime = MenuHelper.SelectInteger("Select the length for your break in minutes", 1, 1, int.MaxValue);
-                    DateOnly d = MenuHelper.SelectDate("Select break date and time", startDate, startDate, endDate);
-                    TimeOnly t;
-                    if (d == startDate && d == endDate){
-                        t = MenuHelper.SelectTime("Select the date and time for your break", "", new TimeOnly(), startTime, endTime);
-                    }else if (d == startDate){
-                        t = MenuHelper.SelectTime("Select the date and time for your break", "", new TimeOnly(), startTime, TimeOnly.MaxValue);
-                    }else if (d == endDate){
-                        t = MenuHelper.SelectTime("Select the date and time for your break", "", new TimeOnly(), TimeOnly.MinValue, endTime);
-                    }else{
-                        t = MenuHelper.SelectTime("Select the date and time for your break", "", new TimeOnly(), TimeOnly.MinValue, TimeOnly.MaxValue);
-                    }
-                    timeline.Add(
-                        new Break(breakTime),
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0),
-                        new DateTime(d.Year, d.Month, d.Day, t.Hour, t.Minute, 0).AddMinutes(breakTime)
-                    );
-                }},
                 {"Add Entertainment", ()=>{
                     int x = 0;
                     int y = 0;
