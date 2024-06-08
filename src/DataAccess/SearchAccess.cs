@@ -21,27 +21,37 @@ public class SearchAccess
     /// <param name="searchPattern">A string containing Title/Genre text optionally with seperator , between multiple search options.</param>
     /// <returns>A list of Media objects holding every movie/serie where the title/genre contains the searchPattern.</returns>
     public List<Media> Search(string searchPattern){
-        List<Media> films = new List<Media>();
+        List<Media> results = new List<Media>();
         List<Serie> AllSerie = AllSeries;
         List<Film> AllMovies = AllFilms;
         string[] tokens = searchPattern.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries);
-        foreach (Film f in AllMovies){
+        foreach (Film film  in AllMovies){
             foreach (string token in tokens){
-                if(f.Title.ToLower().Contains(token.ToLower())){
-                    films.Add(f);
+                string lowerToken = token.ToLower();
+                if(
+                    film.Title.ToLower().Contains(lowerToken) ||
+                    film.Genres.Any(g => g.ToString().ToLower().Contains(lowerToken)) ||
+                    film.Directors.Any(d => d.ToLower().Contains(lowerToken))
+                ){
+                    results.Add(film);
                     break;
                 }
             }
         }
-        foreach(Serie s in AllSerie){
+        foreach(Serie serie in AllSerie){
             foreach (string token in tokens){
-                if(s.Title.ToLower().Contains(token.ToLower())){
-                    films.Add(s);
+                string lowerToken = token.ToLower();
+                if(
+                    serie.Title.ToLower().Contains(lowerToken) ||
+                    serie.Genres.Any(g => g.ToString().ToLower().Contains(lowerToken)) ||
+                    serie.Directors.Any(d => d.ToLower().Contains(lowerToken))
+                ){
+                    results.Add(serie);
                     break;
                 }
             }
         }
-        films.Sort((x, y) => x.Rating.CompareTo(y.Rating));
-        return films;
+        results.Sort((x, y) => x.Rating.CompareTo(y.Rating));
+        return results;
     }
 }
