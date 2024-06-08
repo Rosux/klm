@@ -24,9 +24,9 @@ public class Episode
     [JsonConstructor]
     public Episode(int id, string title, int runtime, int episodeNumber, float rating, List<string> actors){
         this.Id = id;
-        this.EpisodeNumber = episodeNumber;
         this.Title = title;
         this.Runtime = runtime;
+        this.EpisodeNumber = episodeNumber;
         this.Rating = rating;
         this.Actors = actors;
     }
@@ -40,9 +40,9 @@ public class Episode
     /// <param name="rating">The rating of the episode.</param>
     /// <param name="actors">The actors in the episode.</param>
     public Episode(string title, int runtime, int episodeNumber, float rating, List<string> actors){
-        this.EpisodeNumber = episodeNumber;
         this.Title = title;
         this.Runtime = runtime;
+        this.EpisodeNumber = episodeNumber;
         this.Rating = rating;
         this.Actors = actors;
     }

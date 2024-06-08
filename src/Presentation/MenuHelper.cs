@@ -972,6 +972,17 @@ public static class MenuHelper{
     /// <param name="serie">A Serie object to select episodes from</param>
     /// <returns>null if the user doesnt select anything. A list of strings containing the user selected episodes formatted as: "1.1" being season 1 episode 1.</returns>
     public static List<string>? SelectEpisodes(Serie serie){
+        if(serie.Seasons.Count == 0 || serie.Seasons[0].Episodes.Count == 0)
+        {
+            Console.CursorVisible = false;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Write($"The series {serie.Title} has no seasons or episodes.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\n\nPress any key to return...");
+            Console.ReadKey(true);
+            return new List<string>();
+        }
         bool selectSeason = true;
         bool saving = false;
         int selectedSeason = 0;
@@ -2361,7 +2372,7 @@ public static class MenuHelper{
         Console.Write("Select a seat:\n(Gold indicates there is special entertainment)\n\n");
         // create the top surounding bar with the word Screen centered
         string header = "Screen";
-        for(int i=0;i<(widestSeats*2)+1 - "Screen".Length;i++)
+        for(int i=0;i<(widestSeats*4)+1 - "Screen".Length;i++)
         {
             header = ((i % 2 == 1) ? "─" : "") + header + ((i % 2 == 0) ? "─" : "");
         }
