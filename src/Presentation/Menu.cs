@@ -93,6 +93,7 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
+        MediaLogic.Media();
         // bool x = MediaAccess.DeleteMedia(
         //     new Serie(1, "TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>())
         // );

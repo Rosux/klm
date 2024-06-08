@@ -162,7 +162,6 @@ public class MediaLogic
         }else{
             return false;
         }
-        return false;
     }
 
     private static string GetValidTitle<T>(T media){
