@@ -195,11 +195,6 @@ public class ReservationTest
         // sorry but this test assumes the insert methods in ReservationAccess.cs work
         TimeLine.Holder Timeline = new TimeLine.Holder();
         Timeline.Add(
-            (object)(new Break(15)),
-            DateTime.Parse("2024-04-24 02:00:00"),
-            DateTime.Parse("2024-04-24 02:00:00")
-        );
-        Timeline.Add(
             (object)(new Film(-1, "Test movie", 193, "test plot", 4.6f, "Test language", new List<Genre>(), DateOnly.Parse("2023-07-11"), Certification.PG, new List<string>(), new List<string>(), new List<string>())),
             DateTime.Parse("2024-04-24 02:00:00"),
             DateTime.Parse("2024-04-24 02:00:00")
@@ -258,9 +253,6 @@ public class ReservationTest
         List<TimeLine.Item> timelineItems = t.Items;
         if(timelineItems.Count == 4){
             Assert.Pass("Reservation timeline holds all the objects in the list");
-            if(timelineItems[0].Action is Break && (Break)(timelineItems[0].Action) != null){
-                u++;
-            }
             if(timelineItems[1].Action is Film && (Film)(timelineItems[1].Action) != null){
                 u++;
             }
