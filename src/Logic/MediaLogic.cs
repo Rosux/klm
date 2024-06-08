@@ -164,6 +164,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid title for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film, Serie, Season, or Episode).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid title for the media.</returns>
     private static string GetValidTitle<T>(T media){
         if(media is Film film){
             string prompt = $"Current Title: {film.Title}\n\n";
@@ -186,6 +192,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid integer value for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film, Serie, Season, or Episode).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid integer value for the media.</returns>
     private static object GetValidInteger<T>(T media){
         if(media is Film film){
             string prompt = $"Current Runtime: {film.Runtime}\n\n";
@@ -204,6 +216,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid runtime for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Episode).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid runtime for the media.</returns>
     private static object GetValidRuntime<T>(T media){
         if(media is Episode episode){
             string prompt = $"Current Runtime: {episode.Runtime}\n\n";
@@ -214,6 +232,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid description for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid description for the media.</returns>
     private static string GetValidDescription<T>(T media){
         if(media is Film film){
             string prompt = $"Current Description: {film.Description}\n\n";
@@ -228,6 +252,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid rating for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Episode).</typeparam>
+    /// <param name="rating">The media object containing the rating.</param>
+    /// <returns>A valid rating for the media.</returns>
     private static object GetValidRating<T>(T rating){
         if(rating is Film film){
             string prompt = $"Current Rating: {film.Rating}\n\n";
@@ -242,6 +272,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid language for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid language for the media.</returns>
     private static string GetValidLanguage<T>(T media){
         if(media is Film film){
             string prompt = $"Current Language: {film.Language}\n\n";
@@ -256,6 +292,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets valid genres for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>Valid genres for the media.</returns>
     private static object GetValidGenres<T>(T media){
         List<Genre> possibleGenres = new List<Genre> {
             Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA,
@@ -275,6 +317,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid release date for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid release date for the media.</returns>
     private static object GetValidReleaseDate<T>(T media){
         if(media is Film film){
             string prompt = $"Current Release Date: {film.ReleaseDate}\n\n";
@@ -289,6 +337,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets a valid certification for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>A valid certification for the media.</returns>
     private static object GetValidCertification<T>(T media){
         Certification? newCertification = MenuHelper.SelectFromList(
             "Select a certification",
@@ -319,6 +373,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets valid directors for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Serie).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>Valid directors for the media.</returns>
     private static List<string> GetValidDirectors(Media media){
         if(media is Film film){
             string prompt = $"Current Directors: {ListToString(film.Directors)}\n\n";
@@ -333,6 +393,12 @@ public class MediaLogic
         }
     }
 
+    /// <summary>
+    /// Gets valid actors for the media.
+    /// </summary>
+    /// <typeparam name="T">The type of media (Film or Episode).</typeparam>
+    /// <param name="media">The media object.</param>
+    /// <returns>Valid actors for the media.</returns>
     private static List<string> GetValidActors<T>(T media){
         if(media is Film film){
             string prompt = $"Current Actors: {ListToString(film.Actors)}\n\n";
