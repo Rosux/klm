@@ -30,22 +30,14 @@ public class SearchAccess
                 if(f.Title.ToLower().Contains(token.ToLower())){
                     films.Add(f);
                     break;
-                }else{
-                    bool stop = false;
-                    foreach(string directorName in f.Directors){
-                        if(directorName.ToLower().Contains(token.ToLower())){
-                            films.Add(f);
-                            stop = true;
-                            break;
-                        }
-                    }
-                    if(stop){break;}
-                    foreach(Genre genre in f.Genres){
-                        if(genre.ToString().ToLower().Contains(token.ToLower())){
-                            films.Add(f);
-                            break;
-                        }
-                    }
+                }
+            }
+        }
+        foreach(Serie s in AllSerie){
+            foreach (string token in tokens){
+                if(s.Title.ToLower().Contains(token.ToLower())){
+                    films.Add(s);
+                    break;
                 }
             }
         }
