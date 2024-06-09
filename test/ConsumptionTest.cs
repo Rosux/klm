@@ -60,7 +60,7 @@ public class ConsumptionTest
             }
         }
         _Conn.Close();
-            
+
         foreach (var consumption in readResult)
         {
             if (consumption.Id == x.Id && consumption.Name == x.Name && consumption.Price == x.Price && consumption.StartTime == x.StartTime && consumption.EndTime == x.EndTime)
@@ -71,7 +71,7 @@ public class ConsumptionTest
 
         Assert.Fail("Inserted Consumption not found in the list.");
     }
-    
+
     [Test]
     public void RemoveTest(){
         var x = new Consumption(

@@ -6,15 +6,12 @@ public class UserTest
     private SQLiteConnection _Conn;
     UserAccess? u = null;
 
-    [OneTimeSetUp]
-    public void Setup()
-    {
-        File.Delete("./TEST.db");
-        SQLiteConnection.CreateFile("./TEST.db");
-        string connectionString = "Data Source=./TEST.db;Version=3";
+    [SetUp]
+    public void Setup(){
+        string connectionString = "Data Source=./DataSource/TEST.db;Version=3;";
         _Conn = new SQLiteConnection(connectionString);
-        Directory.CreateDirectory("./DataSource/");
-        u = new UserAccess("./TEST.db");
+        System.IO.Directory.CreateDirectory("./DataSource/");
+        u = new UserAccess("./DataSource/TEST.db");
     }
 
     [TearDown]
@@ -22,6 +19,14 @@ public class UserTest
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
+        if (File.Exists("./DataSource/TEST.db"))
+        {
+            File.Delete("./DataSource/TEST.db");
+        }
+        if (Directory.Exists("./DataSource"))
+        {
+            Directory.Delete("./DataSource");
+        }
     }
 
     [Test]

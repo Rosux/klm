@@ -200,7 +200,7 @@ public class ReservationTest
             DateTime.Parse("2024-04-24 02:00:00")
         );
         Timeline.Add(
-            (object)(new Episode("Test Episode #1", 45, 1, 9.0f, new List<string> { "Actor1", "Actor2" })),
+            (Episode)(new Episode(-1, "Test Episode 1", 45, 1, 4.5f, new List<string> { "Actor1", "Actor2" })),
             DateTime.Parse("2024-04-24 02:00:00"),
             DateTime.Parse("2024-04-24 02:00:00")
         );
@@ -226,40 +226,40 @@ public class ReservationTest
         List<Reservation> a = r.GetReservationsByUserId(2);
         if(a.Count == 1){
             Assert.Pass("Reservation exists in list");
-            Assert.AreEqual(TestTimeLine(a[0].TimeLine), 4);
+            Assert.AreEqual(TestTimeLine(a[0].TimeLine), 3);
         }
 
         List<Reservation> b = r.GetAllReservationsBetweenDates(DateOnly.Parse("2024-04-23"), DateOnly.Parse("2024-05-23"));
         if(b.Count == 1){
             Assert.Pass("Reservation exists in list");
-            Assert.AreEqual(TestTimeLine(b[0].TimeLine), 4);
+            Assert.AreEqual(TestTimeLine(b[0].TimeLine), 3);
         }
 
         List<Reservation> c = r.GetAllReservationsBetweenDates(DateOnly.Parse("2024-04-23"));
         if(c.Count == 1){
             Assert.Pass("Reservation exists in list");
-            Assert.AreEqual(TestTimeLine(c[0].TimeLine), 4);
+            Assert.AreEqual(TestTimeLine(c[0].TimeLine), 3);
         }
 
         List<Reservation> d = r.GetAllReservations();
         if(d.Count == 1){
             Assert.Pass("Reservation exists in list");
-            Assert.AreEqual(TestTimeLine(d[0].TimeLine), 4);
+            Assert.AreEqual(TestTimeLine(d[0].TimeLine), 3);
         }
     }
 
     private int TestTimeLine(TimeLine.Holder t){
         int u = 0;
         List<TimeLine.Item> timelineItems = t.Items;
-        if(timelineItems.Count == 4){
+        if(timelineItems.Count == 3){
             Assert.Pass("Reservation timeline holds all the objects in the list");
-            if(timelineItems[1].Action is Film && (Film)(timelineItems[1].Action) != null){
+            if(timelineItems[0].Action is Film && (Film)(timelineItems[0].Action) != null){
                 u++;
             }
-            if(timelineItems[2].Action is Episode && (Episode)(timelineItems[2].Action) != null){
+            if(timelineItems[1].Action is Episode && (Episode)(timelineItems[1].Action) != null){
                 u++;
             }
-            if(timelineItems[3].Action is Consumption && (Consumption)(timelineItems[3].Action) != null){
+            if(timelineItems[2].Action is Consumption && (Consumption)(timelineItems[2].Action) != null){
                 u++;
             }
         }

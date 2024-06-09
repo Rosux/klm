@@ -183,7 +183,7 @@ public class ReservationAccess : DatabaseHandler
                     (string)(x.Property("Title").Value),
                     (int)(x.Property("Runtime").Value),
                     (int)(x.Property("EpisodeNumber").Value),
-                    (float)(x.Property("rating").Value),
+                    (float)(x.Property("Rating").Value),
                     (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Actors").Value.ToString())
                 );
             }
