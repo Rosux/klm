@@ -213,7 +213,7 @@ public class ReservationAccess : DatabaseHandler
     {
         _Conn.Open();
         int rowsAffected = -1;
-        string UpdateReservation = $@"UPDATE Reservations SET RoomId = @RoomId, UserId= @UserId, GroupSize = @GroupSize, StartDate = @StartDate, EndDate = @EndDate, Price = @Price, TimeLine = @TimeLine, Entertainments = @Entertainments WHERE ID = {reservation.Id}";
+        string UpdateReservation = $@"UPDATE Reservations SET RoomId = @RoomId, UserId= @UserId, GroupSize = @GroupSize, StartDate = @StartDate, EndDate = @EndDate, Price = @Price, TimeLine = @TimeLine, Entertainments = @Entertainments WHERE ID = @Id";
         using (SQLiteCommand Launch = new SQLiteCommand(UpdateReservation, _Conn)){
             Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
             Launch.Parameters.AddWithValue("@UserId", reservation.UserId);
