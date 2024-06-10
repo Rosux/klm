@@ -133,14 +133,15 @@ public class ReservationAccess : DatabaseHandler
     /// <returns>A boolean indicating if the reservation was deleted.</returns>
     public bool DeleteReservation(Reservation reservation){
         _Conn.Open();
-        string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id ";
+        string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id";
+        int rowsAffected;
         using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
         {
             Remove.Parameters.AddWithValue("@Id", reservation.Id);
-            int rowsAffected = Remove.ExecuteNonQuery();
-            _Conn.Close();
-            return rowsAffected > 0;
+            rowsAffected = Remove.ExecuteNonQuery();
         }
+        _Conn.Close();
+        return rowsAffected > 0;
     }
 
     /// <summary>

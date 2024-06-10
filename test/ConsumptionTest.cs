@@ -96,17 +96,17 @@ public class ConsumptionTest
         _Conn.Close();
         bool removeResult = c.DeleteConsumption(x);
 
-            bool isDatabaseEmpty;
-            using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
-            {
-                _Conn.Open();
-                int rowCount = Convert.ToInt32(checkCommand.ExecuteScalar());
-                isDatabaseEmpty = rowCount == 0;
-                _Conn.Close();
-            }
+        bool isDatabaseEmpty;
+        using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
+        {
+            _Conn.Open();
+            int rowCount = Convert.ToInt32(checkCommand.ExecuteScalar());
+            isDatabaseEmpty = rowCount == 0;
+            _Conn.Close();
+        }
 
-            if (removeResult)
-            {
+        if (removeResult)
+        {
             if (isDatabaseEmpty)
             {
                 Assert.Pass("Consumption successfully removed and database is empty.");
