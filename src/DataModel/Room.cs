@@ -20,7 +20,7 @@ public class Room
     /// </summary>
     /// <param name="id">The ID of the room.</param>
     /// <param name="layout">A jagged array of booleans indicating where the seats are.</param>
-    public Room(int id, bool[][] layout, string roomname)
+    public Room(int id, bool[][] layout, string roomName)
     {
         Id = id;
         // set layout
@@ -38,27 +38,27 @@ public class Room
         }
         // set available seats
         Capacity = capacity;
-        RoomName = roomname;
+        RoomName = roomName;
     }
 
     /// <summary>
     /// Create a new room. Automatically counts all the available seats.
     /// </summary>
     /// <param name="layout">A jagged array of booleans indicating where the seats are.</param>
-    public Room(bool[][] layout, string roomname) : this(-1, layout, roomname){}
+    public Room(bool[][] layout, string roomName) : this(-1, layout, roomName){}
 
     /// <summary>
     /// Create a new room based on JSON data. Automatically counts all the available seats.
     /// </summary>
     /// <param name="jsonString">A string containing the room seats data.</param>
-    public Room(string jsonString, string roomname) : this(JsonConvert.DeserializeObject<bool[][]>(jsonString), roomname){}
+    public Room(string jsonString, string roomName) : this(JsonConvert.DeserializeObject<bool[][]>(jsonString), roomName){}
 
     /// <summary>
     /// Create a new room with ID. Automatically counts all the available seats.
     /// </summary>
     /// <param name="id">The ID of the room</param>
     /// <param name="jsonString">A string containing the room seats data.</param>
-    public Room(int id, string jsonString, string roomname) : this(id, JsonConvert.DeserializeObject<bool[][]>(jsonString), roomname){}
+    public Room(int id, string jsonString, string roomName) : this(id, JsonConvert.DeserializeObject<bool[][]>(jsonString), roomName){}
 
 
 }

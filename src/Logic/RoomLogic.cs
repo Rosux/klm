@@ -104,9 +104,6 @@ public static class RoomLogic
         string? RoomName = MenuHelper.SelectText("Give a room name", "", true, 0, 100, @"([A-z]|\d| )");
         if (RoomName == null || RoomName.Length == 0)
         {
-            Console.WriteLine("Action cancelled.");
-            Console.Write($"\n\nPress any key to continue...");
-            Console.ReadKey(true);
             return;
         }
         int? givenRows = null;
