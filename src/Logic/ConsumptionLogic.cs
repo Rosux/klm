@@ -98,7 +98,7 @@ public static class ConsumptionLogic
             confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
         }
         if(confirmation){
-            bool success = _consumptionAccess.DeleteConsumption(consumption);
+            bool success = _consumptionAccess.DeleteConsumption(consumption, false);
             ConsumptionMenu.ConsumptionRemoved(success);
             return success;
         }else{

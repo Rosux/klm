@@ -357,12 +357,8 @@ public class ReservationTest
             }
         }
         _Conn.Close();
-
         foreach(var reservations2 in reservations)
         {
-            Console.WriteLine(reservations2.TimeLine);
-            Console.WriteLine(updatedReservation.TimeLine);
-
             if (reservations2.TimeLine.ToString() == updatedReservation.TimeLine.ToString())
             {
                 Assert.Pass("good");

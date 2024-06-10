@@ -56,8 +56,9 @@ public class ConsumptionAccess : DatabaseHandler
     /// Deletes a consumption item.
     /// </summary>
     /// <param name="consumption">A consumption instance to delete. Must have a valid id.</param>
+    /// <param name="noReservations">If it cant have reservations make this true.</param>
     /// <returns>A boolean indicating if the deletion was successful.</returns>
-    public bool DeleteConsumption(Consumption consumption){
+    public bool DeleteConsumption(Consumption consumption, bool noReservations){
         _Conn.Open();
         int rowsAffected = 0;
         string NewQuery = @"DELETE FROM Consumptions WHERE ID = @Id ";
@@ -68,7 +69,7 @@ public class ConsumptionAccess : DatabaseHandler
             _Conn.Close();
         }
         bool changed = false;
-        if(consumption != null)
+        if(consumption != null && noReservations == false)
         {
             List<Reservation> Reservations = _reservationAccess.GetAllReservations();
             foreach(Reservation Reservation in Reservations)

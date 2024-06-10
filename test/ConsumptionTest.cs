@@ -94,7 +94,7 @@ public class ConsumptionTest
             rowsAffected = Launch.ExecuteNonQuery();
         }
         _Conn.Close();
-        bool removeResult = c.DeleteConsumption(x);
+        bool removeResult = c.DeleteConsumption(x, true);
 
             bool isDatabaseEmpty;
             using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
