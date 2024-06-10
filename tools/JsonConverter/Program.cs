@@ -14,11 +14,11 @@ class Program
     public static async Task Main(string[] args)
     {
         Console.Clear();
-        Console.WriteLine(">Loading json...");
+        Console.WriteLine("Loading json...");
         string filmJsonString = File.ReadAllText("../tmdb_movies.min.json"); // thx imbd
         List<tmbdMovie> x = JsonConvert.DeserializeObject<List<tmbdMovie>>(filmJsonString);
         List<Film> newFilms = new List<Film>();
-        Console.WriteLine(">Converting Json to Films...");
+        Console.WriteLine("Converting Json to Films...");
         foreach(tmbdMovie movie in x)
         {
             newFilms.Add(
@@ -38,7 +38,7 @@ class Program
                 )
             );
         }
-        Console.WriteLine($"> {newFilms.Count} Films have been converted.");
+        Console.WriteLine($"{newFilms.Count} Films have been converted.");
         // Console.WriteLine(newFilms.Count);
         // Console.WriteLine("--------------------");
         // Console.WriteLine("Id: "+newFilms[0].Id);
@@ -54,13 +54,13 @@ class Program
         // Console.WriteLine("Actors: "+ListToString(newFilms[0].Actors));
         // Console.WriteLine("Writers: "+ListToString(newFilms[0].Writers));
 
-        Console.WriteLine("Saving films.");
         Directory.CreateDirectory("./ResultingData");
         Environment.SetEnvironmentVariable("MEDIA_PATH", "./ResultingData/Media.json");
 
         CreateFile();
         MediaJsonStruct mediaStructure = new MediaJsonStruct();
 
+        Console.WriteLine("Saving films.");
         foreach(Film film in newFilms)
         {
             film.Id = (++mediaStructure.CurrentFilmId);
@@ -68,8 +68,8 @@ class Program
         }
 
         Console.WriteLine("Fetching series...");
-        List<Serie> series = await ConvertSeries(40);
-        Console.WriteLine("Saving series.");
+        List<Serie> series = await ConvertSeries(4);
+        Console.WriteLine("\nSaving series.");
         foreach(Serie s in series)
         {
             s.Id = (++mediaStructure.CurrentSerieId);
@@ -78,7 +78,7 @@ class Program
 
         SetMedia(mediaStructure);
 
-        Console.WriteLine("Films and Series saved. Find them at ./ResultingData/Media.json");
+        Console.WriteLine("Films and Series saved. You can find them at ./ResultingData/Media.json");
     }
 
     private static void SetMedia(MediaJsonStruct mediaStructure)
@@ -113,20 +113,33 @@ class Program
         List<Serie> series = new List<Serie>();
         for(int i=1;i<=count;i++)
         {
+            Console.CursorVisible = false;
             Console.Write("");
             Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write($"On serie {i} of {count}...");
-            Thread.Sleep(7000);
+            Console.Write($"fetching serie {i} of {count}...");
+            Thread.Sleep(1000);
             HttpClient client = new HttpClient();
-            HttpResponseMessage res = await client.GetAsync($"{baseUrl}/shows/{i}");
+            HttpResponseMessage res = await client.GetAsync($"{baseUrl}/shows/{i}?embed[]=episodes&embed[]=seasons&embed[]=crew&embed[]=cast");
 
             if(res.IsSuccessStatusCode){
                 string jsonData = await res.Content.ReadAsStringAsync();
 
                 Show x = JsonConvert.DeserializeObject<Show>(jsonData);
 
-                List<ShowSeason> seasons = await GetSeasons(x.id);
-                List<ShowEpisode> episodes = await GetEpisodes(x.id);
+                List<ShowSeason> seasons = x.embeds.seasons;
+                List<ShowEpisode> episodes = x.embeds.episodes;
+
+                List<string> patterns = new List<string>(){
+                    "creator",
+                };
+                List<string> directors = new List<string>();
+                foreach(ShowCrew crew in x.embeds.crew)
+                {
+                    if(patterns.Any(s=>crew.type.ToLower().Contains(s)))
+                    {
+                        directors.Add(crew.person.name);
+                    }
+                }
 
                 List<Season> createdSeasons = new List<Season>();
                 foreach(ShowSeason season in seasons)
@@ -180,7 +193,7 @@ class Program
                     genres,
                     DateOnly.ParseExact(x.premiered, "yyyy-MM-dd"),
                     Certification.NONE,
-                    new List<string>(),
+                    directors,
                     false,
                     new List<Season>()
                 );
@@ -198,33 +211,5 @@ class Program
             client.Dispose();
         }
         return series;
-    }
-
-    private static async Task<List<ShowSeason>> GetSeasons(int showId)
-    {
-        List<ShowSeason> seasons = new List<ShowSeason>();
-        HttpClient client = new HttpClient();
-        HttpResponseMessage seasonResponse = await client.GetAsync($"{baseUrl}/shows/{showId}/seasons");
-        if(seasonResponse.IsSuccessStatusCode){
-            string seasonJson = await seasonResponse.Content.ReadAsStringAsync();
-            seasons = JsonConvert.DeserializeObject<List<ShowSeason>>(seasonJson);
-        }else{
-            return new List<ShowSeason>();
-        }
-        return seasons;
-    }
-
-    private static async Task<List<ShowEpisode>> GetEpisodes(int showId)
-    {
-        List<ShowEpisode> episodes = new List<ShowEpisode>();
-        HttpClient client = new HttpClient();
-        HttpResponseMessage seasonResponse = await client.GetAsync($"{baseUrl}/shows/{showId}/episodes");
-        if(seasonResponse.IsSuccessStatusCode){
-            string seasonJson = await seasonResponse.Content.ReadAsStringAsync();
-            episodes = JsonConvert.DeserializeObject<List<ShowEpisode>>(seasonJson);
-        }else{
-            return new List<ShowEpisode>();
-        }
-        return episodes;
     }
 }
