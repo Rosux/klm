@@ -1,8 +1,10 @@
 public class ConsumptionAccess : DatabaseHandler
 {
-    public static ReservationAccess _reservationAccess = new ReservationAccess();
+    private ReservationAccess? _reservationAccess = null;
 
-    public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){}
+    public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){
+        _reservationAccess = new ReservationAccess(DatabasePath);
+    }
 
     /// <summary>
     /// Creates a new consumption item.
