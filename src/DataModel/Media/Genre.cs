@@ -11,4 +11,10 @@ public enum Genre
     THRILLER,
     MYSTERY,
     CRIME,
+    ANIMATION,
+    ROMANCE,
+    WESTERN,
+    WAR,
+    HISTORY,
+    
 }

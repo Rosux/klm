@@ -15,7 +15,7 @@ public class MediaLogic
                 {"Type", m=>(m is Film) ? "Film" : "Serie"},
                 {"Title", m=>m.Title},
                 {"Runtime (Min)", m=>m.Runtime},
-                {"Description", m=>m.Description.Substring(0, 10) + (m.Description.Length > 10 ? "..." : "")},
+                {"Description", m=>GetDescription(m.Description)},
                 {"Rating", m=>m.Rating},
                 {"Language", m=>m.Language},
                 {"Release Date", m=>m.ReleaseDate},
@@ -30,7 +30,7 @@ public class MediaLogic
                 new Dictionary<string, PropertyEditMapping<Media>>(){
                     {"Title", new(x=>x.Title, GetValidTitle)},
                     {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
-                    {"Description", new(x=>x.Description, GetValidDescription)},
+                    {"Description", new(x=>GetDescription(x.Description), GetValidDescription)},
                     {"Rating", new(x=>x.Rating, GetValidRating)},
                     {"Language", new(x=>x.Language, GetValidLanguage)},
                     {"Genres", new(x=>ListToString(((Film)x).Genres), x=>((Film)x).Genres, GetValidGenres)},
@@ -43,7 +43,7 @@ public class MediaLogic
                 new Dictionary<string, PropertyEditMapping<Media>>(){
                     {"Title", new(x=>x.Title, GetValidTitle)},
                     {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
-                    {"Description", new(x=>x.Description, GetValidDescription)},
+                    {"Description", new(x=>GetDescription(x.Description), GetValidDescription)},
                     {"Language", new(x=>x.Language, GetValidLanguage)},
                     {"Genres", new(x=>ListToString(((Serie)x).Genres), x=>((Serie)x).Genres, GetValidGenres)},
                     {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
@@ -60,6 +60,14 @@ public class MediaLogic
         );
     }
 
+    private static string GetDescription(string description)
+    {
+        if(description == ""){
+            return "No Description.";
+        }
+        return description.Substring(0, Math.Max(0, 10));
+    }
+
     /// <summary>
     /// Converts a list to a string. Formatted like this: "[item1, item2, +32]".
     /// </summary>
@@ -68,10 +76,7 @@ public class MediaLogic
     /// <returns>A string containing the list in string format for a table.</returns>
     private static string ListToString<T>(List<T> items)
     {
-        if(items.Count == 0){return "None";}
-        if(items.Count == 1){return $"[{items[0]}]";}
-        if(items.Count == 2){return $"[{items[0]}, {items[1]}]";}
-        return $"[{items[0]}, {items[1]}, +{items.Count-2}]";
+        return $"{items.Count}";
     }
 
     /// <summary>
@@ -125,14 +130,14 @@ public class MediaLogic
     private static bool SaveEditedMedia<T>(T media)
     {
         if(media is Film film){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}");
+            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(film);
                 MediaMenu.MediaAdded(success);
                 return success;
             }
         }else if(media is Serie serie){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}");
+            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(serie);
                 MediaMenu.MediaAdded(success);
@@ -151,7 +156,7 @@ public class MediaLogic
     {
         bool confirmation = false;
         if(media is Film film){
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
             if(confirmation){
                 bool success = MediaAccess.DeleteMedia(film);
                 MediaMenu.MediaDeleted(success);
@@ -160,7 +165,7 @@ public class MediaLogic
                 return false;
             }
         }else if(media is Serie serie){
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
+            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
             if(confirmation){
                 bool success = MediaAccess.DeleteMedia(serie);
                 MediaMenu.MediaDeleted(success);

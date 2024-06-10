@@ -1657,6 +1657,18 @@ public static class MenuHelper{
             if(currentPage > maxPage){
                 currentPage--;
             }
+
+            // clamp the currentPage and currentPageSelection
+            currentPage = Math.Clamp(currentPage, 0, Math.Max(0, chunks.Count-1));
+            if(chunks.Count > 0){
+                if(canAdd){
+                    currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, chunks[currentPage].Count);
+                }else{
+                    currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, chunks[currentPage].Count-1);
+                }
+            }else{
+                currentPageSelection = Math.Clamp(currentPageSelection, canSearch?-1:0, 0);
+            }
             #endregion
 
             #region Generate edit table values based on the type of the selected object
@@ -2242,6 +2254,8 @@ public static class MenuHelper{
             {
                 searchString = searchString.Insert(searchCursor, rawKey.KeyChar.ToString());
                 searchCursor++;
+                // reset the currentPage to page 0 so the user sees the best result first
+                currentPage = 0;
             }
             if(searching && (key == ConsoleKey.LeftArrow || key == ConsoleKey.RightArrow))
             {
