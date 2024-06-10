@@ -62,7 +62,7 @@ public static class RoomLogic
             return;
         }else{
             bool exists = false;
-            bool deletion = false;
+            bool deletion;
             List<Reservation> allReservations = _reservationAccess.GetAllReservations();
             foreach(Reservation reservation in allReservations)
             {
@@ -125,7 +125,6 @@ public static class RoomLogic
             /// makes the layout for the room
             if (givenSeats  != null)
             {
-                int capacity = rows * (int)givenSeats;
                 int i = 0;
                 bool[][] seats = new bool[rows][];
                 while(i < rows)
@@ -218,10 +217,10 @@ public static class RoomLogic
         foreach(Room room in roomListRoom)
         {
             bool check = true;
-            string room_str = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
-            if(room_str.Length > longest)
+            string roomString = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
+            if(roomString.Length > longest)
             {
-                longest = room_str.Length;
+                longest = roomString.Length;
             }
             if(i == 9)
             {
@@ -296,13 +295,13 @@ public static class RoomLogic
             /// prints all info
             foreach(Room room in allRoomList[page])
             {
-                string zin = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
+                string roomInformation = $"Id: {room.Id}, Name: {room.RoomName}, capacity: {room.Capacity}";
                 Console.Write("│ ");
                 /// if currently selected make the background darkgray instead of black
                 if (i == choice){ Console.BackgroundColor = ConsoleColor.DarkGray; }
-                Console.Write(zin);
+                Console.Write(roomInformation);
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.Write($"{new String(' ', Math.Max(0, allLength[page] - zin.Length))} │\n");
+                Console.Write($"{new String(' ', Math.Max(0, allLength[page] - roomInformation.Length))} │\n");
                 i++;
             }
 
