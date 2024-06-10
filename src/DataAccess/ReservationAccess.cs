@@ -209,25 +209,6 @@ public class ReservationAccess : DatabaseHandler
         }
         return newTimeLine;
     }
-
-    //Check against all reservations if a room is available at a certain date.
-    public bool RoomAvailable(int roomId, DateTime startDateTime, DateTime endDateTime)
-    {
-        List<Reservation> reservations = GetAllReservations();
-        foreach (var reservation in reservations)
-        {
-            if (reservation.RoomId == roomId)
-            {
-                if (startDateTime <= reservation.EndDate && endDateTime >= reservation.StartDate)
-                {
-                    return false; 
-                }
-            }
-        }
-        return true;
-    }
-
-
     public bool EditReservation(Reservation reservation)
     {
         _Conn.Open();

@@ -2076,7 +2076,7 @@ public static class MenuHelper{
                 Console.Write($"{(i < editStringLines.Count ? editStringLines[i].Substring(editStringLines[i].Length-2, 2) : "")}");
                 Console.Write("\n");
             }
-            Console.Write($"\nUse the Arrow Keys to move around\n{(canEdit ? "Press Enter to select a row to edit\n" : "")}{(canCancel ? "Press Escape to go back\n" : "")}");
+            Console.Write($"\nUser the Arrow Keys to move around\n{(canEdit ? "Press Enter to select a row to edit\n" : "")}{(canCancel ? "Press Escape to go back\n" : "")}");
             #endregion
 
             #region Input
