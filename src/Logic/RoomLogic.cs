@@ -97,7 +97,7 @@ public static class RoomLogic
     /// 3. gives the admin the option to remove or reinstae seats using RoomLayoutManager
     /// 4. than asks if the admin wants to save the rrom.
     /// </summary>
-    /// <param name="given_rows"> a interger that gives the rows for the room (only used for loop)</param>
+    /// <param name="rowsGiven"> a interger that gives the rows for the room (only used for loop)</param>
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int rowsGiven = 0, int seat = 0)
     {
@@ -116,7 +116,7 @@ public static class RoomLogic
         }
         else
         {
-            givenRows = given_rows;
+            givenRows = rowsGiven;
         }
         if (givenRows != null)
         {
