@@ -30,7 +30,7 @@ public class MediaLogic
                 new Dictionary<string, PropertyEditMapping<Media>>(){
                     {"Title", new(x=>x.Title, GetValidTitle)},
                     {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
-                    {"Description", new(x=>GetDescription(x.Description), GetValidDescription)},
+                    {"Description", new(x=>GetDescription(x.Description), x=>x.Description, GetValidDescription)},
                     {"Rating", new(x=>x.Rating, GetValidRating)},
                     {"Language", new(x=>x.Language, GetValidLanguage)},
                     {"Genres", new(x=>ListToString(((Film)x).Genres), x=>((Film)x).Genres, GetValidGenres)},
@@ -43,7 +43,7 @@ public class MediaLogic
                 new Dictionary<string, PropertyEditMapping<Media>>(){
                     {"Title", new(x=>x.Title, GetValidTitle)},
                     {"Runtime (Min)", new(x=>x.Runtime, GetValidInteger)},
-                    {"Description", new(x=>GetDescription(x.Description), GetValidDescription)},
+                    {"Description", new(x=>GetDescription(x.Description), x=>x.Description, GetValidDescription)},
                     {"Language", new(x=>x.Language, GetValidLanguage)},
                     {"Genres", new(x=>ListToString(((Serie)x).Genres), x=>((Serie)x).Genres, GetValidGenres)},
                     {"Release Date", new(x=>x.ReleaseDate, GetValidReleaseDate)},
