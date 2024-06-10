@@ -99,7 +99,7 @@ public static class RoomLogic
     /// </summary>
     /// <param name="given_rows"> a interger that gives the rows for the room (only used for loop)</param>
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
-    public static void AddRoom(int given_rows = 0, int seat = 0)
+    public static void AddRoom(int rowsGiven = 0, int seat = 0)
     {
         string? RoomName = MenuHelper.SelectText("Give a room name", "", true, 0, 100, @"([A-z]|\d| )");
         if (RoomName == null || RoomName.Length == 0)
@@ -110,7 +110,7 @@ public static class RoomLogic
             return;
         }
         int? givenRows = null;
-        if(given_rows == 0)
+        if(rowsGiven == 0)
         {
             givenRows = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 10);
         }
@@ -350,7 +350,6 @@ public static class RoomLogic
             else if (key == ConsoleKey.Enter)
             {
                 return roomListRoom[choice];
-                break;
             }
         } while (key != ConsoleKey.Escape);
         return null;

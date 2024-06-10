@@ -104,8 +104,8 @@ public class RoomAccess : DatabaseHandler {
             {
                 int id = reader.GetInt32(0);
                 string layoutJson = reader.GetString(2);
-                string roomname = reader.GetString(3);
-                roomlist.Add(new Room(id, layoutJson, roomname));
+                string roomName = reader.GetString(3);
+                roomlist.Add(new Room(id, layoutJson, roomName));
             }
         }
         _Conn.Close();
