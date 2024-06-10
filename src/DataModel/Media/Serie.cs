@@ -12,7 +12,8 @@ public class Serie : Media
         get
         {
             return Seasons?.Sum(s => s.Runtime) ?? 0;
-        }set{}
+        }
+        set{}
     }
 
     public string Description { get; set; } = "";
@@ -23,7 +24,8 @@ public class Serie : Media
                 return 0f;
             }
             return Seasons.Average(e => e.Rating);
-        }set{}
+        }
+        set{}
     } // ranges from 0.0f to 10.0f
     public string Language { get; set; } = "";
     public List<Genre> Genres { get; set; } = new List<Genre>();
@@ -32,7 +34,7 @@ public class Serie : Media
     public List<string> Directors { get; set; } = new List<string>();
     public bool Bingeable {
         get{
-            if (Rating > 8.5 && Runtime > 400){
+            if (Rating >= 7.5 && Runtime >= 400){
                 return true;
             }
             return false;

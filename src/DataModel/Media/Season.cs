@@ -1,4 +1,3 @@
-using System.Dynamic;
 using Newtonsoft.Json;
 
 /// <summary>
@@ -13,7 +12,8 @@ public class Season
         get
         {
             return Episodes?.Sum(e => e.Runtime) ?? 0;
-        }set{}
+        }
+        set{}
     }
 
     public int SeasonNumber = 0;
@@ -25,7 +25,8 @@ public class Season
                 return 0f;
             }
             return Episodes.Average(e => e.Rating);
-        }set{}
+        }
+        set{}
     }
 
     /// <summary>

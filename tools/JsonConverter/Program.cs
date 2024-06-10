@@ -1,10 +1,17 @@
-﻿namespace JsonConverter;
-
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+
+namespace JsonConverter;
 
 class Program
 {
-    static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         Console.Clear();
         Console.WriteLine(">Loading json...");
@@ -60,9 +67,18 @@ class Program
             mediaStructure.Films.Add(film);
         }
 
+        Console.WriteLine("Fetching series...");
+        List<Serie> series = await ConvertSeries(40);
+        Console.WriteLine("Saving series.");
+        foreach(Serie s in series)
+        {
+            s.Id = (++mediaStructure.CurrentSerieId);
+            mediaStructure.Series.Add(s);
+        }
+
         SetMedia(mediaStructure);
 
-        Console.WriteLine("Films saved. Find them at ./ResultingData/Media.json");
+        Console.WriteLine("Films and Series saved. Find them at ./ResultingData/Media.json");
     }
 
     private static void SetMedia(MediaJsonStruct mediaStructure)
@@ -89,5 +105,126 @@ class Program
             result += $"{t.ToString()}, ";
         }
         return result;
+    }
+
+    public static readonly string baseUrl = "https://api.tvmaze.com";
+    public static async Task<List<Serie>> ConvertSeries(int count)
+    {
+        List<Serie> series = new List<Serie>();
+        for(int i=1;i<=count;i++)
+        {
+            Console.Write("");
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write($"On serie {i} of {count}...");
+            Thread.Sleep(7000);
+            HttpClient client = new HttpClient();
+            HttpResponseMessage res = await client.GetAsync($"{baseUrl}/shows/{i}");
+
+            if(res.IsSuccessStatusCode){
+                string jsonData = await res.Content.ReadAsStringAsync();
+
+                Show x = JsonConvert.DeserializeObject<Show>(jsonData);
+
+                List<ShowSeason> seasons = await GetSeasons(x.id);
+                List<ShowEpisode> episodes = await GetEpisodes(x.id);
+
+                List<Season> createdSeasons = new List<Season>();
+                foreach(ShowSeason season in seasons)
+                {
+                    createdSeasons.Add(
+                        new Season(
+                            -1,
+                            season.name == "" ? $"Season {season.number}" : season.name,
+                            season.number,
+                            new List<Episode>()
+                        )
+                    );
+                }
+
+                foreach(ShowEpisode episode in episodes)
+                {
+                    Episode createdEpisode = new Episode(
+                        -1,
+                        episode.name,
+                        episode.runtime,
+                        episode.number,
+                        episode.rating.average,
+                        new List<string>()
+                    );
+                    foreach(Season s in createdSeasons)
+                    {
+                        if(s.SeasonNumber == episode.season)
+                        {
+                            s.Episodes.Add(createdEpisode);
+                            break;
+                        }
+                    }
+                }
+
+                List<Genre> genres = new List<Genre>();
+                foreach(string g in x.genres)
+                {
+                    if(Enum.TryParse(g, true, out Genre genre))
+                    {
+                        genres.Add(genre);
+                    }
+                }
+
+                Serie createdSerie = new Serie(
+                    -1,
+                    x.name,
+                    -1,
+                    Regex.Replace(x.summary, "<.*?>", string.Empty),
+                    0.0f,
+                    x.language,
+                    genres,
+                    DateOnly.ParseExact(x.premiered, "yyyy-MM-dd"),
+                    Certification.NONE,
+                    new List<string>(),
+                    false,
+                    new List<Season>()
+                );
+                foreach(Season s in createdSeasons)
+                {
+                    createdSerie.Seasons.Add(s);
+                }
+                series.Add(createdSerie);
+
+            }else{
+                Console.WriteLine($"Serie fetch resulted in: {res.StatusCode}");
+                break;
+            }
+
+            client.Dispose();
+        }
+        return series;
+    }
+
+    private static async Task<List<ShowSeason>> GetSeasons(int showId)
+    {
+        List<ShowSeason> seasons = new List<ShowSeason>();
+        HttpClient client = new HttpClient();
+        HttpResponseMessage seasonResponse = await client.GetAsync($"{baseUrl}/shows/{showId}/seasons");
+        if(seasonResponse.IsSuccessStatusCode){
+            string seasonJson = await seasonResponse.Content.ReadAsStringAsync();
+            seasons = JsonConvert.DeserializeObject<List<ShowSeason>>(seasonJson);
+        }else{
+            return new List<ShowSeason>();
+        }
+        return seasons;
+    }
+
+    private static async Task<List<ShowEpisode>> GetEpisodes(int showId)
+    {
+        List<ShowEpisode> episodes = new List<ShowEpisode>();
+        HttpClient client = new HttpClient();
+        HttpResponseMessage seasonResponse = await client.GetAsync($"{baseUrl}/shows/{showId}/episodes");
+        if(seasonResponse.IsSuccessStatusCode){
+            string seasonJson = await seasonResponse.Content.ReadAsStringAsync();
+            episodes = JsonConvert.DeserializeObject<List<ShowEpisode>>(seasonJson);
+        }else{
+            return new List<ShowEpisode>();
+        }
+        return episodes;
     }
 }
