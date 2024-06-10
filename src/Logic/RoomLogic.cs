@@ -140,11 +140,11 @@ public static class RoomLogic
                     seats[i] = row;
                     i++;
                 }
-                Room room = new(seats);
+                Room room = new(seats, RoomName);
                 string prefix = "This is the current room layout:";
                 string suffix = "Use your arrow keys to select a seat.\nPress space to remove or re-instate a seat, the room can not be empty.\n\nPress enter to save the room.\nPress escape to go back.";
                 /// lets admin remove or reinsate seats
-                Room roomFinished = RoomLayoutManager(room, prefix, suffix);
+                Room roomFinished = RoomLayoutManager(room, prefix, suffix, RoomName);
                 if(roomFinished != null)
                 {
                     /// asks for conformation
@@ -363,7 +363,7 @@ public static class RoomLogic
     /// <param name="prefix">A string of text printed before the selected value.</param>
     /// <param name="suffix">A string of text printed after the selected value.</param>
     /// <returns></returns>
-    public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "")
+    public static Room? RoomLayoutManager(Room room, string prefix ="", string suffix = "", string RoomName = "")
     {
         ConsoleKey key;
         int choiceSeat = 0;
@@ -495,8 +495,8 @@ public static class RoomLogic
             }
             else if(key == ConsoleKey.Enter && notEmptyCheck)
             {
-                Room roomFinisehed = new(room.Id, seats);
-                return roomFinisehed;
+                Room roomFinished = new(room.Id, seats, RoomName);
+                return roomFinished;
             }
         }while(key != ConsoleKey.Escape);
         return null;
