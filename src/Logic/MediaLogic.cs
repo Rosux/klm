@@ -152,16 +152,24 @@ public class MediaLogic
         bool confirmation = false;
         if(media is Film film){
             confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {film.Description.Substring(0, 10) + (film.Description.Length > 10 ? "..." : "")}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
+            if(confirmation){
+                bool success = MediaAccess.DeleteMedia(film);
+                MediaMenu.MediaDeleted(success);
+                return success;
+            }else{
+                return false;
+            }
         }else if(media is Serie serie){
             confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {serie.Description.Substring(0, 10) + (serie.Description.Length > 10 ? "..." : "")}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
+            if(confirmation){
+                bool success = MediaAccess.DeleteMedia(serie);
+                MediaMenu.MediaDeleted(success);
+                return success;
+            }else{
+                return false;
+            }
         }
-        if(confirmation){
-            bool success = MediaAccess.DeleteMedia(media);
-            MediaMenu.MediaDeleted(success);
-            return success;
-        }else{
-            return false;
-        }
+        return confirmation;
     }
 
     /// <summary>

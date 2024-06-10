@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 public static class MediaAccess
 {
     private static string _mediaPath = Environment.GetEnvironmentVariable("MEDIA_PATH") ?? "";
+    private static string _databasePath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "";
 
     /// <summary>
     /// Saves the given media.
@@ -122,6 +123,27 @@ public static class MediaAccess
 
         if(filmsCount != mediaStructure.Films.Count || seriesCount != mediaStructure.Series.Count){
             changed = true;
+        }
+
+        if(changed)
+        {
+            ReservationAccess reservationAccess = new ReservationAccess(_databasePath);
+            List<Reservation> Reservations = reservationAccess.GetAllReservations();
+            foreach(Reservation Reservation in Reservations)
+            {
+                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+                {
+                    if(TimelineObject.Action is Film timelineFilm && ((Film)TimelineObject.Action).Id == timelineFilm.Id)
+                    {
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                    }
+                    else if(TimelineObject.Action is Serie timelineSerie && ((Film)TimelineObject.Action).Id == timelineSerie.Id)
+                    {
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                    }
+                }
+                reservationAccess.EditReservation(Reservation);
+            }
         }
 
         // save the MediaJsonStruct to the json file
