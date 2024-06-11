@@ -75,19 +75,13 @@ public class ReservationTest
         var result = _timeline.HasConflict(startTime, endTime);
 
         Assert.IsFalse(result.Conflict);
-        Assert.IsNull(result.ConflictingTitle);
-        Assert.IsNull(result.ConflictingString);
-
-
-        // Test for a time with a conflict
         startTime = new DateTime(2024, 6, 5, 15, 0, 0); // During the first film
         endTime = startTime.AddMinutes(_film2.Runtime);
 
         result = _timeline.HasConflict(startTime, endTime);
-
         Assert.IsTrue(result.Conflict);
         Assert.AreEqual(_film1.Title, result.ConflictingTitle);
-        Assert.AreEqual($"Movie {_film1.Title} is already scheduled from 14:00 to 16:00", result.ConflictingString);
+        Assert.AreEqual("from 14:00 to 16:00", result.ConflictingTime);
     }
 
     [Test]

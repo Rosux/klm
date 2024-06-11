@@ -41,7 +41,7 @@ public class RoomTest
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
             },
-            roomName: "Insert Room"
+            roomname: "Insert Room"
         );
 
         Room? insertResult = r.AddRoom(room);
@@ -86,7 +86,7 @@ public class RoomTest
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
             },
-            roomName: "Remove Room"
+            roomname: "Remove Room"
         );
         _Conn.Open();
         string query = @"INSERT INTO Rooms (Capacity, Seats, RoomName) VALUES (@capacity, @seats, @roomname); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
@@ -138,7 +138,7 @@ public class RoomTest
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
             },
-            roomName: "Read Room"
+            roomname: "Read Room"
         );
         _Conn.Open();
         string query = @"INSERT INTO Rooms (Capacity, Seats, RoomName) VALUES (@capacity, @seats, @roomname); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
