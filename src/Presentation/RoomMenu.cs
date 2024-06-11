@@ -14,7 +14,7 @@ public class RoomMenu
         Console.Clear();
         Dictionary<string, Room> rooms = new Dictionary<string, Room>();
         foreach(Room r in r.GetAllRooms()){
-            rooms.Add($"Id: {r.Id}, Capacity: {r.Capacity}", r);
+            rooms.Add($"Name: {r.RoomName}, Id: {r.Id}, Capacity: {r.Capacity}", r);
         }
         MenuHelper.SelectFromList("All Rooms", true, rooms);
     }
@@ -33,6 +33,7 @@ public class RoomMenu
         Console.Write("\n\nPress any key to continue...");
         Console.ReadKey(true);
     }
+
 
     /// <summary>
     /// Tell the user that there are no rooms.
