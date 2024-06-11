@@ -274,11 +274,11 @@ public class MediaLogic
     private static object GetValidRating<T>(T rating){
         if(rating is Film film){
             string prompt = $"Current Rating: {film.Rating}\n\n";
-            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter ther new rating of the movie from 1-10::", "", true, 0d, 10d);
+            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter the new rating of the movie from 0.0-10.0:", "", true, 0d, 10d);
             return newRating ?? film.Rating;
         }else if(rating is Episode episode){
             string prompt = $"Current Rating: {episode.Rating}\n\n";
-            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter ther new rating of the episode from 1-10::", "", true, 0d, 10d);
+            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter the new rating of the episode from 0.0-10.0:", "", true, 0d, 10d);
             return newRating ?? episode.Rating;
         }else {
             return 0;

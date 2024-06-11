@@ -152,14 +152,14 @@ namespace MenuHelper
                 // create a list of editable options (like UserName, Email, role etc)
                 List<string> editOptions = new List<string>();
                 if(canEdit && currentPageSelection != -1 && chunks.Count > 0 && currentPageSelection <= chunks[currentPage].Count-1 && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
-                    if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T1)
+                    if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks[currentPage].Count))] is T1)
                     {
                         foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> mapping in propertyEditMapping.Value.Item1)
                         {
                             editOptions.Add(mapping.Key);
                         }
                     }
-                    else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T2)
+                    else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks[currentPage].Count))] is T2)
                     {
                         foreach(KeyValuePair<string, PropertyEditMapping<BaseType>> mapping in propertyEditMapping.Value.Item2)
                         {
@@ -180,9 +180,9 @@ namespace MenuHelper
                         // create the edit table text
                         if(canEdit && propertyEditMapping != null && propertyEditMapping.Value.Item1 != null && propertyEditMapping.Value.Item2 != null){
                             Dictionary<string, PropertyEditMapping<BaseType>>? typedPropertyEditMapping;
-                            if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T1){
+                            if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks[currentPage].Count))] is T1){
                                 typedPropertyEditMapping = propertyEditMapping.Value.Item1;
-                            }else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks.Count))] is T2){
+                            }else if(chunks[currentPage][Math.Clamp(currentPageSelection, 0, Math.Max(0, chunks[currentPage].Count))] is T2){
                                 typedPropertyEditMapping = propertyEditMapping.Value.Item2;
                             }else{
                                 throw new Exception("Object is not of type T1 or T2");
@@ -269,7 +269,9 @@ namespace MenuHelper
                 if(currentPageSelection != -1){
                     if(showEditTable && chunks.Count > 0){
                         for(int i=0;i<editOptions.Count;i++){
-                            if(editOptionData[i].Length+editOptions[i].Length > longestEditOption){
+                            if(editOptionData[i].Length
+                            +editOptions[i].Length
+                             > longestEditOption){
                                 longestEditOption = editOptionData[i].Length+editOptions[i].Length;
                             }
                         }
