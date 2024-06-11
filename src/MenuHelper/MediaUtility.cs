@@ -170,15 +170,19 @@ namespace MenuHelper
                 int longestEpisodeName = "Select Episode".Length;
 
                 // calculate season/episode name length
+                int index = 1;
                 foreach(Season s in allSeasons){
-                    if (s.Title.Length+3 > longestSeasonName){
-                        longestSeasonName = s.Title.Length+3;
+                    if (s.Title.Length+2+index.ToString().Length > longestSeasonName){
+                        longestSeasonName = s.Title.Length+2+index.ToString().Length;
                     }
+                    index++;
                 }
+                index = 1;
                 foreach(Episode e in allEpisodes){
-                    if (e.Title.Length+3 > longestEpisodeName){
-                        longestEpisodeName = e.Title.Length+3;
+                    if (e.Title.Length+2+index.ToString().Length > longestEpisodeName){
+                        longestEpisodeName = e.Title.Length+2+index.ToString().Length;
                     }
+                    index++;
                 }
 
                 List<string> seasons = new List<string>();
