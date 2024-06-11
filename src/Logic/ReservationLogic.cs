@@ -14,7 +14,7 @@ public static class ReservationLogic
         bool running = true;
         while(running)
         {
-            MenuHelper.SelectOptions("Reservations", new Dictionary<string, Action>(){
+            MenuHelper.OptionsUtility.SelectOptions("Reservations", new Dictionary<string, Action>(){
                 {"1. Book a Reservation", BookReservation},
                 {"2. View Reservation", ()=> ViewReservationsUser()},
                 {"3. Exit to main menu", ()=>{
@@ -31,7 +31,7 @@ public static class ReservationLogic
         bool running = true;
         while(running)
         {
-            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+            MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. View all reservations",()=> {
                     ViewAllReservationsAdmin();
                 }},
@@ -108,7 +108,7 @@ public static class ReservationLogic
     /// Shows the admin all the reservations of the selected month.
     /// </summary>
     private static void ViewReservationMonthAdmin(){
-        DateOnly? selectedMonth = MenuHelper.SelectDate("Select at what date you want to search:", true);
+        DateOnly? selectedMonth = MenuHelper.DateUtility.SelectDate("Select at what date you want to search:", true);
         if(selectedMonth == null){
             return;
         }
@@ -125,7 +125,7 @@ public static class ReservationLogic
     /// Shows the admin all the reservations of the selected week.
     /// </summary>
     private static void ViewReservationWeekAdmin(){
-        DateOnly? selectedWeek = MenuHelper.SelectDate("Select at what date you want to search:", true);
+        DateOnly? selectedWeek = MenuHelper.DateUtility.SelectDate("Select at what date you want to search:", true);
         if(selectedWeek == null){
             return;
         }
@@ -142,7 +142,7 @@ public static class ReservationLogic
     /// Shows the admin all the reservations of the selected day.
     /// </summary>
     private static void ViewReservationDayAdmin(){
-        DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to search:", true);
+        DateOnly? startDate = MenuHelper.DateUtility.SelectDate("Select at what date you want to search:", true);
         if(startDate == null){
             return;
         }
@@ -158,11 +158,11 @@ public static class ReservationLogic
     /// Shows the admin all the reservations between the selected period.
     /// </summary>
     private static void ViewReservationCustomAdmin(){
-        DateOnly? startDate = MenuHelper.SelectDate("Select at what date you want to start your search:", true);
+        DateOnly? startDate = MenuHelper.DateUtility.SelectDate("Select at what date you want to start your search:", true);
         if(startDate == null){
             return;
         }
-        DateOnly? endDate = MenuHelper.SelectDate("Select at what date you want to end your search", "", true, startDate, startDate, null);
+        DateOnly? endDate = MenuHelper.DateUtility.SelectDate("Select at what date you want to end your search", "", true, startDate, startDate, null);
         if(endDate == null){
             return;
         }
@@ -211,7 +211,7 @@ public static class ReservationLogic
         Reservation? reservationresult;
         while(true)
         {
-            reservationresult = MenuHelper.SelectFromTable(
+            reservationresult = MenuHelper.TableUtility.SelectFromTable(
                 reservations,
                 new Dictionary<string, Func<Reservation, object>>
                 {

@@ -9,7 +9,7 @@ public class MediaLogic
     /// Main method for the media table. handles Films and Series together in one neat table. Whoever made this possible deserves a great reward like at least 200 dollars cash. Send it to my btc address: 1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX. (totally me btw)
     /// </summary>
     public static void Media(){
-        MenuHelper.Table<Media, Film, Serie>(
+        MenuHelper.TableUtility.Table<Media, Film, Serie>(
             MediaAccess.GetAllMedia(),
             new Dictionary<string, Func<Media, object>>(){
                 {"Type", m=>(m is Film) ? "Film" : "Serie"},
@@ -86,7 +86,7 @@ public class MediaLogic
     private static Media? AddMedia()
     {
         // ask user if they want to add a film or serie
-        string? userSelection = MenuHelper.SelectFromList(
+        string? userSelection = MenuHelper.ListUtility.SelectFromList(
             "Do you want to add a Film or Serie?",
             true,
             new Dictionary<string, string>(){
@@ -130,14 +130,14 @@ public class MediaLogic
     private static bool SaveEditedMedia<T>(T media)
     {
         if(media is Film film){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}");
+            bool confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to save the following edited data:\n\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(film);
                 MediaMenu.MediaAdded(success);
                 return success;
             }
         }else if(media is Serie serie){
-            bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}");
+            bool confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to save the following edited data:\n\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}");
             if(confirmation){
                 bool success = MediaAccess.EditMedia(serie);
                 MediaMenu.MediaAdded(success);
@@ -156,7 +156,7 @@ public class MediaLogic
     {
         bool confirmation = false;
         if(media is Film film){
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following film:\nId: {film.Id}\nTitle: {film.Title}\nRuntime: {film.Runtime}\nDescription: {GetDescription(film.Description)}\nRating: {film.Rating}\nLanguage: {film.Language}\nGenres: {ListToString(film.Genres)}\nReleaseDate: {film.ReleaseDate}\nCertification: {film.Certification}\nDirectors: {ListToString(film.Directors)}\nActors: {ListToString(film.Actors)}\nWriters: {ListToString(film.Writers)}\n");
             if(confirmation){
                 bool success = MediaAccess.DeleteMedia(film);
                 MediaMenu.MediaDeleted(success);
@@ -165,7 +165,7 @@ public class MediaLogic
                 return false;
             }
         }else if(media is Serie serie){
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following serie:\nId: {serie.Id}\nTitle: {serie.Title}\nRuntime: {serie.Runtime}\nDescription: {GetDescription(serie.Description)}\nRating: {serie.Rating}\nLanguage: {serie.Language}\nGenres: {ListToString(serie.Genres)}\nReleaseDate: {serie.ReleaseDate}\nCertification: {serie.Certification}\nDirectors: {ListToString(serie.Directors)}\nSeasons: {serie.Seasons.Count}\n");
             if(confirmation){
                 bool success = MediaAccess.DeleteMedia(serie);
                 MediaMenu.MediaDeleted(success);
@@ -186,19 +186,19 @@ public class MediaLogic
     private static string GetValidTitle<T>(T media){
         if(media is Film film){
             string prompt = $"Current Title: {film.Title}\n\n";
-            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the movie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newTitle = MenuHelper.StringUtility.SelectText(prompt+"Enter the new title of the movie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
             return newTitle ?? film.Title;
         }else if(media is Serie serie){
                 string prompt = $"Current Title: {serie.Title}\n\n";
-                string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the serie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+                string? newTitle = MenuHelper.StringUtility.SelectText(prompt+"Enter the new title of the serie:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newTitle ?? serie.Title;
         }else if(media is Season season){
             string prompt = $"Current Title: {season.Title}\n\n";
-            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the season:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newTitle = MenuHelper.StringUtility.SelectText(prompt+"Enter the new title of the season:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
             return newTitle ?? season.Title;
         }else if(media is Episode episode){
             string prompt = $"Current Title: {episode.Title}\n\n";
-            string? newTitle = MenuHelper.SelectText(prompt+"Enter the new title of the episode:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newTitle = MenuHelper.StringUtility.SelectText(prompt+"Enter the new title of the episode:", "",true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
             return newTitle ?? episode.Title;
         }else{
             return "An error occurred. The provided title is not valid for editing.\n\nPress any key to continue";
@@ -214,15 +214,15 @@ public class MediaLogic
     private static object GetValidInteger<T>(T media){
         if(media is Film film){
             string prompt = $"Current Runtime: {film.Runtime}\n\n";
-            int? newRuntime = MenuHelper.SelectInteger(prompt + "Enter the new runtime of the movie:", "", true, 0, 0, 500);
+            int? newRuntime = MenuHelper.IntegerUtility.SelectInteger(prompt + "Enter the new runtime of the movie:", "", true, 0, 0, 500);
             return newRuntime ?? film.Runtime;
         }else if(media is Season season){
             string prompt = $"Current Season Number: {season.SeasonNumber}\n\n";
-            int? newSeasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the new season number:", "", true, 0, 0, 60);
+            int? newSeasonNumber = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the new season number:", "", true, 0, 0, 60);
             return newSeasonNumber ?? season.SeasonNumber;
         }else if(media is Episode episode){
             string prompt = $"Current Episode Number: {episode.EpisodeNumber}\n\n";
-            int? newEpisodeNumber = MenuHelper.SelectInteger(prompt+"Please enter the new episode number:", "", true, 0, 0, 60);
+            int? newEpisodeNumber = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the new episode number:", "", true, 0, 0, 60);
             return newEpisodeNumber ?? episode.EpisodeNumber;
         }else{
             return 0;
@@ -238,7 +238,7 @@ public class MediaLogic
     private static object GetValidRuntime<T>(T media){
         if(media is Episode episode){
             string prompt = $"Current Runtime: {episode.Runtime}\n\n";
-            int? newRuntime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
+            int? newRuntime = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
             return newRuntime ?? episode.Runtime;
         }else{
             return 0;
@@ -254,11 +254,11 @@ public class MediaLogic
     private static string GetValidDescription<T>(T media){
         if(media is Film film){
             string prompt = $"Current Description: {film.Description}\n\n";
-            string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the movie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+            string? newDescription = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new description of the movie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
             return newDescription ?? film.Description;
         }else if(media is Serie serie){
                 string prompt = $"Current Description: {serie.Description}\n\n";
-                string? newDescription = MenuHelper.SelectText(prompt+"Please enter the new description of the serie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+                string? newDescription = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new description of the serie:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
                 return newDescription ?? serie.Description;
         }else{
             return "An error occurred. The provided description is not valid for editing.\n\nPress any key to continue";
@@ -274,11 +274,11 @@ public class MediaLogic
     private static object GetValidRating<T>(T rating){
         if(rating is Film film){
             string prompt = $"Current Rating: {film.Rating}\n\n";
-            float? newRating = (float?)MenuHelper.SelectPrice(prompt+"Please enter ther new rating of the movie from 1-10::", "", true, 0d, 10d);
+            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter ther new rating of the movie from 1-10::", "", true, 0d, 10d);
             return newRating ?? film.Rating;
         }else if(rating is Episode episode){
             string prompt = $"Current Rating: {episode.Rating}\n\n";
-            float? newRating = (float?)MenuHelper.SelectPrice(prompt+"Please enter ther new rating of the episode from 1-10::", "", true, 0d, 10d);
+            float? newRating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter ther new rating of the episode from 1-10::", "", true, 0d, 10d);
             return newRating ?? episode.Rating;
         }else {
             return 0;
@@ -294,11 +294,11 @@ public class MediaLogic
     private static string GetValidLanguage<T>(T media){
         if(media is Film film){
             string prompt = $"Current Language: {film.Language}\n\n";
-            string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the movie:", "", true, 0, 30);
+            string? newLanguage = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new language of the movie:", "", true, 0, 30);
             return newLanguage ?? film.Language;
         }else if (media is Serie serie){
                 string prompt = $"Current Language: {serie.Language}\n\n";
-                string? newLanguage = MenuHelper.SelectText(prompt+"Please enter the new language of the serie:", "", true, 0, 30);
+                string? newLanguage = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new language of the serie:", "", true, 0, 30);
                 return newLanguage ?? serie.Language;
         }else{
             return "An error occurred. The provided language is not valid for editing.\n\nPress any key to continue";
@@ -317,7 +317,7 @@ public class MediaLogic
             Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME
         };
 
-        List<Genre>? newGenres = MenuHelper.SelectFromEnum<Genre>(
+        List<Genre>? newGenres = MenuHelper.EnumUtility.SelectFromEnum<Genre>(
             possibleGenres, "Genres", "Select one or multiple genres", "", true
         );
 
@@ -339,11 +339,11 @@ public class MediaLogic
     private static object GetValidReleaseDate<T>(T media){
         if(media is Film film){
             string prompt = $"Current Release Date: {film.ReleaseDate}\n\n";
-            DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the movie:", true);
+            DateOnly? newDate = MenuHelper.DateUtility.SelectDate(prompt+"Please enter the new release date of the movie:", true);
             return newDate ?? film.ReleaseDate;
         }else if(media is Serie serie){
             string prompt = $"Current Release Date: {serie.ReleaseDate}\n\n";
-            DateOnly? newDate = MenuHelper.SelectDate(prompt+"Please enter the new release date of the serie:", true);
+            DateOnly? newDate = MenuHelper.DateUtility.SelectDate(prompt+"Please enter the new release date of the serie:", true);
             return newDate ?? serie.ReleaseDate;
         }else{
             return new DateOnly();
@@ -357,7 +357,7 @@ public class MediaLogic
     /// <param name="media">The media object.</param>
     /// <returns>A valid certification for the media.</returns>
     private static object GetValidCertification<T>(T media){
-        Certification? newCertification = MenuHelper.SelectFromList(
+        Certification? newCertification = MenuHelper.ListUtility.SelectFromList(
             "Select a certification",
             true,
             new Dictionary<string, Certification>(){
@@ -395,11 +395,11 @@ public class MediaLogic
     private static List<string> GetValidDirectors(Media media){
         if(media is Film film){
             string prompt = $"Current Directors: {ListToString(film.Directors)}\n\n";
-            string? newDirectors = MenuHelper.SelectText(prompt+"Please enter the new directors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            string? newDirectors = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new directors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
             return newDirectors != null ? newDirectors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Directors;
         }else if(media is Serie serie){
             string prompt = $"Current Directors: {ListToString(serie.Directors)}\n\n";
-            string? newDirectors = MenuHelper.SelectText(prompt+"Please enter the new directors of the serie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            string? newDirectors = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new directors of the serie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
             return newDirectors != null ? newDirectors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : serie.Directors;
         }else{
             return media.Directors;
@@ -415,11 +415,11 @@ public class MediaLogic
     private static List<string> GetValidActors<T>(T media){
         if(media is Film film){
             string prompt = $"Current Actors: {ListToString(film.Actors)}\n\n";
-            string? newActors = MenuHelper.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            string? newActors = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
             return newActors != null ? newActors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Actors;
         }else if(media is Episode episode){
             string prompt = $"Current Actors: {ListToString(episode.Actors)}\n\n";
-            string? newActors = MenuHelper.SelectText(prompt+"Please enter the actors of the episode seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            string? newActors = MenuHelper.StringUtility.SelectText(prompt+"Please enter the actors of the episode seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
             return newActors != null ? newActors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : episode.Actors;
         }else{
             return null;
@@ -435,7 +435,7 @@ public class MediaLogic
     private static object GetValidWriters<T>(T media){
         if(media is Film film){
             string prompt = $"Current Writers: {ListToString(film.Writers)}\n\n";
-            string? newWriters = MenuHelper.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+            string? newWriters = MenuHelper.StringUtility.SelectText(prompt+"Please enter the new actors of the movie seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
             return newWriters != null ? newWriters.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList() : film.Writers;
         }else{
             return null;
@@ -449,7 +449,7 @@ public class MediaLogic
     /// <returns>A list of edited seasons.</returns>
     private static List<Season> EditSeasons(Serie serie)
     {
-        MenuHelper.Table<Season>(
+        MenuHelper.TableUtility.Table<Season>(
             serie.Seasons,
             new Dictionary<string, Func<Season, object>>(){
                 {"Title", m=>m.Title},
@@ -483,7 +483,7 @@ public class MediaLogic
     /// <returns>A list of edited episodes.</returns>
     private static List<Episode> EditEpisodes(List<Episode> episodes)
     {
-        MenuHelper.Table<Episode>(
+        MenuHelper.TableUtility.Table<Episode>(
             episodes,
             new Dictionary<string, Func<Episode, object>>(){
                 {"Title", m=>m.Title},
@@ -523,7 +523,7 @@ public class MediaLogic
             return null;
         }
 
-        MenuHelper.Table<Season>(
+        MenuHelper.TableUtility.Table<Season>(
             _tempSeasons,
             new Dictionary<string, Func<Season, object>>(){
                 {"Title", m=>m.Title},
@@ -564,7 +564,7 @@ public class MediaLogic
     /// <returns>A list of episodes made by the user.</returns>
     private static List<Episode> CreateEpisode(Season season)
     {
-        MenuHelper.Table<Episode>(
+        MenuHelper.TableUtility.Table<Episode>(
             _tempEpisodes,
             new Dictionary<string, Func<Episode, object>>(){
                 {"Title", m=>m.Title},

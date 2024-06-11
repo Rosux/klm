@@ -15,7 +15,7 @@ class Menu
         while(true){
             if(Program.CurrentUser == null)
             {
-                MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                     {"Register", ()=>{
                         // run Register method
                         UserLogic.Register();
@@ -35,7 +35,7 @@ class Menu
                 bool uwu = true;
                 while(uwu)
                 {
-                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                    MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Manage Media", ()=>{
                             // takes admin to movie editor
                             MediaLogic.Media();
@@ -69,7 +69,7 @@ class Menu
                 bool uwu = true;
                 while(uwu)
                 {
-                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                    MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Reservations", ()=>{
                             ReservationLogic.ReservationUser();
                         }},

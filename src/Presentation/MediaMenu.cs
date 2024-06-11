@@ -5,29 +5,29 @@ public static class MediaMenu
     /// </summary>
     /// <returns>Returns a Film object or null in case the user exists the process.</returns>
     public static Film? CreateFilm(){
-        string? title = MenuHelper.SelectText($"Title: \nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nType the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.StringUtility.SelectText($"Title: \nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nType the title of the film:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
-        int? runtime = MenuHelper.SelectInteger($"Title: {title}\nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the runtime in minutes:", "", true, 0, 0, 500);
+        int? runtime = MenuHelper.IntegerUtility.SelectInteger($"Title: {title}\nRuntime: \nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
 
-        string? description = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? description = MenuHelper.StringUtility.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: \nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
         if (description == null){return null;}
 
-        float? rating = (float?)MenuHelper.SelectPrice($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a rating from 1-10:", "", true, 0d, 10d);
+        float? rating = (float?)MenuHelper.PriceUtility.SelectPrice($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: \nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a rating from 1-10:", "", true, 0d, 10d);
         if (rating == null){return null;}
 
-        string? language = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a language:", "", true, 0, 30);
+        string? language = MenuHelper.StringUtility.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: \nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter a language:", "", true, 0, 30);
         if (language == null){return null;}
 
-        DateOnly? releaseDate = MenuHelper.SelectDate($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the date of the movie:", true);
+        DateOnly? releaseDate = MenuHelper.DateUtility.SelectDate($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: \nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nPlease enter the date of the movie:", true);
         if (releaseDate == null){return null;}
 
         List<Genre> genres = new List<Genre>{ Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA, Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME };
-        List<Genre>? selectedGenres = MenuHelper.SelectFromEnum<Genre>(genres, "Genres", $"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nSelect one or multiple Genres", "", true);
+        List<Genre>? selectedGenres = MenuHelper.EnumUtility.SelectFromEnum<Genre>(genres, "Genres", $"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: \nCertification: \nDirectors: \nActors: \nWriters: \n\nSelect one or multiple Genres", "", true);
         if(selectedGenres == null){return null;}
 
-        Certification? certification = MenuHelper.SelectFromList(
+        Certification? certification = MenuHelper.ListUtility.SelectFromList(
             "Select a certification",
             true,
             new Dictionary<string, Certification>(){
@@ -48,13 +48,13 @@ public static class MediaMenu
             }
         );
 
-        string? directors = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: \nActors: \nWriters: \n\nPlease enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        string? directors = MenuHelper.StringUtility.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: \nActors: \nWriters: \n\nPlease enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (directors == null){return null;}
 
-        string? actors = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: \nWriters: \n\nPlease enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        string? actors = MenuHelper.StringUtility.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: \nWriters: \n\nPlease enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
 
-        string? writers = MenuHelper.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: {actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nWriters: \n\nPlease enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        string? writers = MenuHelper.StringUtility.SelectText($"Title: {title}\nRuntime: {runtime}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nRating: {rating}\nLanguage: {language}\nRelease Date: {releaseDate}\nGenres: {genres.Count}\nCertification: {certification}\nDirectors: {directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nActors: {actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList().Count}\nWriters: \n\nPlease enter the writers seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (writers == null){return null;}
 
         return new Film(title, (int)runtime, description, (float)rating, language, selectedGenres, (DateOnly)releaseDate, (Certification)certification, directors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList(), writers.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());
@@ -66,34 +66,34 @@ public static class MediaMenu
     /// <returns>A Serie or null in case the user exists the process.</returns>
     public static Serie? CreateSerie(){
         string prompt = "Title: \nDescription: \nLanguage: \nDate: \nDirectors: \nGenres: \nCertifications: \n";
-        string? title = MenuHelper.SelectText(prompt+"Type the title of the serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.StringUtility.SelectText(prompt+"Type the title of the serie:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if(title == null){return null;}
 
         int runtime = 0;
 
         prompt = $"Title: {title}\nDescription: \nLanguage: \nDate: \nDirectors: \nGenres: \nCertifications: \n";
-        string? description = MenuHelper.SelectText(prompt+"Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? description = MenuHelper.StringUtility.SelectText(prompt+"Please enter the description:", "", true, 10, 500, @"([A-Za-z]|\ |[0-9]|\-)");
         if(description == null){return null;}
 
         float rating = 0f;
 
         prompt = $"Title: {title}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nLanguage: \nDate: \nDirectors: \nGenres: \nCertifications: \n";
-        string? language = MenuHelper.SelectText(prompt+"Please enter a language:", "", true, 0, 30);
+        string? language = MenuHelper.StringUtility.SelectText(prompt+"Please enter a language:", "", true, 0, 30);
         if(language == null){return null;}
 
         prompt = $"Title: {title}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nLanguage: {language}\nDate: \nDirectors: \nGenres: \nCertifications: \n";
-        DateOnly? date = MenuHelper.SelectDate(prompt+"Please enter the date of the movie:", true);
+        DateOnly? date = MenuHelper.DateUtility.SelectDate(prompt+"Please enter the date of the movie:", true);
         if(date == null){return null;}
 
         prompt = $"Title: {title}\nDescription: {description.Substring(0, 10) + (description.Length > 10 ? "..." : "")}\nLanguage: {language}\nDate: {date}\nDirectors: \nGenres: \nCertifications: \n";
-        string? director = MenuHelper.SelectText(prompt+"Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        string? director = MenuHelper.StringUtility.SelectText(prompt+"Please enter the directors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if(director == null){return null;}
 
         List<Genre> possibleGenres = new List<Genre>{ Genre.HORROR, Genre.ACTION, Genre.COMEDY, Genre.FAMILY, Genre.DRAMA, Genre.ADVENTURE, Genre.FANTASY, Genre.THRILLER, Genre.MYSTERY, Genre.CRIME };
-        List<Genre>? genres = MenuHelper.SelectFromEnum<Genre>(possibleGenres, "Genres", "Select one or multiple genres", "", true);
+        List<Genre>? genres = MenuHelper.EnumUtility.SelectFromEnum<Genre>(possibleGenres, "Genres", "Select one or multiple genres", "", true);
         if(genres == null){return null;}
 
-        Certification? certification = MenuHelper.SelectFromList(
+        Certification? certification = MenuHelper.ListUtility.SelectFromList(
             "Select a certification",
             true,
             new Dictionary<string, Certification>(){
@@ -124,11 +124,11 @@ public static class MediaMenu
         List<Episode> episodes = new List<Episode>();
 
         string prompt = "Title: \nSeason Number: \n";
-        string? title = MenuHelper.SelectText(prompt+"Type the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.StringUtility.SelectText(prompt+"Type the title of the season:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
         prompt = $"Title: {title}\nSeason Number: \n";
-        int? seasonNumber = MenuHelper.SelectInteger(prompt+"Please enter the season number:", "", true, 0, 0, 60);
+        int? seasonNumber = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the season number:", "", true, 0, 0, 60);
         if (seasonNumber == null){return null;}
 
         return new Season(title, (int)seasonNumber, episodes);
@@ -140,23 +140,23 @@ public static class MediaMenu
     /// <returns>The created episode.</returns>
     public static Episode? CreateEpisode(){
         string prompt = "Title: \nRuntime (Min): \nEpisode Number: \nRating: \nActors: \n";
-        string? title = MenuHelper.SelectText(prompt+"Type the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
+        string? title = MenuHelper.StringUtility.SelectText(prompt+"Type the title of the episode:", "", true, 1, 100, @"([A-Za-z]|\ |[0-9]|\-)");
         if (title == null){return null;}
 
         prompt = $"Title: {title}\nRuntime (Min): \nEpisode Number: \nRating: \nActors: \n";
-        int? runtime = MenuHelper.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
+        int? runtime = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the runtime in minutes:", "", true, 0, 0, 500);
         if (runtime == null){return null;}
 
         prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: \nRating: \nActors: \n";
-        int? episodeNumber = MenuHelper.SelectInteger(prompt+"Please enter the episode number:", "", true, 0, 0, 60);
+        int? episodeNumber = MenuHelper.IntegerUtility.SelectInteger(prompt+"Please enter the episode number:", "", true, 0, 0, 60);
         if (episodeNumber == null){return null;}
 
         prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: {episodeNumber}\nRating: \nActors: \n";
-        float? rating = (float?)MenuHelper.SelectPrice(prompt+"Please enter a rating from 1-10:", "", true, 0d, 10d);
+        float? rating = (float?)MenuHelper.PriceUtility.SelectPrice(prompt+"Please enter a rating from 1-10:", "", true, 0d, 10d);
         if (rating == null){return null;}
 
         prompt = $"Title: {title}\nRuntime (Min): {runtime}\nEpisode Number: {episodeNumber}\nRating: {rating}\nActors: \n";
-        string? actors = MenuHelper.SelectText(prompt+"Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
+        string? actors = MenuHelper.StringUtility.SelectText(prompt+"Please enter the actors seperated by comma:", "", true, 0, 500, "([a-zA-Z]|\\ |\\,)");
         if (actors == null){return null;}
 
         Episode episode = new Episode(title, (int)runtime, (int)episodeNumber, (float)rating, actors.Split(new string[]{" , "," ,",", ",","}, StringSplitOptions.RemoveEmptyEntries).ToList());

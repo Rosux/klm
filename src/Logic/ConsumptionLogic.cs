@@ -8,7 +8,7 @@ public static class ConsumptionLogic
     /// Asks the user to select an option among Edit consumption and Exit to main menu.
     /// </summary>
     public static void Consumption(){
-        MenuHelper.Table<Consumption>(
+        MenuHelper.TableUtility.Table<Consumption>(
             _consumptionAccess.ReadConsumption(),
             new Dictionary<string, Func<Consumption, object>>(){
                 {"Id", c=>c.Id},
@@ -58,7 +58,7 @@ public static class ConsumptionLogic
     /// <param name="consumption">An edited consumption to update.</param>
     /// <returnsA boolean indicating if the update went correctly.</returns>
     private static bool SaveEditedConsumption(Consumption consumption){
-        bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
+        bool confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to save the following edited data:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
         if(confirmation){
             bool success = _consumptionAccess.UpdateConsumption(consumption);
             ConsumptionMenu.ConsumptionUpdated(success);
@@ -92,10 +92,10 @@ public static class ConsumptionLogic
         }
         if (exists == true)
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}\nIt is used in one or more reservations.\n", true);
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}\nIt is used in one or more reservations.\n", true);
         }else
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following consumption:\n\nId: {consumption.Id}\nName: {consumption.Name}\nPrice: {consumption.Price}\nStartTime: {consumption.StartTime}\nEndTime: {consumption.EndTime}");
         }
         if(confirmation){
             bool success = _consumptionAccess.DeleteConsumption(consumption);
@@ -113,7 +113,7 @@ public static class ConsumptionLogic
     /// <returns>A string of the new member value.</returns>
     private static string GetValidName(Consumption previousConsumption){
         string prompt = $"Current Name: {previousConsumption.Name}\nCurrent Price: {previousConsumption.Price}\nCurrent StartTime: {previousConsumption.StartTime}\nCurrent EndTime: {previousConsumption.EndTime}\n\n";
-        string? newName = MenuHelper.SelectText(prompt+"Enter the new name of the product:", "", true, 2, 30);
+        string? newName = MenuHelper.StringUtility.SelectText(prompt+"Enter the new name of the product:", "", true, 2, 30);
         return newName ?? previousConsumption.Name;
     }
 
@@ -124,7 +124,7 @@ public static class ConsumptionLogic
     /// <returns>A string of the new member value.</returns>
     private static object GetValidPrice(Consumption previousConsumption){
         string prompt = $"Current Name: {previousConsumption.Name}\nCurrent Price: {previousConsumption.Price}\nCurrent StartTime: {previousConsumption.StartTime}\nCurrent EndTime: {previousConsumption.EndTime}\n\n";
-        double? newPrice = MenuHelper.SelectPrice(prompt+"Enter the new price of the product:", "", true);
+        double? newPrice = MenuHelper.PriceUtility.SelectPrice(prompt+"Enter the new price of the product:", "", true);
         return newPrice ?? previousConsumption.Price;
     }
 
@@ -135,7 +135,7 @@ public static class ConsumptionLogic
     /// <returns>A string of the new member value.</returns>
     private static object GetValidStartTime(Consumption previousConsumption){
         string prompt = $"Current Name: {previousConsumption.Name}\nCurrent Price: {previousConsumption.Price}\nCurrent StartTime: {previousConsumption.StartTime}\nCurrent EndTime: {previousConsumption.EndTime}\n\n";
-        TimeOnly? newStartTime = MenuHelper.SelectTime(prompt+"Enter the new start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        TimeOnly? newStartTime = MenuHelper.TimeUtility.SelectTime(prompt+"Enter the new start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
         return newStartTime ?? previousConsumption.StartTime;
     }
 
@@ -146,7 +146,7 @@ public static class ConsumptionLogic
     /// <returns>A string of the new member value.</returns>
     private static object GetValidEndTime(Consumption previousConsumption){
         string prompt = $"Current Name: {previousConsumption.Name}\nCurrent Price: {previousConsumption.Price}\nCurrent StartTime: {previousConsumption.StartTime}\nCurrent EndTime: {previousConsumption.EndTime}\n\n";
-        TimeOnly? newEndTime = MenuHelper.SelectTime(prompt+"Enter the new end time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        TimeOnly? newEndTime = MenuHelper.TimeUtility.SelectTime(prompt+"Enter the new end time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
         return newEndTime ?? previousConsumption.EndTime;
     }
 }
