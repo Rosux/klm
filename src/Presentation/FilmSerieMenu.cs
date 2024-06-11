@@ -139,7 +139,6 @@ class FilmSerieMenu
         if (serie_obj.Check_Series_exist())
         {
             SeasonLogic season_obj = new SeasonLogic();
-                        
             Console.WriteLine("Serie Id: ");
             if (int.TryParse(Console.ReadLine(), out int serie_id))
             {
@@ -152,16 +151,13 @@ class FilmSerieMenu
                     Console.WriteLine("Season to add episode: ");
                     if (int.TryParse(Console.ReadLine(), out int season_id))
                     {
-                            
                         if (season_obj.Check_Seasons(serie_id, season_id))
                         {
                             Console.WriteLine("Episode title: ");
                             string episode_title = Console.ReadLine();
-                    
                             Console.WriteLine("Episode duration(min): ");
                             if (int.TryParse(Console.ReadLine(), out int episode_duration))
                             {
-                    
                                 Episode new_episode = new Episode(episode_title, episode_duration);
                                 Console.WriteLine(season_obj.Add_Episode(new_episode, serie_id, season_id));
                             }
@@ -185,7 +181,7 @@ class FilmSerieMenu
                 else
                 {
                     Console.WriteLine($"Serie with id: {serie_id} does not exist.");
-                }       
+                }
             }
             else
             {
@@ -291,7 +287,7 @@ class FilmSerieMenu
         {
             if(filmlogic_obj.Check_films_exist())
             {
-                MenuHelper.SelectOptions("Choose what part you want to change", new Dictionary<string, Action>(){
+                MenuHelper.SelectOptions("Add a new film", new Dictionary<string, Action>(){
                 {$"Genres {Selected[0]} {Selectedmoviegenres}", ()=>{
                     Genres = GetGenres();
                     if (Genres == null)

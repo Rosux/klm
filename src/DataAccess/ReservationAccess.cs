@@ -211,7 +211,13 @@ public class ReservationAccess : DatabaseHandler
     }
 
 
-    //Check against all reservations if a room is available at a certain date.
+        /// <summary>
+        /// Checks if a room is available at a certain date/time.
+        /// </summary>
+        /// <param name="roomId">ID of the selected room.</param>
+        /// <param name="startDateTime"> given starting date/time of reservation</param>
+        /// <param name="endDateTime"> given ending date/time of reservation </param>
+        /// <returns>bool, false = conflict, room not available. True = available. </returns>
     public bool RoomAvailable(int roomId, DateTime startDateTime, DateTime endDateTime)
     {
         List<Reservation> reservations = GetAllReservations();
@@ -221,7 +227,7 @@ public class ReservationAccess : DatabaseHandler
             {
                 if (startDateTime <= reservation.EndDate && endDateTime >= reservation.StartDate)
                 {
-                    return false; 
+                    return false;
                 }
             }
         }

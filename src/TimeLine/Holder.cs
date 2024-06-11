@@ -39,7 +39,6 @@ namespace TimeLine{
         /// </summary>
         /// <param name="startTime">Start time of the new item.</param>
         /// <param name="endTime">End time of the new item.</param>
-        /// <param name="MovieOrSerie"> true = Movie, false = Serie
         /// <returns>bool Conflict, string conflicting title (for testing purposes), string conflicting time ("From ... to ...)</returns>
         public (bool Conflict, string ConflictingTitle, string ConflictingString) HasConflict(DateTime startTime, DateTime endTime)
         {
