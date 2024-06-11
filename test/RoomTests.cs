@@ -33,14 +33,15 @@ public class RoomTest
     public void InsertionTest()
     {
         var room = new Room(
-            new bool[][]
+            layout: new bool[][]
             {
                 new bool[] { false, true, true, true, false },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
-            }
+            },
+            roomname: "Insert Room"
         );
 
         Room? insertResult = r.AddRoom(room);
@@ -57,14 +58,15 @@ public class RoomTest
             {
                 int fetchedId = reader.GetInt32(0);
                 string seats = reader.GetString(2);
-                readResult.Add(new Room(fetchedId, seats));
+                string roomName = reader.GetString(3);
+                readResult.Add(new Room(fetchedId, seats, roomName));
             }
         }
         _Conn.Close();
 
         foreach (var roomcheck in readResult)
         {
-            if (roomcheck.Id == insertResult.Id && roomcheck.Capacity == insertResult.Capacity && roomcheck.Seats.Length == insertResult.Seats.Length)
+            if (roomcheck.Id == insertResult.Id && roomcheck.Capacity == insertResult.Capacity && roomcheck.Seats.Length == insertResult.Seats.Length && roomcheck.RoomName == insertResult.RoomName)
             {
                 Assert.Pass("Inserted Room found in the list.");
             }
@@ -76,21 +78,23 @@ public class RoomTest
     public void RemoveTest()
     {
         var room = new Room(
-            new bool[][]
+            layout: new bool[][]
             {
                 new bool[] { false, true, true, true, false },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
-            }
+            },
+            roomname: "Remove Room"
         );
         _Conn.Open();
-        string query = @"INSERT INTO Rooms (Capacity, Seats) VALUES (@capacity, @seats); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
+        string query = @"INSERT INTO Rooms (Capacity, Seats, RoomName) VALUES (@capacity, @seats, @roomname); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
         int roomId = -1;
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            Command.Parameters.AddWithValue("@roomname", room.RoomName);
             roomId = Convert.ToInt32(Command.ExecuteScalar());
         }
         _Conn.Close();
@@ -126,21 +130,23 @@ public class RoomTest
     public  void ReadTest()
     {
         var room = new Room(
-            new bool[][]
+            layout: new bool[][]
             {
                 new bool[] { false, true, true, true, false },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { true, true, true, true, true },
                 new bool[] { false, true, true, true, false }
-            }
+            },
+            roomname: "Read Room"
         );
         _Conn.Open();
-        string query = @"INSERT INTO Rooms (Capacity, Seats) VALUES (@capacity, @seats); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
+        string query = @"INSERT INTO Rooms (Capacity, Seats, RoomName) VALUES (@capacity, @seats, @roomname); SELECT * FROM Rooms WHERE ID = last_insert_rowid();";
         int roomId = -1;
         using(SQLiteCommand Command = new SQLiteCommand(query, _Conn)){
             Command.Parameters.AddWithValue("@capacity", room.Capacity);
             Command.Parameters.AddWithValue("@seats", JsonConvert.SerializeObject(room.Seats));
+            Command.Parameters.AddWithValue("@roomname", room.RoomName);
             roomId = Convert.ToInt32(Command.ExecuteScalar());
         }
         _Conn.Close();
@@ -149,7 +155,7 @@ public class RoomTest
 
         foreach (var roomcheck in readResult)
         {
-            if (roomcheck.Id == roomId && roomcheck.Seats.Length == room.Seats.Length)
+            if (roomcheck.Id == roomId && roomcheck.Seats.Length == room.Seats.Length && roomcheck.RoomName == room.RoomName)
             {
                 Assert.Pass("Inserted Room found in the list.");
             }

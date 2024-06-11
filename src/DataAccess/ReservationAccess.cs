@@ -209,6 +209,31 @@ public class ReservationAccess : DatabaseHandler
         }
         return newTimeLine;
     }
+
+
+        /// <summary>
+        /// Checks if a room is available at a certain date/time.
+        /// </summary>
+        /// <param name="roomId">ID of the selected room.</param>
+        /// <param name="startDateTime"> given starting date/time of reservation</param>
+        /// <param name="endDateTime"> given ending date/time of reservation </param>
+        /// <returns>bool, false = conflict, room not available. True = available. </returns>
+    public bool RoomAvailable(int roomId, DateTime startDateTime, DateTime endDateTime)
+    {
+        List<Reservation> reservations = GetAllReservations();
+        foreach (var reservation in reservations)
+        {
+            if (reservation.RoomId == roomId)
+            {
+                if (startDateTime <= reservation.EndDate && endDateTime >= reservation.StartDate)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public bool EditReservation(Reservation reservation)
     {
         _Conn.Open();
