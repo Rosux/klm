@@ -141,6 +141,12 @@ class Program
                     }
                 }
 
+                List<string> cast = new List<string>();
+                foreach(ShowCast c in x.embeds.cast)
+                {
+                    cast.Add(c.person.name);
+                }
+
                 List<Season> createdSeasons = new List<Season>();
                 foreach(ShowSeason season in seasons)
                 {
@@ -161,8 +167,8 @@ class Program
                         episode.name,
                         episode.runtime,
                         episode.number,
-                        episode.rating.average,
-                        new List<string>()
+                        (float)(Math.Round((float)episode.rating.average, 2)),
+                        cast
                     );
                     foreach(Season s in createdSeasons)
                     {

@@ -24,7 +24,7 @@ public class Season
             {
                 return 0f;
             }
-            return Episodes.Average(e => e.Rating);
+            return (float)Math.Round(Episodes.Average(e => e.Rating), 2);
         }
         set{}
     }

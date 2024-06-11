@@ -23,7 +23,7 @@ public class Serie : Media
             {
                 return 0f;
             }
-            return Seasons.Average(e => e.Rating);
+            return (float)Math.Round(Seasons.Average(e => e.Rating), 2);
         }
         set{}
     } // ranges from 0.0f to 10.0f

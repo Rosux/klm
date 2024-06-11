@@ -16,7 +16,7 @@ public struct ShowEmbed{
     public List<ShowEpisode> episodes;
     public List<ShowSeason> seasons;
     public List<ShowCrew> crew;
-    public List<ShowPerson> cast;
+    public List<ShowCast> cast;
 }
 
 public struct ShowSeason
@@ -42,6 +42,11 @@ public struct ShowRating
 public struct ShowCrew
 {
     public string type;
+    public ShowPerson person;
+}
+
+public struct ShowCast
+{
     public ShowPerson person;
 }
 
