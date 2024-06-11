@@ -101,6 +101,9 @@ public static class MediaAccess
         if(Environment.GetEnvironmentVariable("MEDIA_PATH") == null){
             throw new Exception("Environment MEDIA_PATH not set.");
         }
+        if(Environment.GetEnvironmentVariable("DATABASE_PATH") == null){
+            throw new Exception("Environment DATABASE_PATH not set.");
+        }
         // if the type is not Film or Serie dont save it
         if(typeof(T) != typeof(Film) && typeof(T) != typeof(Serie)){
             return false;

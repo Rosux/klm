@@ -11,6 +11,10 @@ public class MediaTest
             File.SetAttributes("./DataSource/Media.json", FileAttributes.Normal);
             File.Delete("./DataSource/Media.json");
         }
+        if (File.Exists("./DataSource/TEST.db"))
+        {
+            File.Delete("./DataSource/TEST.db");
+        }
         Directory.Delete("./DataSource");
     }
 
@@ -18,7 +22,7 @@ public class MediaTest
     public void Setup()
     {
         Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
-
+        Environment.SetEnvironmentVariable("DATABASE_PATH", "./DataSource/TEST.db");
         Directory.CreateDirectory("./DataSource/");
         using (File.Create("./DataSource/Media.json")) { }
 
@@ -65,7 +69,6 @@ public class MediaTest
     [Test]
     public void GetAllMedia()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
         Directory.CreateDirectory("./DataSource/");
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
         {
@@ -89,7 +92,6 @@ public class MediaTest
     [Test]
     public void GetMovie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
         Directory.CreateDirectory("./DataSource/");
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
         {
@@ -103,7 +105,6 @@ public class MediaTest
     [Test]
     public void GetSerie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
         Directory.CreateDirectory("./DataSource/");
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
         {
@@ -117,8 +118,6 @@ public class MediaTest
     [Test]
     public void EditMovie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
-
         Directory.CreateDirectory("./DataSource/");
 
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
@@ -143,8 +142,6 @@ public class MediaTest
     [Test]
     public void EditSerie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
-
         Directory.CreateDirectory("./DataSource/");
 
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
@@ -169,8 +166,6 @@ public class MediaTest
     [Test]
     public void RemoveMovie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
-
         Directory.CreateDirectory("./DataSource/");
 
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
@@ -193,8 +188,6 @@ public class MediaTest
     [Test]
     public void RemoveSerie()
     {
-        Environment.SetEnvironmentVariable("MEDIA_PATH", "./DataSource/Media.json");
-
         Directory.CreateDirectory("./DataSource/");
 
         using (StreamWriter sf = new StreamWriter("./DataSource/Media.json"))
