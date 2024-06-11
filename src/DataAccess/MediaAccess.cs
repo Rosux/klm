@@ -82,6 +82,43 @@ public static class MediaAccess
             }
         }
 
+        if(changed)
+        {
+            ReservationAccess reservationAccess = new ReservationAccess(_databasePath);
+            List<Reservation> Reservations = reservationAccess.GetAllReservations();
+            foreach(Reservation Reservation in Reservations)
+            {
+                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+                {
+                    // delete the Film if its used
+                    if(TimelineObject.Action is Film timelineFilm && media is Film editedFilm && timelineFilm.Id == editedFilm.Id)
+                    {
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                    }
+                    // delete the Episode if it exists
+                    else if(TimelineObject.Action is Episode timelineEpisode && media is Serie editedSerie)
+                    {
+                        bool episodePresent = false;
+                        foreach(Season s in editedSerie.Seasons)
+                        {
+                            foreach(Episode e in s.Episodes)
+                            {
+                                if(timelineEpisode.Title == e.Title && timelineEpisode.EpisodeNumber == e.EpisodeNumber && timelineEpisode.Id == e.Id)
+                                {
+                                    episodePresent = true;
+                                }
+                            }
+                        }
+                        if(!episodePresent)
+                        {
+                            Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        }
+                    }
+                }
+                reservationAccess.EditReservation(Reservation);
+            }
+        }
+
         // save the MediaJsonStruct to the json file
         SetMedia(mediaStructure);
 
@@ -136,13 +173,24 @@ public static class MediaAccess
             {
                 foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
                 {
-                    if(TimelineObject.Action is Film timelineFilm && ((Film)TimelineObject.Action).Id == timelineFilm.Id)
+                    // delete the Film if its used
+                    if(TimelineObject.Action is Film timelineFilm && media is Film deletedFilm && timelineFilm.Id == deletedFilm.Id)
                     {
                         Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
                     }
-                    else if(TimelineObject.Action is Serie timelineSerie && ((Film)TimelineObject.Action).Id == timelineSerie.Id)
+                    // delete the Episode if it exists
+                    else if(TimelineObject.Action is Episode timelineEpisode && media is Serie deletedSerie)
                     {
-                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                        foreach(Season s in deletedSerie.Seasons)
+                        {
+                            foreach(Episode e in s.Episodes)
+                            {
+                                if(timelineEpisode.Title == e.Title && timelineEpisode.EpisodeNumber == e.EpisodeNumber && timelineEpisode.Id == e.Id)
+                                {
+                                    Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
+                                }
+                            }
+                        }
                     }
                 }
                 reservationAccess.EditReservation(Reservation);
