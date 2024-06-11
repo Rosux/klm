@@ -68,7 +68,7 @@ class Program
         }
 
         Console.WriteLine("Fetching series...");
-        List<Serie> series = await ConvertSeries(4);
+        List<Serie> series = await ConvertSeries(200);
         Console.WriteLine("\nSaving series.");
         foreach(Serie s in series)
         {
@@ -111,7 +111,7 @@ class Program
     public static async Task<List<Serie>> ConvertSeries(int count)
     {
         List<Serie> series = new List<Serie>();
-        for(int i=1;i<=count;i++)
+        for(int i=1;series.Count<=count;i++)
         {
             Console.CursorVisible = false;
             Console.Write("");
@@ -144,32 +144,37 @@ class Program
                 List<string> cast = new List<string>();
                 foreach(ShowCast c in x.embeds.cast)
                 {
+                    if(c.person.name == null){continue;}
                     cast.Add(c.person.name);
                 }
 
+                int sn = 0;
                 List<Season> createdSeasons = new List<Season>();
                 foreach(ShowSeason season in seasons)
                 {
                     createdSeasons.Add(
                         new Season(
                             -1,
-                            season.name == "" ? $"Season {season.number}" : season.name,
-                            season.number,
+                            (season.name != null && season.name == "") ? $"Season {season.number}" : season.name,
+                            (season.number != null) ? season.number : -1,
                             new List<Episode>()
                         )
                     );
+                    sn++;
                 }
 
+                int en = 1;
                 foreach(ShowEpisode episode in episodes)
                 {
                     Episode createdEpisode = new Episode(
                         -1,
-                        episode.name,
-                        episode.runtime,
-                        episode.number,
-                        (float)(Math.Round((float)episode.rating.average, 2)),
+                        episode.name != null ? episode.name : $"#{en}",
+                        episode.uwu,
+                        episode.number != null ? episode.number : en,
+                        episode.rating.average != null ? (float)(Math.Round((float)episode.rating.average, 2)) : 0.0f,
                         cast
                     );
+                    en++;
                     foreach(Season s in createdSeasons)
                     {
                         if(s.SeasonNumber == episode.season)
@@ -211,7 +216,6 @@ class Program
 
             }else{
                 Console.WriteLine($"Serie fetch resulted in: {res.StatusCode}");
-                break;
             }
 
             client.Dispose();
