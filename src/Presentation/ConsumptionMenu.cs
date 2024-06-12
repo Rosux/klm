@@ -13,7 +13,7 @@ public static class ConsumptionMenu
 
         string Name;
         while(true){
-            string? name = MenuHelper.SelectText(prompt+"\nType the name of the product:", "", true, 2, 30);
+            string? name = MenuHelper.StringUtility.SelectText(prompt+"\nType the name of the product:", "", true, 2, 30);
             if(name == null){
                 return null;
             }
@@ -26,22 +26,22 @@ public static class ConsumptionMenu
             }
         }
         prompt = $"Name: {Name}\nPrice: \nStartTime: \nEndTime: \n";
-        double? Price = MenuHelper.SelectPrice(prompt+"\nPlease provide the price of the product:", "", true);
+        double? Price = MenuHelper.PriceUtility.SelectPrice(prompt+"\nPlease provide the price of the product:", "", true);
         if(Price == null){
             return null;
         }
         prompt = $"Name: {Name}\nPrice: {Price}\nStartTime: \nEndTime: \n";
-        TimeOnly? StartTime = MenuHelper.SelectTime(prompt+"\nPlease enter the start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        TimeOnly? StartTime = MenuHelper.TimeUtility.SelectTime(prompt+"\nPlease enter the start time of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
         if(StartTime == null){
             return null;
         }
         prompt = $"Name: {Name}\nPrice: {Price}\nStartTime: {StartTime}\nEndTime: \n";
-        TimeOnly? EndTime = MenuHelper.SelectTime(prompt+"\nPlease enter the endtime of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
+        TimeOnly? EndTime = MenuHelper.TimeUtility.SelectTime(prompt+"\nPlease enter the endtime of when the product can be ordered:", "", true, TimeOnly.MinValue, null, null);
         if(EndTime == null){
             return null;
         }
         prompt = $"Are you sure you want to save the following data:\nName: {Name}\nPrice: {Price}\nStartTime: {StartTime}\nEndTime: {EndTime}";
-        if(!MenuHelper.Confirm(prompt)){
+        if(!MenuHelper.ConfirmationUtility.Confirm(prompt)){
             return null;
         }
         Consumption consumption = new Consumption(Name, (double)Price, (TimeOnly)StartTime, (TimeOnly)EndTime);

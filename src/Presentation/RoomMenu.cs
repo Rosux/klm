@@ -16,7 +16,7 @@ public class RoomMenu
         foreach(Room r in r.GetAllRooms()){
             rooms.Add($"Name: {r.RoomName}, Id: {r.Id}, Capacity: {r.Capacity}", r);
         }
-        MenuHelper.SelectFromList("All Rooms", true, rooms);
+        MenuHelper.ListUtility.SelectFromList("All Rooms", true, rooms);
     }
 
     /// <summary>

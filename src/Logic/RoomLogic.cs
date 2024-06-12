@@ -14,7 +14,7 @@ public static class RoomLogic
         while(running)
         {
             // gives the user a UI with all options
-            MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+            MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                 {"1. Show all rooms", ()=>{
                     ShowAllRooms();
                 }},
@@ -44,7 +44,7 @@ public static class RoomLogic
             if(chosenRoom != null){
                 Console.CursorVisible = false;
                 Console.Clear();
-                Console.WriteLine(MenuHelper.PrintSeats(chosenRoom));
+                Console.WriteLine(MenuHelper.SeatUtility.PrintSeats(chosenRoom));
                 Console.ReadKey(true);
             }
         }
@@ -74,10 +74,10 @@ public static class RoomLogic
             // ask the user if they're sure they want to delete the room
             if(exists)
             {
-                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}\nThis room is planned in for 1 or more users.", true);
+                deletion = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}\nThis room is planned in for 1 or more users.", true);
             }else
             {
-                deletion = MenuHelper.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
+                deletion = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the selected room:\nId: {selectedRoom.Id}\nCapacity: {selectedRoom.Capacity}");
             }
             if(deletion){
                 // if the user answered yes remove the room and show the user if it worked or not
@@ -101,7 +101,7 @@ public static class RoomLogic
     /// <param name="seat">a interger that gives the seats for the room (only used for loop)</param>
     public static void AddRoom(int rowsGiven = 0, int seat = 0)
     {
-        string? RoomName = MenuHelper.SelectText("Give a room name", "", true, 0, 100, @"([A-z]|\d| )");
+        string? RoomName = MenuHelper.StringUtility.SelectText("Give a room name", "", true, 0, 100, @"([A-z]|\d| )");
         if (RoomName == null || RoomName.Length == 0)
         {
             return;
@@ -109,7 +109,7 @@ public static class RoomLogic
         int? givenRows = null;
         if(rowsGiven == 0)
         {
-            givenRows = MenuHelper.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 10);
+            givenRows = MenuHelper.IntegerUtility.SelectInteger("Select the amount of rows you want for the new room: ", "", true, 0, 1, 10);
         }
         else
         {
@@ -118,7 +118,7 @@ public static class RoomLogic
         if (givenRows != null)
         {
             int rows = (int)givenRows;
-            int? givenSeats = MenuHelper.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 10);
+            int? givenSeats = MenuHelper.IntegerUtility.SelectInteger($"Current amount of rows: {rows}\nSelect the amount of seats you want per row: ", "", true, 0, 1, 10);
             /// makes the layout for the room
             if (givenSeats  != null)
             {
@@ -145,7 +145,7 @@ public static class RoomLogic
                 if(roomFinished != null)
                 {
                     /// asks for conformation
-                    bool conformation = MenuHelper.Confirm($"Current room layout:\n{MenuHelper.PrintSeats(roomFinished)}\nAre you sure you want to add this room? ");
+                    bool conformation = MenuHelper.ConfirmationUtility.Confirm($"Current room layout:\n{MenuHelper.SeatUtility.PrintSeats(roomFinished)}\nAre you sure you want to add this room? ");
                     if(conformation)
                     {
                         /// if conformation is given it adds the room to the database

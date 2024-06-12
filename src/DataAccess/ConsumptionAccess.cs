@@ -1,8 +1,10 @@
 public class ConsumptionAccess : DatabaseHandler
 {
-    public static ReservationAccess _reservationAccess = new ReservationAccess();
+    private ReservationAccess? _reservationAccess = null;
 
-    public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){}
+    public ConsumptionAccess(string? DatabasePath=null) : base(DatabasePath){
+        _reservationAccess = new ReservationAccess(DatabasePath);
+    }
 
     /// <summary>
     /// Creates a new consumption item.
@@ -67,25 +69,20 @@ public class ConsumptionAccess : DatabaseHandler
             rowsAffected = Remove.ExecuteNonQuery();
             _Conn.Close();
         }
-        bool changed = false;
-        if(consumption != null)
+        List<Reservation> Reservations = _reservationAccess.GetAllReservations();
+        foreach(Reservation Reservation in Reservations)
         {
-            List<Reservation> Reservations = _reservationAccess.GetAllReservations();
-            foreach(Reservation Reservation in Reservations)
+            foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
             {
-                foreach(var TimelineObject in Reservation.TimeLine.Items.ToList())
+                if(TimelineObject.Action is Consumption)
                 {
-                    if(TimelineObject.Action is Consumption)
+                    if(((Consumption)TimelineObject.Action).Id == consumption.Id)
                     {
-                        if(((Consumption)TimelineObject.Action).Id == consumption.Id)
-                        {
-                            Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
-                        }
+                        Reservation.TimeLine.Items.Remove((TimeLine.Item)TimelineObject);
                     }
                 }
-                changed = _reservationAccess.EditReservation(Reservation);
             }
-            return changed;
+            _reservationAccess.EditReservation(Reservation);
         }
         return rowsAffected > 0;
     }

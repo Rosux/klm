@@ -133,14 +133,15 @@ public class ReservationAccess : DatabaseHandler
     /// <returns>A boolean indicating if the reservation was deleted.</returns>
     public bool DeleteReservation(Reservation reservation){
         _Conn.Open();
-        string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id ";
+        string NewQuery = @"DELETE FROM Reservations WHERE ID = @Id";
+        int rowsAffected;
         using(SQLiteCommand Remove = new SQLiteCommand(NewQuery, _Conn))
         {
             Remove.Parameters.AddWithValue("@Id", reservation.Id);
-            int rowsAffected = Remove.ExecuteNonQuery();
-            _Conn.Close();
-            return rowsAffected > 0;
+            rowsAffected = Remove.ExecuteNonQuery();
         }
+        _Conn.Close();
+        return rowsAffected > 0;
     }
 
     /// <summary>
@@ -159,27 +160,32 @@ public class ReservationAccess : DatabaseHandler
             JObject x = JObject.Parse(JsonConvert.SerializeObject(i.Action)); // <- is either a film/serie/break/consumption
             object? obj = null;
 
-            if(x.Property("Id") != null && x.Property("Genres") != null && x.Property("Original_language") != null && x.Property("Overview") != null && x.Property("Release_date") != null && x.Property("Runtime") != null && x.Property("Title") != null && x.Property("Vote_average") != null && x.Property("Certification") != null && x.Property("Directors") != null)
+            if(x.Property("Id") != null && x.Property("Title") != null && x.Property("Runtime") != null && x.Property("Description") != null && x.Property("Rating") != null && x.Property("Language") != null && x.Property("Genres") != null && x.Property("ReleaseDate") != null && x.Property("Certification") != null && x.Property("Directors") != null && x.Property("Actors") != null && x.Property("Writers") != null)
             {
                 obj = (object)new Film(
                     (int)(x.Property("Id").Value),
-                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Genres").Value.ToString()),
-                    (string)(x.Property("Original_language").Value),
-                    (string)(x.Property("Overview").Value),
-                    (string)(x.Property("Release_date").Value),
-                    (int)(x.Property("Runtime").Value),
                     (string)(x.Property("Title").Value),
-                    (double)(x.Property("Vote_average").Value),
-                    (string)(x.Property("Certification").Value),
-                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Directors").Value.ToString())
+                    (int)(x.Property("Runtime").Value),
+                    (string)(x.Property("Description").Value),
+                    (float)(x.Property("Rating").Value),
+                    (string)(x.Property("Language").Value),
+                    (List<Genre>)JsonConvert.DeserializeObject<List<Genre>>(x.Property("Genres").Value.ToString()),
+                    DateOnly.Parse((x.Property("ReleaseDate").Value.ToString())),
+                    (Certification)JsonConvert.DeserializeObject<Certification>(x.Property("Certification").Value.ToString()),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Directors").Value.ToString()),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Actors").Value.ToString()),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Writers").Value.ToString())
                 );
             }
-            else if(x.Property("Title") != null && x.Property("Length") != null && x.Property("Id") != null)
+            else if(x.Property("Id") != null && x.Property("Title") != null && x.Property("Runtime") != null && x.Property("EpisodeNumber") != null && x.Property("Rating") != null && x.Property("Actors") != null)
             {
                 obj = (object)new Episode(
                     (int)(x.Property("Id").Value),
                     (string)(x.Property("Title").Value),
-                    (int)(x.Property("Length").Value)
+                    (int)(x.Property("Runtime").Value),
+                    (int)(x.Property("EpisodeNumber").Value),
+                    (float)(x.Property("Rating").Value),
+                    (List<string>)JsonConvert.DeserializeObject<List<string>>(x.Property("Actors").Value.ToString())
                 );
             }
             else if(x.Property("Id") != null && x.Property("Name") != null && x.Property("Price") != null && x.Property("StartTime") != null && x.Property("EndTime") != null)
@@ -190,12 +196,6 @@ public class ReservationAccess : DatabaseHandler
                     (double)(x.Property("Price").Value),
                     TimeOnly.Parse((string)(x.Property("StartTime").Value)),
                     TimeOnly.Parse((string)(x.Property("EndTime").Value))
-                );
-            }
-            else if(x.Property("Time") != null)
-            {
-                obj = (object)new Break(
-                    (int)(x.Property("Time").Value)
                 );
             }
 
@@ -238,7 +238,7 @@ public class ReservationAccess : DatabaseHandler
     {
         _Conn.Open();
         int rowsAffected = -1;
-        string UpdateReservation = $@"UPDATE Reservations SET RoomId = @RoomId, UserId= @UserId, GroupSize = @GroupSize, StartDate = @StartDate, EndDate = @EndDate, Price = @Price, TimeLine = @TimeLine, Entertainments = @Entertainments WHERE ID = {reservation.Id}";
+        string UpdateReservation = $@"UPDATE Reservations SET RoomId = @RoomId, UserId= @UserId, GroupSize = @GroupSize, StartDate = @StartDate, EndDate = @EndDate, Price = @Price, TimeLine = @TimeLine, Entertainments = @Entertainments WHERE ID = @Id";
         using (SQLiteCommand Launch = new SQLiteCommand(UpdateReservation, _Conn)){
             Launch.Parameters.AddWithValue("@RoomId", reservation.RoomId);
             Launch.Parameters.AddWithValue("@UserId", reservation.UserId);

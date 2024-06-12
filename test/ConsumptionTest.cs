@@ -60,7 +60,7 @@ public class ConsumptionTest
             }
         }
         _Conn.Close();
-            
+
         foreach (var consumption in readResult)
         {
             if (consumption.Id == x.Id && consumption.Name == x.Name && consumption.Price == x.Price && consumption.StartTime == x.StartTime && consumption.EndTime == x.EndTime)
@@ -71,7 +71,7 @@ public class ConsumptionTest
 
         Assert.Fail("Inserted Consumption not found in the list.");
     }
-    
+
     [Test]
     public void RemoveTest(){
         var x = new Consumption(
@@ -96,17 +96,17 @@ public class ConsumptionTest
         _Conn.Close();
         bool removeResult = c.DeleteConsumption(x);
 
-            bool isDatabaseEmpty;
-            using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
-            {
-                _Conn.Open();
-                int rowCount = Convert.ToInt32(checkCommand.ExecuteScalar());
-                isDatabaseEmpty = rowCount == 0;
-                _Conn.Close();
-            }
+        bool isDatabaseEmpty;
+        using (SQLiteCommand checkCommand = new SQLiteCommand("SELECT COUNT(*) FROM Consumptions", _Conn))
+        {
+            _Conn.Open();
+            int rowCount = Convert.ToInt32(checkCommand.ExecuteScalar());
+            isDatabaseEmpty = rowCount == 0;
+            _Conn.Close();
+        }
 
-            if (removeResult)
-            {
+        if (removeResult)
+        {
             if (isDatabaseEmpty)
             {
                 Assert.Pass("Consumption successfully removed and database is empty.");

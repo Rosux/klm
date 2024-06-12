@@ -7,7 +7,7 @@ public static class UserLogic
     /// Asks the user to select an option among Edit user and Exit to main menu.
     /// </summary>
     public static void User(){
-        MenuHelper.Table<User>(
+        MenuHelper.TableUtility.Table<User>(
             _userAccess.GetAllUsers(),
             new Dictionary<string, Func<User, object>>(){
                 {"Id", u=>u.Id},
@@ -51,10 +51,10 @@ public static class UserLogic
             }
         if(exists)
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}\nThis user has an reservation.", true);
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}\nThis user has an reservation.", true);
         }else
         {
-            confirmation = MenuHelper.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
+            confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to delete the following user:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
         }
         if(confirmation){
             bool success = _userAccess.DeleteUser(user);
@@ -89,7 +89,7 @@ public static class UserLogic
     /// <param name="user">An edited user to update.</param>
     /// <returns>A boolean indicating if the update went correctly.</returns>
     private static bool SaveEditedUser(User user){
-        bool confirmation = MenuHelper.Confirm($"Are you sure you want to save the following edited data:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
+        bool confirmation = MenuHelper.ConfirmationUtility.Confirm($"Are you sure you want to save the following edited data:\n\nId: {user.Id}\nFirstname: {user.FirstName}\nLastname: {user.LastName}\nEmail: {user.Email}\nRole: {user.Role}");
         if(confirmation){
             bool success = _userAccess.UpdateUser(user);
             UserMenu.UserUpdated(success);
@@ -147,7 +147,7 @@ public static class UserLogic
     /// <param name="previousUser">The current user before editing any members.</param>
     /// <returns>A string of the new member value.</returns>
     private static object GetValidRole(User previousUser){
-        UserRole? roleSelection = MenuHelper.SelectFromList(
+        UserRole? roleSelection = MenuHelper.ListUtility.SelectFromList(
             "Select the new user role",
             true,
             new Dictionary<string, UserRole>(){

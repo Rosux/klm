@@ -15,7 +15,7 @@ class Menu
         while(true){
             if(Program.CurrentUser == null)
             {
-                MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                     {"Register", ()=>{
                         // run Register method
                         UserLogic.Register();
@@ -35,10 +35,10 @@ class Menu
                 bool uwu = true;
                 while(uwu)
                 {
-                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
-                        {"Manage movies/series", ()=>{
+                    MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                        {"Manage Media", ()=>{
                             // takes admin to movie editor
-                            FilmSerieMenu.UI();
+                            MediaLogic.Media();
                         }},
                         {"Consumptions", ()=>{
                             // consumption editor
@@ -69,7 +69,7 @@ class Menu
                 bool uwu = true;
                 while(uwu)
                 {
-                    MenuHelper.SelectOptions("Choose an option", new Dictionary<string, Action>(){
+                    MenuHelper.OptionsUtility.SelectOptions("Choose an option", new Dictionary<string, Action>(){
                         {"Reservations", ()=>{
                             ReservationLogic.ReservationUser();
                         }},
@@ -93,30 +93,44 @@ class Menu
         Console.Title = "TEST 24/7 BINGE WATCH CINEMA!";
         Console.CursorVisible = false;
 
-        ConsumptionAccess c = new ConsumptionAccess();
-        var x = MenuHelper.SelectFromTable(
-            c.ReadConsumption(),
-            new Dictionary<string, Func<Consumption, object>>(){
-                { "Id", (x)=>x.Id },
-                { "Name", (x)=>x.Name },
-                { "Price", (x)=>x.Price },
-                { "StartTime", (x)=>x.StartTime },
-            },
-            true,
-            true
-        );
-        var y = MenuHelper.SelectFromTable(
-            c.ReadConsumption(),
-            new Dictionary<string, Func<Consumption, object>>(){
-                { "Id", (x)=>x.Id },
-                { "Name", (x)=>x.Name },
-                { "Price", (x)=>x.Price },
-                { "StartTime", (x)=>x.StartTime },
-            },
-            true
-        );
-        Console.WriteLine(x?.Name);
-        Console.WriteLine(y?.Name);
+        MediaLogic.Media();
+        // bool x = MediaAccess.DeleteMedia(
+        //     new Serie(1, "TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>())
+        // );
+        // Console.WriteLine(x);
+
+        // MediaLogic.Media();
+        // List<Media> x = new List<Media>(){
+        //     new Film("FILM SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), new List<string>(), new List<string>()),
+        //     new Serie("TITLE SERIE", 0, "", 0f, "", new List<Genre>(), DateOnly.MinValue, Certification.NONE, new List<string>(), false, new List<Season>()),
+        // };
+        // // Console.WriteLine(x[0].Title);
+        // // Console.WriteLine(x[1].Title);
+
+        // MenuHelper.Table<Media>(
+        //     x,
+        //     new Dictionary<string, Func<Media, object>>(){
+        //         {"Title but like long af cus it breaks the ui", m=>m.Title},
+        //         {"Genre", m=>m.Genres.Count},
+        //     },
+        //     false,
+        //     true,
+        //     true,
+        //     new Dictionary<string, PropertyEditMapping<Media>>(){
+        //         {"Title", new(x=>x.Title, (Media m)=>{return "NEW TITLE:!!!!!!!!!!";})},
+        //         {"Genres", new(x=>ShowListInTable(x.Genres), x=>x.Genres, (Media m)=>{return new List<Genre>(){Genre.HORROR,Genre.ACTION,Genre.COMEDY,Genre.DRAMA};})},
+        //     },
+        //     SaveEditedMedia,
+        //     false,
+        //     null,
+        //     false,
+        //     null
+        // );
+
+        // MediaLogic.Media();
+
+        // List<Media> m = MediaAccess.GetAllMedia();
+        // MenuHelper.Table();
 
     }
 }
