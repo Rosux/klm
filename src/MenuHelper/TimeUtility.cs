@@ -13,15 +13,19 @@ namespace MenuHelper
         /// <param name="maxTime">The maximum allowed selected time.</param>
         /// <returns>A TimeOnly object containing the user selected time or null if the user cances the process.</returns>
         public static TimeOnly? SelectTime(string prefix = "", string suffix = "", bool CanCancel=false, TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
+            #region Setting the min/max/default time to valid values
             TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
             TimeOnly MaxTime = maxTime ?? TimeOnly.MaxValue;
             if(defaultTime <= MinTime){
                 defaultTime = MinTime;
             }
-            TimeOnly time = defaultTime;
-            bool hour = true;
-            ConsoleKey key;
+            #endregion
+            TimeOnly time = defaultTime; // Set the default starting time
+            bool hour = true; // Boolean indicating if the user is changing the hour or minutes
+            ConsoleKey key; // The key the user presses
+            #region Draw Loop
             do{
+                #region Console write
                 Console.CursorVisible = false;
                 Console.Clear();
                 Console.BackgroundColor = ConsoleColor.Black;
@@ -34,6 +38,8 @@ namespace MenuHelper
                 Console.Write($"{time.Minute.ToString("00")}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Write($"\n\n{suffix}");
+                #endregion
+                #region Input
                 key = Console.ReadKey(true).Key;
                 if (key == ConsoleKey.Escape && CanCancel)
                 {
@@ -51,13 +57,15 @@ namespace MenuHelper
                 }
                 if (key == ConsoleKey.UpArrow || key == ConsoleKey.DownArrow)
                 {
-                    double TimeAmount = key == ConsoleKey.DownArrow ? -1 : 1;
+                    double TimeAmount = key == ConsoleKey.DownArrow ? -1 : 1; // increment the TimeAmount
+                    // add amount to the hours/minutes of the time
                     if (hour){
                         time = time.AddHours(TimeAmount);
                     } else {
                         time = time.AddMinutes(TimeAmount);
                     }
 
+                    // clamp time value between min & max
                     if (time < MinTime){
                         time = MinTime;
                     }
@@ -65,7 +73,9 @@ namespace MenuHelper
                         time = MaxTime;
                     }
                 }
+                #endregion
             } while (key != ConsoleKey.Enter || time > MaxTime || time < MinTime);
+            #endregion
             Console.CursorVisible = false;
             Console.Clear();
             return time;
