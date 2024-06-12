@@ -11,7 +11,7 @@ namespace MenuHelper
         /// <param name="defaultTime">A TimeOnly object as starting point for the user.</param>
         /// <param name="minTime">The minimum allowed selected time.</param>
         /// <param name="maxTime">The maximum allowed selected time.</param>
-        /// <returns>A TimeOnly object containing the user selected time or null if the user cances the process.</returns>
+        /// <returns>A TimeOnly object containing the user selected time or null if the user cancels the process.</returns>
         public static TimeOnly? SelectTime(string prefix = "", string suffix = "", bool CanCancel=false, TimeOnly defaultTime = new TimeOnly(), TimeOnly? minTime = null, TimeOnly? maxTime = null){
             #region Setting the min/max/default time to valid values
             TimeOnly MinTime = minTime ?? TimeOnly.MinValue;
