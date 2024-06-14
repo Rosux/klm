@@ -106,6 +106,16 @@ public static class RoomLogic
         {
             return;
         }
+        foreach(Room room in _roomAccess.GetAllRooms())
+        {
+            if (room.RoomName == RoomName)
+            {
+                Console.WriteLine("Action cancelled\nThis room name is already in use.");
+                Console.Write($"\n\nPress any key to continue...");
+                Console.ReadKey(true);
+                return;
+            }
+        }
         int? givenRows = null;
         if(rowsGiven == 0)
         {
