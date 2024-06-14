@@ -106,16 +106,6 @@ public static class RoomLogic
         {
             return;
         }
-        foreach(Room room in _roomAccess.GetAllRooms())
-        {
-            if (room.RoomName == RoomName)
-            {
-                Console.WriteLine("Action cancelled\nThis room name is already in use.");
-                Console.Write($"\n\nPress any key to continue...");
-                Console.ReadKey(true);
-                return;
-            }
-        }
         int? givenRows = null;
         if(rowsGiven == 0)
         {
@@ -154,6 +144,17 @@ public static class RoomLogic
                 Room roomFinished = RoomLayoutManager(room, prefix, suffix, RoomName);
                 if(roomFinished != null)
                 {
+                    foreach(Room Room in _roomAccess.GetAllRooms())
+                    {
+                        if (Room.RoomName == roomFinished.RoomName && Room.Capacity == roomFinished.Capacity)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Action cancelled.\nThis room is already in use.");
+                            Console.Write($"\n\nPress any key to continue...");
+                            Console.ReadKey(true);
+                            return;
+                        }
+                    }
                     /// asks for conformation
                     bool conformation = MenuHelper.ConfirmationUtility.Confirm($"Current room layout:\n{MenuHelper.SeatUtility.PrintSeats(roomFinished)}\nAre you sure you want to add this room? ");
                     if(conformation)
